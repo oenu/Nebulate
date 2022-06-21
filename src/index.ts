@@ -23,6 +23,7 @@ connectDB();
 import logger from "./config/logger";
 import auth from "./middleware/auth";
 import globalInit from "./store/store";
+import videosFromNebula from "./Functions/videosFromNebula";
 app.use(auth);
 
 // Routes
@@ -34,8 +35,20 @@ app.get("/", (_req, res: Response) => {
 app.get("/update/:creatorSlug", async (req: Request, res: Response) => {
   const { creatorSlug } = req.params;
 
-  res.send(`Updating ${creatorSlug}`);
+  if (!creatorSlug) {
+    res.send("No creator slug provided");
+    logger.error("No creator slug provided");
+    return;
+  }
+
   logger.info(`Updating ${creatorSlug}`);
+
+  try {
+    await videosFromNebula(creatorSlug, true, 50);
+  } catch (error) {
+    logger.error(error);
+  }
+  res.send(`Updating ${creatorSlug}`);
 });
 
 // Start the server

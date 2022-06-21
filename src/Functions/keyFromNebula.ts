@@ -14,7 +14,6 @@ export const keyFromNebula = async (): Promise<string> => {
       }
     );
     logger.info("Key from Nebula");
-    logger.info(response.data.key);
     await fs.promises.writeFile(
       path.join(__dirname, "..", "store", "simple_key.txt"),
       response.data.key,

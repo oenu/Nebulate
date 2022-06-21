@@ -20,6 +20,10 @@ export const creatorSchema = new Schema(
     "zype-id": {
       type: "String",
     },
+    videos: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Video",
+    },
   },
   {
     collection: "creators",

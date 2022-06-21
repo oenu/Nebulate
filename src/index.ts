@@ -64,9 +64,14 @@ app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
   try {
     await registerCreatorInDB(creatorSlug);
     res.send(`Registered ${creatorSlug}`);
-  } catch (error) {
-    logger.error(error);
-    res.send(`Could not register ${creatorSlug}`);
+  } catch (error: any) {
+    logger.error(error.message);
+
+    if (error.message) {
+      res.send(error.message);
+    } else {
+      res.send(error);
+    }
   }
 });
 

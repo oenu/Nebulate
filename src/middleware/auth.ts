@@ -44,7 +44,7 @@ const auth = async (_req: Request, res: Response, next: NextFunction) => {
           throw error;
         }
       }
-      if (decode.iss !== "https://api.watchnebula.com/") {
+      if (decode.iss !== "api.watchnebula.com") {
         logger.error("Auth: Token Issuer Invalid");
         throw new Error("Auth: Token Issuer Invalid");
       }

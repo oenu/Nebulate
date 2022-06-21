@@ -2,10 +2,11 @@
 
 import type { Video } from "../models/video";
 import { Video as VideoModel } from "../models/video";
-
+import mongoose from "mongoose";
 // Imports
 import axios from "axios";
 import logger from "../config/logger";
+import { Creator } from "../models/creator";
 
 /**
  * Scrapes api for a creator and returns an array of video objects
@@ -20,19 +21,7 @@ export const videosFromNebula = async (
 ) => {
   let urlBuffer = "";
   let videoBuffer = [];
-
-  // TODO: Import list of known videos
-  // const videoCache = [
-  //   {
-  //     slug: "legaleagle-can-kyle-rittenhouse-sue-everyone-that-called-him-a-murderer",
-  //   },
-  //   {
-  //     slug: "legaleagle-hammering-john-oliver-on-hammer-lawyers",
-  //   },
-  //   {
-  //     slug: "legaleagle-putins-war-on-ukraine-and-international-law",
-  //   },
-  // ];
+  logger.info(`OnlyScrapeNew: ${onlyScrapeNew}`);
 
   // Default scrape limit if none is provided
   if (!videoScrapeLimit) {
@@ -142,6 +131,36 @@ export const videosFromNebula = async (
     // Save videos to database
     const mongoResponse = await VideoModel.insertMany(videosToSave);
     logger.info(`Scrape: ${mongoResponse.length} videos added to database`);
+
+    // Add video ids to the creator
+    if (mongoResponse[0]?.channel_slug) {
+      try {
+        await Creator.findOneAndUpdate(
+          {
+            slug: mongoResponse[0].channel_slug,
+          },
+          {
+            $addToSet: {
+              videos: {
+                $each: [
+                  ...mongoResponse.map(
+                    (video: any) =>
+                      new mongoose.Types.ObjectId(video._id.toString())
+                  ),
+                ],
+              },
+            },
+          }
+        );
+
+        // logger.info(updateResponse);
+        logger.info(`Scrape: ${mongoResponse.length} videos added to creator`);
+      } catch (error) {
+        logger.error(error);
+        logger.error("Scrape: Could not add video ids to creator");
+        throw new Error("Scrape: Could not add video ids to creator");
+      }
+    }
   } catch (error) {
     logger.error(error);
     logger.error("Scrape: Could not save videos");

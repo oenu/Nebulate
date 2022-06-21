@@ -63,7 +63,7 @@ const registerCreatorInDB = async (creatorSlug: string) => {
 
   // Scrape the creator's videos from Nebula and add them to the database
   try {
-    await videosFromNebula(creatorSlug, false, 10); // TODO: Change to 500
+    await videosFromNebula(creatorSlug, false, 500);
   } catch (error) {
     logger.error(`Register: Could not scrape ${creatorSlug}'s videos`);
     throw new Error(`Register: Could not scrape ${creatorSlug}'s videos`);

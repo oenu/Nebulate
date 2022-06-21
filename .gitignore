@@ -28,3 +28,5 @@ build/
 # Misc
 .DS_Store
 .env
+src/store/json_token.txt
+src/store/simple_key.txt

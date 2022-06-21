@@ -1,39 +1,60 @@
 // Middleware to refresh the JWT token
 
 import type { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../config/logger";
 import jwtFromNebula from "../Functions/jwtFromNebula";
 
-const auth = async (_req: Request, _res: Response, next: NextFunction) => {
-  const token = global.token;
-  let decode = jwt.decode(token);
-
-  if (decode === null) {
-    logger.error("Token Missing, Fetching");
-    try {
+const auth = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (global.token === undefined) {
+      logger.error("Auth: Global token undefined, fetching from Nebula");
       await jwtFromNebula();
-    } catch (error) {
-      logger.error(error);
     }
-    decode = jwt.decode(token);
+
+    let decode = jwt.decode(global.token) as JwtPayload;
+
+    // Check token
+    if (decode === null) {
+      logger.error("Auth: Token Missing, Fetching");
+      try {
+        await jwtFromNebula();
+      } catch (error) {
+        logger.error("Could not fetch JWT");
+        throw error;
+      }
+      decode = jwt.decode(token) as JwtPayload;
+    }
+
+    if (decode === undefined) {
+      logger.error("Auth: Token Invalid");
+      res.send("Auth: Token Invalid");
+    }
+
+    if (!decode.exp) {
+      logger.error("Auth: Token Without Expiration");
+      throw new Error("Auth: Token Without Expiration");
+    } else {
+      if (decode.exp < Date.now() / 1000 + 60) {
+        logger.info("Auth: Token Expired - Fetching New Token");
+        try {
+          await jwtFromNebula();
+        } catch (error) {
+          logger.error("Could not fetch JWT");
+          throw error;
+        }
+      }
+      if (decode.iss !== "https://api.watchnebula.com/") {
+        logger.error("Auth: Token Issuer Invalid");
+        throw new Error("Auth: Token Issuer Invalid");
+      }
+      // Token has passed all checks, continue
+      next();
+    }
+  } catch (error) {
+    logger.error("Auth: Error");
+    throw error;
   }
-
-  // if (decode != String && decode != undefined) {
-  // if (decode.exp! < +new Date() / 1000 + 60) {
-  console.log(decode);
-
-  // if (jwt.decode(token).exp < +new Date() / 1000 + 60) {
-  console.log("Existing key used for new token");
-  // await getToken(); // Request token
-
-  // }
-  // } catch {
-  // await apiLogin(); // Password Auth
-  // await getToken(); // Request token
-  // }
-
-  next();
 };
 
 export default auth;

@@ -17,6 +17,9 @@ export const creatorSchema = new Schema(
     description: {
       type: "String",
     },
+    "zype-id": {
+      type: "String",
+    },
   },
   {
     collection: "creators",

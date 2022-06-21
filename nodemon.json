@@ -1,0 +1,6 @@
+{
+  "ignore": ["*.test.js", "*.json", "*.txt"],
+  "execMap": {
+    "ts": "ts-node"
+  }
+}

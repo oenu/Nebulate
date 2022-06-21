@@ -1,5 +1,11 @@
 {
   "display": "Node 16 + ESM + Strictest",
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
   "compilerOptions": {
     "lib": ["es2021"],
     "module": "es2022",

@@ -1,12 +1,9 @@
-// Express server
-
-// Imports
 import express from "express";
 const app = express();
-import "dotenv/config";
 import type { Response } from "express";
+import "dotenv/config";
 
-// Set the port
+// Constants
 const port = process.env.PORT || 3000;
 
 // Mongoose
@@ -29,5 +26,5 @@ mongoose.connection.once("open", () => {
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
-  // logger.info("Connected to MongoDB");
+  logger.info("Connected to MongoDB");
 });

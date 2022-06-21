@@ -1,5 +1,9 @@
 // Express server
+
+// Imports
 import express from "express";
 const app = express();
-// Express server port
+import mongoose from "mongoose";
+
+// Set the port
 const port = process.env.PORT || 3000;

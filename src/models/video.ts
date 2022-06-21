@@ -1,3 +1,4 @@
+// Video type and model
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 

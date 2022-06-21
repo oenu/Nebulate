@@ -5,39 +5,51 @@ import axios from "axios";
 import path from "path";
 import fs from "fs";
 
-// Types
-
-// Models
-
-export const videosFromNebula = async (creatorSlug: string) => {
+export const videosFromNebula = async (
+  creatorSlug: string,
+  videoScrapeLimit?: number
+) => {
   let urlBuffer = "";
-  const videoScrapeLimit = 300;
+  let videoBuffer = [];
 
+  // Default scrape limit if none is provided
+  if (!videoScrapeLimit) {
+    videoScrapeLimit = 100;
+  }
+
+  // Get the token from the file
   const token: string = await fs.promises.readFile(
     path.join(__dirname, "..", "store", "json_token.txt"),
     "utf8"
   );
 
-  let videoBuffer = [];
-
   for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
     try {
       const url = `https://content.watchnebula.com/video/channels/${creatorSlug}/`;
       const requestUrl = urlBuffer ? urlBuffer : url;
+
       const response = await axios.get(requestUrl, {
         data: {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      if (response.status !== 200) {
+        throw new Error("Error fetching videos");
+      }
+
       videoBuffer.push(response.data.episodes.results);
       scrapedVideos += response.data.episodes.results.length;
       urlBuffer = response.data.episodes.next;
+
       if (response.data.episodes.next === null) {
         console.log("Reached end of Next-Redirects");
-        return videoBuffer;
+        break;
       }
     } catch (error) {
       throw error;
     }
   }
+  console.log("Video array length %s", videoBuffer.length);
+  return videoBuffer;
 };

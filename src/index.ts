@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request } from "express";
 const app = express();
 import type { Response } from "express";
 import "dotenv/config";
@@ -18,6 +18,13 @@ import logger from "./config/logger";
 app.get("/", (_req, res: Response) => {
   res.send("Hello World!");
   logger.info("Hello World!");
+});
+
+app.get("/update/:creatorSlug", async (req: Request, res: Response) => {
+  const { creatorSlug } = req.params;
+
+  res.send(`Updating ${creatorSlug}`);
+  logger.info(`Updating ${creatorSlug}`);
 });
 
 // Start the server

@@ -24,6 +24,7 @@ import logger from "./config/logger";
 import auth from "./middleware/auth";
 import globalInit from "./store/store";
 import videosFromNebula from "./Functions/videosFromNebula";
+import registerCreatorInDB from "./Functions/registerCreatorInDB";
 app.use(auth);
 
 // Routes
@@ -49,6 +50,24 @@ app.get("/update/:creatorSlug", async (req: Request, res: Response) => {
     logger.error(error);
   }
   res.send(`Updating ${creatorSlug}`);
+});
+
+app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
+  const { creatorSlug } = req.params;
+
+  if (!creatorSlug) {
+    res.send("No creator slug provided");
+    logger.error("No creator slug provided");
+    return;
+  }
+
+  try {
+    await registerCreatorInDB(creatorSlug);
+    res.send(`Registered ${creatorSlug}`);
+  } catch (error) {
+    logger.error(error);
+    res.send(`Could not register ${creatorSlug}`);
+  }
 });
 
 // Start the server

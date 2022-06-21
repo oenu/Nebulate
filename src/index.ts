@@ -53,6 +53,7 @@ app.get("/update/:creatorSlug", async (req: Request, res: Response) => {
 });
 
 app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
+  // TODO: Change to post
   const { creatorSlug } = req.params;
 
   if (!creatorSlug) {

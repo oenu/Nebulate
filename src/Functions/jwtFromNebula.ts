@@ -5,7 +5,7 @@ import path from "path";
 
 export const jwtFromNebula = async () => {
   const simple_key = await fs.promises.readFile(
-    path.join(__dirname, "..", "database", "simple_key.txt"),
+    path.join(__dirname, "..", "store", "simple_key.txt"),
     "utf-8"
   );
 

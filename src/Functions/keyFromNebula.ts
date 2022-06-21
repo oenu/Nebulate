@@ -18,7 +18,7 @@ export const keyFromNebula = async (): Promise<string | undefined> => {
     .then((response) => {
       fs.promises
         .writeFile(
-          path.join(__dirname, "..", "database", "simple_key.txt"),
+          path.join(__dirname, "..", "store", "simple_key.txt"),
           response.data.key,
           "utf-8"
         )

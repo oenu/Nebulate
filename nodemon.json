@@ -2,5 +2,6 @@
   "ignore": ["*.test.js", "*.json", "*.txt"],
   "execMap": {
     "ts": "ts-node"
-  }
+  },
+  "exec": "ts-node --files ./src/index.ts"
 }

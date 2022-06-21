@@ -53,3 +53,5 @@ export const videosFromNebula = async (
   console.log("Video array length %s", videoBuffer.length);
   return videoBuffer;
 };
+
+export default videosFromNebula;

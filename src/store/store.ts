@@ -38,7 +38,6 @@ const globalInit = async () => {
     // Token Handler
     if (global.token === undefined) {
       try {
-        logger.info("Global token undefined, fetching from file");
         const json_token = await fs.promises.readFile(
           path.join(__dirname, ".", "json_token.txt"),
           "utf-8"

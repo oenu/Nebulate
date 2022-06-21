@@ -1,0 +1,11 @@
+{
+  "name": "Nebulate",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "author": "Oenu",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^4.7.4"
+  },
+  "devDependencies": {}
+}

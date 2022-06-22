@@ -48,7 +48,7 @@ const youtubeVideoSchema = new Schema(
       type: "String",
     },
     // Custom Fields ==================================================
-    creatorSlug: {
+    channel_slug: {
       // "legaleagle"
       type: "String",
       index: true,

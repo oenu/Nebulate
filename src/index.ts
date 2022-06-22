@@ -35,9 +35,9 @@ app.get("/", (_req, res: Response) => {
 });
 
 app.get(
-  "/update/:creatorSlug/:onlySearchNew?/:searchLimit?",
+  "/update/:channel_slug/:onlySearchNew?/:searchLimit?",
   async (req: Request, res: Response) => {
-    const { creatorSlug } = req.params;
+    const { channel_slug } = req.params;
     const onlySearchNew = req.params.onlySearchNew
       ? req.params.onlySearchNew === "true"
       : true;
@@ -45,36 +45,36 @@ app.get(
       ? parseInt(req.params.searchLimit)
       : 10;
 
-    if (!creatorSlug) {
-      res.send("No creator slug provided");
-      logger.error("No creator slug provided");
+    if (!channel_slug) {
+      res.send("No channel_slug provided");
+      logger.error("No channel_slug provided");
       return;
     }
 
-    logger.info(`Updating ${creatorSlug}`);
+    logger.info(`Updating ${channel_slug}`);
 
     try {
-      await videosFromNebula(creatorSlug, onlySearchNew, searchLimit);
+      await videosFromNebula(channel_slug, onlySearchNew, searchLimit);
     } catch (error) {
       logger.error(error);
     }
-    res.send(`Updating ${creatorSlug}`);
+    res.send(`Updating ${channel_slug}`);
   }
 );
 
-app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
+app.get("/register/:channel_slug", async (req: Request, res: Response) => {
   // TODO: Change to post
-  const { creatorSlug } = req.params;
+  const { channel_slug } = req.params;
 
-  if (!creatorSlug) {
-    res.send("No creator slug provided");
-    logger.error("No creator slug provided");
+  if (!channel_slug) {
+    res.send("No channel_slug provided");
+    logger.error("No channel_slug provided");
     return;
   }
 
   try {
-    await registerCreatorInDB(creatorSlug);
-    res.send(`Registered ${creatorSlug}`);
+    await registerCreatorInDB(channel_slug);
+    res.send(`Registered ${channel_slug}`);
   } catch (error: any) {
     logger.error(error.message);
 
@@ -87,9 +87,9 @@ app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
 });
 
 app.get(
-  "/youtube/:creatorSlug/:onlySearchNew?/:videoScrapeLimit?",
+  "/youtube/:channel_slug/:onlySearchNew?/:videoScrapeLimit?",
   async (req: Request, res: Response) => {
-    const creatorSlug = req.params.creatorSlug;
+    const channel_slug = req.params.channel_slug;
     const onlySearchNew = req.params.onlySearchNew
       ? req.params.onlySearchNew === "true"
       : true;
@@ -97,15 +97,15 @@ app.get(
       ? parseInt(req.params.videoScrapeLimit)
       : 10;
 
-    if (!creatorSlug) {
-      res.send("No creator slug provided");
-      logger.error("No creator slug provided");
+    if (!channel_slug) {
+      res.send("No channel_slug provided");
+      logger.error("No channel_slug provided");
       return;
     }
 
     try {
-      await videosFromYoutube(creatorSlug, onlySearchNew, videoScrapeLimit);
-      res.send(`Scraped ${creatorSlug}`);
+      await videosFromYoutube(channel_slug, onlySearchNew, videoScrapeLimit);
+      res.send(`Scraped ${channel_slug}`);
     } catch (error: any) {
       logger.error(error.message);
 

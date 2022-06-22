@@ -14,24 +14,26 @@ import mongoose from "mongoose";
 const yt = youtube("v3");
 
 const videosFromYoutube = async (
-  creatorSlug: string,
+  channel_slug: string,
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
 ) => {
   // Check if creator exists
-  if (await !Creator.exists({ slug: creatorSlug })) {
-    throw new Error(`YtScrape: Creator ${creatorSlug} does not exist in DB`);
+  if (await !Creator.exists({ slug: channel_slug })) {
+    throw new Error(`YtScrape: Creator ${channel_slug} does not exist in DB`);
   }
 
   // Match the creator's slug to the creator's id
-  const creator = await Creator.findOne({ slug: creatorSlug }).select(
+  const creator = await Creator.findOne({ slug: channel_slug }).select(
     "youtube_upload_id"
   );
   console.log(creator);
   if (!creator) {
-    logger.error(`YtScrape: Creator ${creatorSlug} does not have a youtube_id`);
+    logger.error(
+      `YtScrape: Creator ${channel_slug} does not have a youtube_id`
+    );
     throw new Error(
-      `YtScrape: Creator ${creatorSlug} does not have a youtube_id`
+      `YtScrape: Creator ${channel_slug} does not have a youtube_id`
     );
   }
 
@@ -98,14 +100,14 @@ const videosFromYoutube = async (
             });
             // If no new videos were found, break the loop
             if (newVideos.length === 0) {
-              logger.info(`YtScrape: No new videos found for ${creatorSlug}`);
+              logger.info(`YtScrape: No new videos found for ${channel_slug}`);
               break;
             }
 
             // If end new videos was reached, break the loop
             if (newVideos.length && newVideos.length < newEpisodes.length) {
               logger.info(
-                `YtScrape: End of new videos reached for ${creatorSlug}`
+                `YtScrape: End of new videos reached for ${channel_slug}`
               );
               break;
             }
@@ -115,13 +117,13 @@ const videosFromYoutube = async (
             // If all videos are new, continue to the next page
             if (newVideos.length === newEpisodes.length) {
               logger.info(
-                `YtScrape: All new videos found: ${creatorSlug}, scraping again`
+                `YtScrape: All new videos found: ${channel_slug}, scraping again`
               );
             }
 
             // If no next page token, break the loop
             if (!response.data.nextPageToken) {
-              logger.info(`YtScrape: No next page token for ${creatorSlug}`);
+              logger.info(`YtScrape: No next page token for ${channel_slug}`);
               break;
             }
           }
@@ -131,19 +133,20 @@ const videosFromYoutube = async (
           console.log(response.data);
         }
       }
-
+      console.log(videoBuffer[0].contentDetails);
+      console.log(typeof videoBuffer[0].contentDetails.videoPublishedAt);
       // Convert the videoBuffer to an array of YoutubeVideo objects
       const convertedVideos = videoBuffer.map((video: any): YoutubeVideo => {
         return {
           videoId: video.contentDetails.videoId,
-          publishedAt: video.contentDetails.publishedAt,
+          publishedAt: new Date(video.contentDetails.videoPublishedAt),
           playlist_id: video.snippet.playlistId,
           channelTitle: video.snippet.channelTitle,
           title: video.snippet.title,
           channel_id: video.snippet.channelId,
           etag: video.etag,
           status: video.status.privacyStatus,
-          creatorSlug: creatorSlug,
+          channel_slug: channel_slug,
         };
       });
 
@@ -159,21 +162,25 @@ const videosFromYoutube = async (
         });
       });
 
+      console.log("Non conflicting videos: ", nonConflictingVideos.length);
+
       if (nonConflictingVideos.length === 0) {
-        logger.info(`Scrape: No new videos found for ${creatorSlug}`);
+        logger.info(
+          `YtScrape: No new videos found for ${channel_slug}, logging scrape and exiting`
+        );
 
         try {
           // If no new videos were found, update the creator's last_scraped_nebula field
           await Creator.findOneAndUpdate(
-            { slug: creatorSlug },
+            { slug: channel_slug },
             { $set: { last_scraped_youtube: new Date() } }
           );
           logger.info(
-            `YtScrape: Updated last_scraped_youtube for ${creatorSlug}`
+            `YtScrape: Updated last_scraped_youtube for ${channel_slug}`
           );
         } catch {
           logger.info(
-            `YtScrape: Couldn't update last_scraped_youtube for ${creatorSlug}`
+            `YtScrape: Couldn't update last_scraped_youtube for ${channel_slug}`
           );
         }
         return;
@@ -186,30 +193,32 @@ const videosFromYoutube = async (
         logger.info(`YtScrape: ${nonConflictingVideos.length} videos inserted`);
         // TODO: #33 Implement last_scraped_date
 
+        console.log("Mongo response: ", mongoResponse);
         // Add video ids to creator
         if (mongoResponse[0]?.channel_slug) {
           try {
             await Creator.findOneAndUpdate(
-              { slug: mongoResponse[0].creatorSlug },
+              { slug: mongoResponse[0].channel_slug },
               {
                 $addToSet: {
                   youtube_videos: {
                     $each: [
-                      ...nonConflictingVideos.map(
-                        (video: any) =>
-                          new mongoose.Types.ObjectId(video._id.toString())
-                      ),
+                      ...mongoResponse.map((video: any) => {
+                        return new mongoose.Types.ObjectId(
+                          video._id.toString()
+                        );
+                      }),
                     ],
                   },
                 },
               }
             );
             logger.info(
-              `YtScrape: Creator ${creatorSlug} youtube_videos updated`
+              `YtScrape: Creator ${channel_slug} youtube_videos updated`
             );
           } catch (error) {
             logger.error(
-              `YtScrape: Error updating youtube_videos for creator ${creatorSlug}`
+              `YtScrape: Error updating youtube_videos for creator ${channel_slug}`
             );
           }
         }
@@ -219,8 +228,8 @@ const videosFromYoutube = async (
       }
     } catch (error) {
       // TODO: #32 Clean this up
-      logger.error(`YtScrape: Error scraping ${creatorSlug}`);
-      throw new Error(`YtScrape: Error scraping ${creatorSlug}`);
+      logger.error(`YtScrape: Error scraping ${channel_slug}`);
+      throw new Error(`YtScrape: Error scraping ${channel_slug}`);
     }
   }
 };

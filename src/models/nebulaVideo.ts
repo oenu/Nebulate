@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
-const videoSchema = new Schema(
+const nebulaVideoSchema = new Schema(
   {
     id: {
       type: "String",
@@ -28,6 +28,7 @@ const videoSchema = new Schema(
     },
     channel_slug: {
       type: "String",
+      index: true,
     },
     channel_slugs: {
       type: ["String"],
@@ -43,10 +44,13 @@ const videoSchema = new Schema(
     },
   },
   {
-    collection: "videos",
+    collection: "nebulaVideos",
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );
 
-export type Video = InferSchemaType<typeof videoSchema>;
-export const Video = mongoose.model<Video>("Video", videoSchema);
+export type NebulaVideo = InferSchemaType<typeof nebulaVideoSchema>;
+export const NebulaVideo = mongoose.model<NebulaVideo>(
+  "NebulaVideo",
+  nebulaVideoSchema
+);

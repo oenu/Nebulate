@@ -5,6 +5,7 @@
   "author": "Oenu",
   "license": "MIT",
   "dependencies": {
+    "@googleapis/youtube": "^5.0.0",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",

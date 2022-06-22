@@ -1,7 +1,7 @@
 //#
 /* cSpell:disable */
 
-const creatorList = [
+const youtubeIds = [
   {
     slug: "12tone",
     title: "12tone",
@@ -1343,5 +1343,7 @@ const creatorList = [
     youtube_id: "UCaffuWQ2mLfRevosyKoz87Q",
   },
 ];
+
+export default youtubeIds;
 
 //https://www.youtube.com/results?search_query=

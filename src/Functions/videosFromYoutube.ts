@@ -18,41 +18,39 @@ const videosFromYoutube = async (
   }
 
   // Match the creator's slug to the creator's id
-  const creatorId = await Creator.findOne({ slug: creatorSlug }).select(
-    "youtube_id"
+  const creator = await Creator.findOne({ slug: creatorSlug }).select(
+    "youtube_upload_id"
   );
-  console.log(creatorId);
-  if (!creatorId) {
+  console.log(creator);
+  if (!creator) {
     logger.error(`YtScrape: Creator ${creatorSlug} does not have a youtube_id`);
     throw new Error(
       `YtScrape: Creator ${creatorSlug} does not have a youtube_id`
     );
   }
 
-  if (creatorId.youtube_id && process.env.YOUTUBE_API_KEY) {
+  // TODO: Get creators earliest video date on nebula and stop scraping before that date
+
+  if (creator.youtube_upload_id && process.env.YOUTUBE_API_KEY) {
     // get list of all channel uploads
     logger.info(`YtScrape: Getting videos for ${creatorSlug}`);
-
-    // Get channel upload playlist
-    const res = await yt.channels.list({
-      id: [creatorId.youtube_id],
+    const response = await yt.playlistItems.list({
+      playlistId: creator.youtube_upload_id,
       auth: process.env.YOUTUBE_API_KEY,
-      part: ["contentDetails"],
+      part: ["snippet", "contentDetails", "status", "id"],
+      maxResults: 20,
+      pageToken: "",
     });
-    if (res.data?.items) {
-      console.log(
-        res.data?.items[0]?.contentDetails?.relatedPlaylists?.uploads
-      );
-      console.log(videoScrapeLimit);
+    console.log(response.data);
+    console.log(videoScrapeLimit);
+    if (response.data.items) {
+      // response?.data.items.forEach((item) => {
+      //   console.log(item?.snippet?.title);
+      //   console.log(item?.snippet);
+
+      // });
+      console.log(JSON.stringify(response.data.items[0]));
     }
-    // Gets Playlists
-    // const res = await yt.playlists.list({
-    //   channelId: creatorId.youtube_id,
-    //   auth: process.env.YOUTUBE_API_KEY,
-    //   part: ["snippet", "contentDetails"],
-    // });
-    // console.log(res.data.items);
-    // console.log(videoScrapeLimit);
   }
 };
 

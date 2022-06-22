@@ -19,6 +19,10 @@ export const videosFromNebula = async (
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
 ) => {
+  if (await !Creator.exists({ slug: creatorSlug })) {
+    throw new Error(`Scrape: Creator ${creatorSlug} does not exist in DB`);
+  }
+
   let urlBuffer = "";
   let videoBuffer = [];
   logger.info(`OnlyScrapeNew: ${onlyScrapeNew}`);

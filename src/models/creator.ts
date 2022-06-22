@@ -29,6 +29,7 @@ export const creatorSchema = new Schema(
     youtube_id: {
       type: "String",
     },
+    youtube_upload_id: { type: "String" },
   },
   {
     collection: "creators",

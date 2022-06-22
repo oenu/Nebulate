@@ -33,24 +33,33 @@ app.get("/", (_req, res: Response) => {
   logger.info("Hello World!");
 });
 
-app.get("/update/:creatorSlug", async (req: Request, res: Response) => {
-  const { creatorSlug } = req.params;
+app.get(
+  "/update/:creatorSlug/?:onlySearchNew/?:searchLimit",
+  async (req: Request, res: Response) => {
+    const { creatorSlug } = req.params;
+    const onlySearchNew = req.params.onlySearchNew
+      ? req.params.onlySearchNew === "true"
+      : true;
+    const searchLimit = req.params.searchLimit
+      ? parseInt(req.params.searchLimit)
+      : 10;
 
-  if (!creatorSlug) {
-    res.send("No creator slug provided");
-    logger.error("No creator slug provided");
-    return;
+    if (!creatorSlug) {
+      res.send("No creator slug provided");
+      logger.error("No creator slug provided");
+      return;
+    }
+
+    logger.info(`Updating ${creatorSlug}`);
+
+    try {
+      await videosFromNebula(creatorSlug, onlySearchNew, searchLimit);
+    } catch (error) {
+      logger.error(error);
+    }
+    res.send(`Updating ${creatorSlug}`);
   }
-
-  logger.info(`Updating ${creatorSlug}`);
-
-  try {
-    await videosFromNebula(creatorSlug, true, 50);
-  } catch (error) {
-    logger.error(error);
-  }
-  res.send(`Updating ${creatorSlug}`);
-});
+);
 
 app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
   // TODO: Change to post

@@ -1,35 +1,31 @@
 // Scrapes api for a creator and returns an array of video objects
 
+import type { Video } from "../models/video";
+import { Video as VideoModel } from "../models/video";
+import mongoose from "mongoose";
 // Imports
 import axios from "axios";
 import logger from "../config/logger";
+import { Creator } from "../models/creator";
 
 /**
- * @param {string} creatorSlug - The creator's slug
- * @returns {Promise<any>} Returns a promise that resolves to an array of video objects
- * @memberof Functions
- * @description Scrapes api for a creator and returns an array of video objects
+ * Scrapes api for a creator and returns an array of video objects
+ * @param creatorSlug - The creator's slug
+ * @param onlyScrapeNew - If true, only scrape new videos
+ * @param videoScrapeLimit - The number of videos to scrape
  */
 export const videosFromNebula = async (
   creatorSlug: string,
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
 ) => {
+  if (await !Creator.exists({ slug: creatorSlug })) {
+    throw new Error(`Scrape: Creator ${creatorSlug} does not exist in DB`);
+  }
+
   let urlBuffer = "";
   let videoBuffer = [];
-
-  // TODO: Import list of known videos
-  const videoCache = [
-    {
-      slug: "legaleagle-can-kyle-rittenhouse-sue-everyone-that-called-him-a-murderer",
-    },
-    {
-      slug: "legaleagle-hammering-john-oliver-on-hammer-lawyers",
-    },
-    {
-      slug: "legaleagle-putins-war-on-ukraine-and-international-law",
-    },
-  ];
+  logger.info(`OnlyScrapeNew: ${onlyScrapeNew}`);
 
   // Default scrape limit if none is provided
   if (!videoScrapeLimit) {
@@ -55,6 +51,10 @@ export const videosFromNebula = async (
 
       // If onlyScrapeNew is true, check if the video is in the cache
       if (onlyScrapeNew === true) {
+        const videoCache = await VideoModel.find({
+          slug: { $in: newEpisodes.map((video: any) => video.slug) },
+        }).select("slug");
+
         const newVideos = newEpisodes.filter((video: any) => {
           return !videoCache.some((cacheVideo) => {
             return cacheVideo.slug === video.slug;
@@ -95,7 +95,83 @@ export const videosFromNebula = async (
   }
 
   console.log("Fetched: %s videos for: %s ", videoBuffer.length, creatorSlug);
-  return videoBuffer;
+
+  // Convert to video objects
+  const convertedVideos = videoBuffer.map((video: any): Video => {
+    return {
+      slug: video.slug,
+      title: video.title,
+      short_description: video.short_description,
+      duration: video.duration,
+      published_at: video.published_at,
+      channel_id: video.channel_id,
+      channel_slug: video.channel_slug,
+      channel_slugs: video.channel_slugs,
+      channel_title: video.channel_title,
+      share_url: video.share_url,
+      channel: video.channel,
+    };
+  });
+
+  // Check if videos are already in the database
+  const existingVideos = await VideoModel.find({
+    slug: { $in: convertedVideos.map((video: any) => video.slug) },
+  }).select("slug"); // Select() reduces the amount of data to be sent back from the database
+
+  // If videos are already in the database, remove them from the array
+  const videosToSave = convertedVideos.filter((video: any) => {
+    return !existingVideos.some((existingVideo: any) => {
+      return existingVideo.slug === video.slug;
+    });
+  });
+
+  if (videosToSave.length === 0) {
+    logger.info(`Scrape: No new videos found for ${creatorSlug}`);
+    return;
+  }
+
+  logger.info(`Scrape: ${videosToSave.length} un-scraped videos to be added`);
+  try {
+    // Save videos to database
+    const mongoResponse = await VideoModel.insertMany(videosToSave);
+    logger.info(`Scrape: ${mongoResponse.length} videos added to database`);
+
+    // Add video ids to the creator
+    if (mongoResponse[0]?.channel_slug) {
+      try {
+        await Creator.findOneAndUpdate(
+          {
+            slug: mongoResponse[0].channel_slug,
+          },
+          {
+            $addToSet: {
+              videos: {
+                $each: [
+                  ...mongoResponse.map(
+                    (video: any) =>
+                      new mongoose.Types.ObjectId(video._id.toString())
+                  ),
+                ],
+              },
+            },
+          }
+        );
+
+        // logger.info(updateResponse);
+        logger.info(`Scrape: ${mongoResponse.length} videos added to creator`);
+      } catch (error) {
+        logger.error(error);
+        logger.error("Scrape: Could not add video ids to creator");
+        throw new Error("Scrape: Could not add video ids to creator");
+      }
+    }
+  } catch (error) {
+    logger.error(error);
+    logger.error("Scrape: Could not save videos");
+    throw new Error("Scrape: Could not save videos");
+  }
+
+  return;
 };
 
 export default videosFromNebula;

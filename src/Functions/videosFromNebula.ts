@@ -55,26 +55,27 @@ export const videosFromNebula = async (
           slug: { $in: newEpisodes.map((video: any) => video.slug) },
         }).select("slug");
 
+        // Filter out videos that are in the cache
         const newVideos = newEpisodes.filter((video: any) => {
           return !videoCache.some((cacheVideo) => {
             return cacheVideo.slug === video.slug;
           });
         });
 
-        // If no new videos are found, break the loop
+        // If no new videos were found, break the loop
         if (newVideos.length === 0) {
           logger.info(`Scrape: No new videos found for ${creatorSlug}`);
           break;
         }
 
-        // If end of new videos is reached, break the loop
+        // If end of new videos was reached, break the loop
         if (newVideos.length > 0 && newVideos.length < newEpisodes.length) {
           logger.info(
             `Scrape: ${newVideos.length} new videos found for: ${creatorSlug}`
           );
           break;
         }
-        // If all new videos are found, continue the loop
+        // If all videos are new, continue to the next page
         if (newVideos.length === newEpisodes.length) {
           logger.info(
             `Scrape: All new videos found: ${creatorSlug}, scraping again`
@@ -82,7 +83,7 @@ export const videosFromNebula = async (
         }
       }
 
-      // If no next page is found, break the loop
+      // If no next page was found, break the loop
       if (response.data.episodes.next === null) {
         logger.info("Scrape: Reached end of Next-Redirects");
         break;
@@ -119,24 +120,26 @@ export const videosFromNebula = async (
   }).select("slug"); // Select() reduces the amount of data to be sent back from the database
 
   // If videos are already in the database, remove them from the array
-  const videosToSave = convertedVideos.filter((video: any) => {
+  const nonConflictingVideos = convertedVideos.filter((video: any) => {
     return !existingVideos.some((existingVideo: any) => {
       return existingVideo.slug === video.slug;
     });
   });
 
-  if (videosToSave.length === 0) {
+  if (nonConflictingVideos.length === 0) {
     logger.info(`Scrape: No new videos found for ${creatorSlug}`);
     return;
   }
 
-  logger.info(`Scrape: ${videosToSave.length} un-scraped videos to be added`);
+  logger.info(
+    `Scrape: ${nonConflictingVideos.length} un-scraped videos to be added`
+  );
   try {
     // Save videos to database
-    const mongoResponse = await VideoModel.insertMany(videosToSave);
+    const mongoResponse = await VideoModel.insertMany(nonConflictingVideos);
     logger.info(`Scrape: ${mongoResponse.length} videos added to database`);
 
-    // Add video ids to the creator
+    // Add video ids to creator
     if (mongoResponse[0]?.channel_slug) {
       try {
         await Creator.findOneAndUpdate(
@@ -145,7 +148,7 @@ export const videosFromNebula = async (
           },
           {
             $addToSet: {
-              videos: {
+              nebula_videos: {
                 $each: [
                   ...mongoResponse.map(
                     (video: any) =>

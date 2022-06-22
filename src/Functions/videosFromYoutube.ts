@@ -159,7 +159,27 @@ const videosFromYoutube = async (
         });
       });
 
+      if (nonConflictingVideos.length === 0) {
+        logger.info(`Scrape: No new videos found for ${creatorSlug}`);
+
+        try {
+          // If no new videos were found, update the creator's last_scraped_nebula field
+          await Creator.findOneAndUpdate(
+            { slug: creatorSlug },
+            { $set: { last_scraped_youtube: new Date() } }
+          );
+          logger.info(
+            `YtScrape: Updated last_scraped_youtube for ${creatorSlug}`
+          );
+        } catch {
+          logger.info(
+            `YtScrape: Couldn't update last_scraped_youtube for ${creatorSlug}`
+          );
+        }
+        return;
+      }
       logger.info(`YtScrape: ${nonConflictingVideos.length} videos found`);
+
       try {
         // Insert the nonConflictingVideos into the database
         const mongoResponse = await VideoModel.insertMany(nonConflictingVideos);

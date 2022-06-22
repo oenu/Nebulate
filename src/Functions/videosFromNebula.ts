@@ -128,6 +128,19 @@ export const videosFromNebula = async (
 
   if (nonConflictingVideos.length === 0) {
     logger.info(`Scrape: No new videos found for ${creatorSlug}`);
+
+    try {
+      // If no new videos were found, update the creator's last_scraped_nebula field
+      await Creator.findOneAndUpdate(
+        { slug: creatorSlug },
+        { $set: { last_scraped_nebula: new Date() } }
+      );
+      logger.info(`Scrape: Updated last_scraped_nebula for ${creatorSlug}`);
+    } catch {
+      logger.info(
+        `Scrape: Couldn't update last_scraped_nebula for ${creatorSlug}`
+      );
+    }
     return;
   }
 
@@ -156,6 +169,9 @@ export const videosFromNebula = async (
                   ),
                 ],
               },
+            },
+            $set: {
+              last_scraped_nebula: new Date(),
             },
           }
         );

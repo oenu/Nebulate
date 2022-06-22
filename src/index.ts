@@ -25,6 +25,7 @@ import auth from "./middleware/auth";
 import globalInit from "./store/store";
 import videosFromNebula from "./Functions/videosFromNebula";
 import registerCreatorInDB from "./Functions/registerCreatorInDB";
+import videosFromYoutube from "./Functions/videosFromYoutube";
 app.use(auth);
 
 // Routes
@@ -34,7 +35,7 @@ app.get("/", (_req, res: Response) => {
 });
 
 app.get(
-  "/update/:creatorSlug/?:onlySearchNew/?:searchLimit",
+  "/update/:creatorSlug/:onlySearchNew?/:searchLimit?",
   async (req: Request, res: Response) => {
     const { creatorSlug } = req.params;
     const onlySearchNew = req.params.onlySearchNew
@@ -84,6 +85,35 @@ app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
     }
   }
 });
+
+app.get(
+  "/youtube/:creatorSlug/:videoScrapeLimit?",
+  async (req: Request, res: Response) => {
+    const creatorSlug = req.params.creatorSlug;
+    const videoScrapeLimit = req.params.videoScrapeLimit
+      ? parseInt(req.params.videoScrapeLimit)
+      : 10;
+
+    if (!creatorSlug) {
+      res.send("No creator slug provided");
+      logger.error("No creator slug provided");
+      return;
+    }
+
+    try {
+      await videosFromYoutube(creatorSlug, videoScrapeLimit);
+      res.send(`Scraped ${creatorSlug}`);
+    } catch (error: any) {
+      logger.error(error.message);
+
+      if (error.message) {
+        res.send(error.message);
+      } else {
+        res.send(error);
+      }
+    }
+  }
+);
 
 // Start the server
 mongoose.connection.once("open", async () => {

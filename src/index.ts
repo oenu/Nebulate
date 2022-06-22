@@ -87,9 +87,12 @@ app.get("/register/:creatorSlug", async (req: Request, res: Response) => {
 });
 
 app.get(
-  "/youtube/:creatorSlug/:videoScrapeLimit?",
+  "/youtube/:creatorSlug/:onlySearchNew?/:videoScrapeLimit?",
   async (req: Request, res: Response) => {
     const creatorSlug = req.params.creatorSlug;
+    const onlySearchNew = req.params.onlySearchNew
+      ? req.params.onlySearchNew === "true"
+      : true;
     const videoScrapeLimit = req.params.videoScrapeLimit
       ? parseInt(req.params.videoScrapeLimit)
       : 10;
@@ -101,7 +104,7 @@ app.get(
     }
 
     try {
-      await videosFromYoutube(creatorSlug, videoScrapeLimit);
+      await videosFromYoutube(creatorSlug, onlySearchNew, videoScrapeLimit);
       res.send(`Scraped ${creatorSlug}`);
     } catch (error: any) {
       logger.error(error.message);

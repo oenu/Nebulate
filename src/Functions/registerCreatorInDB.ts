@@ -7,6 +7,7 @@ import { Creator } from "../models/creator";
 import videosFromNebula from "./videosFromNebula";
 import { youtube } from "@googleapis/youtube";
 import youtubeIds from "../config/youtubeIds";
+import videosFromYoutube from "./videosFromYoutube";
 const yt = youtube("v3");
 
 const registerCreatorInDB = async (creatorSlug: string) => {
@@ -110,8 +111,21 @@ const registerCreatorInDB = async (creatorSlug: string) => {
     await videosFromNebula(creatorSlug, false, 500);
   } catch (error) {
     // Catch for videosFromNebula
-    logger.error(`Register: Could not scrape ${creatorSlug}'s videos`);
-    throw new Error(`Register: Could not scrape ${creatorSlug}'s videos`);
+    logger.error(`Register: Could not scrape ${creatorSlug}'s Nebula videos`);
+    throw new Error(
+      `Register: Could not scrape ${creatorSlug}'s Nebula videos`
+    );
+  }
+
+  // Scrape the creator's videos from Youtube and add them to the database
+  try {
+    await videosFromYoutube(creatorSlug, false, 500);
+  } catch (error) {
+    // Catch for videosFromYoutube
+    logger.error(`Register: Could not scrape ${creatorSlug}'s Youtube videos`);
+    throw new Error(
+      `Register: Could not scrape ${creatorSlug}'s Youtube videos`
+    );
   }
 };
 

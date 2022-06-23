@@ -37,9 +37,6 @@ const youtubeVideoSchema = new Schema(
       // "UCpa-Zb0ZcQjTCPP1Dx_1M8Q"
       type: "String",
     },
-    channel: {
-      type: "Mixed",
-    },
     // Top Level Fields -------------------------------------------------------
     etag: {
       // YZNawim6aEi5f8DTA__Is2ijzx8 -- Used to identify if the video has changed
@@ -51,7 +48,7 @@ const youtubeVideoSchema = new Schema(
       type: "String",
     },
     // Custom Fields ==================================================
-    creatorSlug: {
+    channel_slug: {
       // "legaleagle"
       type: "String",
       index: true,

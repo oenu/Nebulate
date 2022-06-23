@@ -20,16 +20,24 @@ export const creatorSchema = new Schema(
     "zype-id": {
       type: "String",
     },
-    videos: [
+    nebula_videos: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Video",
+        ref: "NebulaVideo",
+      },
+    ],
+    youtube_videos: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "YoutubeVideo",
       },
     ],
     youtube_id: {
       type: "String",
     },
     youtube_upload_id: { type: "String" },
+    last_scraped_nebula: { type: "Date" },
+    last_scraped_youtube: { type: "Date" },
   },
   {
     collection: "creators",

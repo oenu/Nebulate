@@ -10,17 +10,17 @@ import { Creator } from "../models/creator";
 
 /**
  * Scrapes api for a creator and returns an array of video objects
- * @param creatorSlug - The creator's slug
+ * @param channel_slug - The creator's slug
  * @param onlyScrapeNew - If true, only scrape new videos
  * @param videoScrapeLimit - The number of videos to scrape
  */
 export const videosFromNebula = async (
-  creatorSlug: string,
+  channel_slug: string,
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
 ) => {
-  if (await !Creator.exists({ slug: creatorSlug })) {
-    throw new Error(`Scrape: Creator ${creatorSlug} does not exist in DB`);
+  if (await !Creator.exists({ slug: channel_slug })) {
+    throw new Error(`Scrape: Creator ${channel_slug} does not exist in DB`);
   }
 
   let urlBuffer = "";
@@ -34,7 +34,7 @@ export const videosFromNebula = async (
 
   for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
     try {
-      const url = `https://content.watchnebula.com/video/channels/${creatorSlug}/`;
+      const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
       const requestUrl = urlBuffer ? urlBuffer : url;
 
       // Get the next page of videos
@@ -55,34 +55,35 @@ export const videosFromNebula = async (
           slug: { $in: newEpisodes.map((video: any) => video.slug) },
         }).select("slug");
 
+        // Filter out videos that are in the cache
         const newVideos = newEpisodes.filter((video: any) => {
           return !videoCache.some((cacheVideo) => {
             return cacheVideo.slug === video.slug;
           });
         });
 
-        // If no new videos are found, break the loop
+        // If no new videos were found, break the loop
         if (newVideos.length === 0) {
-          logger.info(`Scrape: No new videos found for ${creatorSlug}`);
+          logger.info(`Scrape: No new videos found for ${channel_slug}`);
           break;
         }
 
-        // If end of new videos is reached, break the loop
+        // If end of new videos was reached, break the loop
         if (newVideos.length > 0 && newVideos.length < newEpisodes.length) {
           logger.info(
-            `Scrape: ${newVideos.length} new videos found for: ${creatorSlug}`
+            `Scrape: ${newVideos.length} new videos found for: ${channel_slug}`
           );
           break;
         }
-        // If all new videos are found, continue the loop
+        // If all videos are new, continue to the next page
         if (newVideos.length === newEpisodes.length) {
           logger.info(
-            `Scrape: All new videos found: ${creatorSlug}, scraping again`
+            `Scrape: All new videos found: ${channel_slug}, scraping again`
           );
         }
       }
 
-      // If no next page is found, break the loop
+      // If no next page was found, break the loop
       if (response.data.episodes.next === null) {
         logger.info("Scrape: Reached end of Next-Redirects");
         break;
@@ -94,7 +95,9 @@ export const videosFromNebula = async (
     }
   }
 
-  console.log("Fetched: %s videos for: %s ", videoBuffer.length, creatorSlug);
+  logger.info(
+    `Scrape: Scrape found ${videoBuffer.length} Nebula videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
+  );
 
   // Convert to video objects
   const convertedVideos = videoBuffer.map((video: any): NebulaVideo => {
@@ -103,7 +106,7 @@ export const videosFromNebula = async (
       title: video.title,
       short_description: video.short_description,
       duration: video.duration,
-      published_at: video.published_at,
+      published_at: new Date(video.published_at),
       channel_id: video.channel_id,
       channel_slug: video.channel_slug,
       channel_slugs: video.channel_slugs,
@@ -119,24 +122,39 @@ export const videosFromNebula = async (
   }).select("slug"); // Select() reduces the amount of data to be sent back from the database
 
   // If videos are already in the database, remove them from the array
-  const videosToSave = convertedVideos.filter((video: any) => {
+  const nonConflictingVideos = convertedVideos.filter((video: any) => {
     return !existingVideos.some((existingVideo: any) => {
       return existingVideo.slug === video.slug;
     });
   });
 
-  if (videosToSave.length === 0) {
-    logger.info(`Scrape: No new videos found for ${creatorSlug}`);
+  if (nonConflictingVideos.length === 0) {
+    logger.info(`Scrape: No new videos found for ${channel_slug}`);
+
+    try {
+      // If no new videos were found, update the creator's last_scraped_nebula field
+      await Creator.findOneAndUpdate(
+        { slug: channel_slug },
+        { $set: { last_scraped_nebula: new Date() } }
+      );
+      logger.info(`Scrape: Updated last_scraped_nebula for ${channel_slug}`);
+    } catch {
+      logger.info(
+        `Scrape: Couldn't update last_scraped_nebula for ${channel_slug}`
+      );
+    }
     return;
   }
 
-  logger.info(`Scrape: ${videosToSave.length} un-scraped videos to be added`);
+  logger.info(
+    `Scrape: ${nonConflictingVideos.length} un-scraped videos to be added`
+  );
   try {
     // Save videos to database
-    const mongoResponse = await VideoModel.insertMany(videosToSave);
+    const mongoResponse = await VideoModel.insertMany(nonConflictingVideos);
     logger.info(`Scrape: ${mongoResponse.length} videos added to database`);
 
-    // Add video ids to the creator
+    // Add video ids to creator
     if (mongoResponse[0]?.channel_slug) {
       try {
         await Creator.findOneAndUpdate(
@@ -145,7 +163,7 @@ export const videosFromNebula = async (
           },
           {
             $addToSet: {
-              videos: {
+              nebula_videos: {
                 $each: [
                   ...mongoResponse.map(
                     (video: any) =>
@@ -153,6 +171,9 @@ export const videosFromNebula = async (
                   ),
                 ],
               },
+            },
+            $set: {
+              last_scraped_nebula: new Date(),
             },
           }
         );

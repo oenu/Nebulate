@@ -16,28 +16,28 @@ import Fuse from "fuse.js";
  */
 const matchVideos = async (
   channel_slug: string,
+  rematch_all?: boolean,
   rematch_nebula_slug?: Array<string>,
-  rematch_yt_id?: Array<string>,
-  rematch_all?: boolean
+  rematch_yt_id?: Array<string>
 ) => {
-  logger.log(`Matching videos for ${channel_slug}`);
+  logger.info(`Matching videos for ${channel_slug}`);
   console.log(rematch_nebula_slug, rematch_yt_id, rematch_all); // Temp
 
   // Check for creator slug
-  try {
-    if (await Creator.exists({ slug: channel_slug })) {
-      throw new Error(`Register: Creator ${channel_slug} already exists in DB`);
-    }
-  } catch (error) {
-    throw error;
+  if (await !Creator.exists({ slug: channel_slug })) {
+    throw new Error(`Match: Creator ${channel_slug} doesn't exist in database`);
   }
 
   // Get creator
   const creator = await Creator.findOne({ slug: channel_slug });
   if (!creator) {
-    throw new Error(`Register: Creator ${channel_slug} not found in DB`);
+    throw new Error(`Match: Creator ${channel_slug} not found in DB`);
   }
-  console.log(creator); // Temp
+
+  // Check to see if creator has youtube id
+  if (!creator.youtube_id) {
+    throw new Error(`Match: Creator ${channel_slug} has no youtube id`);
+  }
 
   // Check the last time the creator's nebula videos were scraped
   const { last_scraped_nebula, last_scraped_youtube } = creator;
@@ -167,3 +167,5 @@ const matchVideos = async (
   logger.info(`Match: Found ${matched_videos.length} possible matching videos`);
   logger.verbose(matched_videos);
 };
+
+export default matchVideos;

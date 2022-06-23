@@ -62,6 +62,11 @@ const youtubeVideoSchema = new Schema(
       type: "String",
       index: true,
     },
+    matched: {
+      type: "Boolean",
+      index: true,
+      default: false,
+    },
   },
   {
     collection: "youtubeVideos",

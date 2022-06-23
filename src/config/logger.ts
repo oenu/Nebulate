@@ -2,9 +2,9 @@ const winston = require("winston");
 import path from "path";
 import { format } from "winston";
 
-const verboseFormat = format.printf(({ level }) => {
-  return `${level}: Verbose message`;
-});
+// const verboseFormat = format.printf(() => {
+//   return `Verbose message`;
+// });
 
 const logger = winston.createLogger({
   // defaultMeta: { service: "user-service" },
@@ -57,10 +57,12 @@ if (process.env.NODE_ENV !== "production") {
         format((info: any) => {
           return info.level === "verbose" ? info : false;
         })(),
-        verboseFormat,
+        // verboseFormat,
+        // winston.format.colorize(),
+        // winston.format.prettyPrint(),
+        // winston.format.simple()
         winston.format.colorize(),
-        winston.format.prettyPrint(),
-        winston.format.simple()
+        winston.format.printf((log: any) => `${log.level}: Wrote to file`)
       ),
       timestamp: true,
       filename: path.join(__dirname, "..", "/logs", "verbose.log"),

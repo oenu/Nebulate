@@ -38,6 +38,7 @@ export const creatorSchema = new Schema(
     youtube_upload_id: { type: "String" },
     last_scraped_nebula: { type: "Date" },
     last_scraped_youtube: { type: "Date" },
+    last_matched: { type: "Date" },
   },
   {
     collection: "creators",

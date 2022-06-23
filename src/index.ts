@@ -122,9 +122,8 @@ app.get(
 mongoose.connection.once("open", async () => {
   // Initialize global variables
   await globalInit();
-  console.log("Connected to MongoDB");
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
   logger.info("Connected to MongoDB");
+  app.listen(port, () => {
+    logger.info(`Server is running on port ${port}`);
+  });
 });

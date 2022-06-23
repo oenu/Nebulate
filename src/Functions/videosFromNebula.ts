@@ -95,7 +95,9 @@ export const videosFromNebula = async (
     }
   }
 
-  console.log("Fetched: %s videos for: %s ", videoBuffer.length, channel_slug);
+  logger.info(
+    `Scrape: Scrape found ${videoBuffer.length} Nebula videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
+  );
 
   // Convert to video objects
   const convertedVideos = videoBuffer.map((video: any): NebulaVideo => {

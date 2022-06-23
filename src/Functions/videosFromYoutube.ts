@@ -135,6 +135,11 @@ const videosFromYoutube = async (
       }
       console.log(videoBuffer[0].contentDetails);
       console.log(typeof videoBuffer[0].contentDetails.videoPublishedAt);
+
+      logger.info(
+        `YtScrape: Scrape found ${videoBuffer.length} YT videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
+      );
+
       // Convert the videoBuffer to an array of YoutubeVideo objects
       const convertedVideos = videoBuffer.map((video: any): YoutubeVideo => {
         return {

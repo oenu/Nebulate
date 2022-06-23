@@ -119,7 +119,7 @@ const registerCreatorInDB = async (creatorSlug: string) => {
 
   // Scrape the creator's videos from Youtube and add them to the database
   try {
-    await videosFromYoutube(creatorSlug, false, 500);
+    await videosFromYoutube(creatorSlug, false, 20); // HACK: Change to 500
   } catch (error) {
     // Catch for videosFromYoutube
     logger.error(`Register: Could not scrape ${creatorSlug}'s Youtube videos`);

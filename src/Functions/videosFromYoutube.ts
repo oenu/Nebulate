@@ -8,7 +8,7 @@ import { youtube } from "@googleapis/youtube";
 import {
   YoutubeVideo as VideoModel,
   YoutubeVideo,
-} from "../models/youtubeVido";
+} from "../models/youtubeVideo";
 import mongoose from "mongoose";
 
 const yt = youtube("v3");

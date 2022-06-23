@@ -112,7 +112,7 @@ const videosFromYoutube = async (
               break;
             }
 
-            console.log("Newvideos length: ", newVideos.length);
+            console.log("NewVideos length: ", newVideos.length);
             console.log("NewEpisodes length: ", newEpisodes.length);
             // If all videos are new, continue to the next page
             if (newVideos.length === newEpisodes.length) {

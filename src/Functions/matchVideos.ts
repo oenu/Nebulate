@@ -21,7 +21,6 @@ const matchVideos = async (
   rematch_yt_id?: Array<string>
 ) => {
   logger.info(`Matching videos for ${channel_slug}`);
-  console.log(rematch_nebula_slug, rematch_yt_id, rematch_all); // Temp
 
   // Check for creator slug
   if (await !Creator.exists({ slug: channel_slug })) {
@@ -119,6 +118,7 @@ const matchVideos = async (
     }
   }
 
+  logger.verbose(nebula_videos[0]);
   // Match youtube videos to nebula videos using fuse.js sorted by score
   const fuse = new Fuse(nebula_videos, {
     keys: ["title"],
@@ -131,31 +131,40 @@ const matchVideos = async (
   // Match youtube videos to nebula videos
   const matched_videos = youtube_videos.map((youtube_video: any) => {
     const match = fuse.search(youtube_video.title);
-
+    let bestMatch: any = {};
     if (match.length === 0) {
       // No match returned from fuse.js, return null
-      return null;
+      return;
     } else if (match.length === 1) {
+      bestMatch = match[0];
       // If there is only one match, return it regardless of whether it has already been matched to any other video
-      return match[0];
-    }
-    // If there are multiple matches, rank them by match and score and return the best match
-    else if (match.length > 1) {
+    } else if (match.length > 1) {
+      // If there are multiple matches, rank them by match and score and return the best match
       const previouslyUnmatched = match.filter((match: any) => {
         return !match.item.matched;
       });
 
       // If there are no previously unmatched matches, return the first video
       if (previouslyUnmatched.length > 0) {
-        return previouslyUnmatched[0];
+        bestMatch = previouslyUnmatched[0];
       } else {
         // If removing matched videos returns no videos, return the first original video regardless of whether it has already been matched to any other video
-        return match[0];
+        bestMatch = match[0];
       }
     } else {
       throw new Error(
         `Match: Error matching youtube video ${youtube_video.videoId}`
       );
+    }
+    if (bestMatch.item) {
+      logger.info("Item matched with score: " + bestMatch.score);
+      return {
+        youtube_video: bestMatch.item,
+        nebula_video: nebula_videos[bestMatch.refIndex],
+        score: bestMatch.score,
+      };
+    } else {
+      return;
     }
   });
 

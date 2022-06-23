@@ -102,6 +102,7 @@ export const videosFromNebula = async (
   // Convert to video objects
   const convertedVideos = videoBuffer.map((video: any): NebulaVideo => {
     return {
+      id: video.id,
       slug: video.slug,
       title: video.title,
       short_description: video.short_description,

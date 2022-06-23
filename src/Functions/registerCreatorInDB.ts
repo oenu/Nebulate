@@ -10,15 +10,15 @@ import youtubeIds from "../config/youtubeIds";
 import videosFromYoutube from "./videosFromYoutube";
 const yt = youtube("v3");
 
-const registerCreatorInDB = async (creatorSlug: string) => {
+const registerCreatorInDB = async (channel_slug: string) => {
   // Check if creator exists in DB
   try {
-    if (await Creator.exists({ slug: creatorSlug })) {
-      throw new Error(`Register: Creator ${creatorSlug} already exists in DB`);
+    if (await Creator.exists({ slug: channel_slug })) {
+      throw new Error(`Register: Creator ${channel_slug} already exists in DB`);
     }
   } catch (error) {
     logger.error(error);
-    logger.info(`Register: Creator ${creatorSlug} already exists in DB`);
+    logger.info(`Register: Creator ${channel_slug} already exists in DB`);
     throw error;
   }
 
@@ -27,7 +27,7 @@ const registerCreatorInDB = async (creatorSlug: string) => {
   let response;
   try {
     // Get creator data from Nebula
-    const url = `https://content.watchnebula.com/video/channels/${creatorSlug}/`;
+    const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
     response = await axios.get(url, {
       data: {
         Authorization: `Bearer ${token}`,
@@ -35,22 +35,22 @@ const registerCreatorInDB = async (creatorSlug: string) => {
     });
   } catch (error: any) {
     if (error?.code === "ERR_BAD_REQUEST") {
-      logger.error(`Register: ${creatorSlug} not valid slug`);
-      throw new Error(`Register: ${creatorSlug} not valid slug`);
+      logger.error(`Register: ${channel_slug} not valid slug`);
+      throw new Error(`Register: ${channel_slug} not valid slug`);
     }
-    logger.info(`Register: Creator ${creatorSlug} does not exist in Nebula`);
+    logger.info(`Register: Creator ${channel_slug} does not exist in Nebula`);
     throw error;
   }
 
   try {
     // Get Creator Youtube_id from lookup table
     const creatorYtId = youtubeIds.find(
-      (creator) => creator.slug === creatorSlug
+      (creator) => creator.slug === channel_slug
     )?.youtube_id;
 
     if (!creatorYtId) {
       throw new Error(
-        `Register: Creator ${creatorSlug} does not exist in youtube mapping`
+        `Register: Creator ${channel_slug} does not exist in youtube mapping`
       );
     }
 
@@ -76,7 +76,7 @@ const registerCreatorInDB = async (creatorSlug: string) => {
       try {
         // Create new creator document in DB
         if (res.data?.items) {
-          logger.info(`Adding ${creatorSlug} to the database`);
+          logger.info(`Adding ${channel_slug} to the database`);
           await Creator.create({
             id: response.data.details.id,
             slug: response.data.details.slug,
@@ -92,9 +92,9 @@ const registerCreatorInDB = async (creatorSlug: string) => {
       } catch (error) {
         // Catch for creating creator document in DB
         logger.error(error);
-        logger.error(`Register: Could not add ${creatorSlug} to the database`);
+        logger.error(`Register: Could not add ${channel_slug} to the database`);
         throw new Error(
-          `Register: Could not add ${creatorSlug} to the database`
+          `Register: Could not add ${channel_slug} to the database`
         );
       }
     }
@@ -104,27 +104,27 @@ const registerCreatorInDB = async (creatorSlug: string) => {
   }
 
   // Scrape the creator's videos
-  logger.info(`Register: Scraping ${creatorSlug}'s videos`);
+  logger.info(`Register: Scraping ${channel_slug}'s videos`);
 
   // Scrape the creator's videos from Nebula and add them to the database
   try {
-    await videosFromNebula(creatorSlug, false, 500);
+    await videosFromNebula(channel_slug, false, 500);
   } catch (error) {
     // Catch for videosFromNebula
-    logger.error(`Register: Could not scrape ${creatorSlug}'s Nebula videos`);
+    logger.error(`Register: Could not scrape ${channel_slug}'s Nebula videos`);
     throw new Error(
-      `Register: Could not scrape ${creatorSlug}'s Nebula videos`
+      `Register: Could not scrape ${channel_slug}'s Nebula videos`
     );
   }
 
   // Scrape the creator's videos from Youtube and add them to the database
   try {
-    await videosFromYoutube(creatorSlug, false, 20); // HACK: Change to 500
+    await videosFromYoutube(channel_slug, false, 20); // HACK: Change to 500
   } catch (error) {
     // Catch for videosFromYoutube
-    logger.error(`Register: Could not scrape ${creatorSlug}'s Youtube videos`);
+    logger.error(`Register: Could not scrape ${channel_slug}'s Youtube videos`);
     throw new Error(
-      `Register: Could not scrape ${creatorSlug}'s Youtube videos`
+      `Register: Could not scrape ${channel_slug}'s Youtube videos`
     );
   }
 };

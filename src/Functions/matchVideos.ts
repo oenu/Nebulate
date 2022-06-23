@@ -129,7 +129,10 @@ const matchVideos = async (
   });
 
   // Match youtube videos to nebula videos
-  const matched_videos = youtube_videos.map((youtube_video: any) => {
+  logger.info(
+    `Match: Matching ${youtube_videos.length} youtube videos against ${nebula_videos.length} nebula videos`
+  );
+  const matchedArray = youtube_videos.map((youtube_video: any) => {
     const match = fuse.search(youtube_video.title);
     let bestMatch: any = {};
     if (match.length === 0) {
@@ -139,7 +142,13 @@ const matchVideos = async (
       bestMatch = match[0];
       // If there is only one match, return it regardless of whether it has already been matched to any other video
     } else if (match.length > 1) {
+      // override if rematching all
+      if (rematch_all) {
+        return match[0];
+      }
+      
       // If there are multiple matches, rank them by match and score and return the best match
+
       const previouslyUnmatched = match.filter((match: any) => {
         return !match.item.matched;
       });
@@ -157,24 +166,41 @@ const matchVideos = async (
       );
     }
     if (bestMatch.item) {
-      logger.info("Item matched with score: " + bestMatch.score);
+      // logger.info("Item matched with score: " + bestMatch.score);
       return {
         youtube_video: bestMatch.item,
         nebula_video: nebula_videos[bestMatch.refIndex],
         score: bestMatch.score,
       };
     } else {
-      return;
+      return undefined;
     }
+  });
+
+  // Remove null values
+  const matched_videos = matchedArray.filter((video): video is any => {
+    return video !== undefined;
   });
 
   if (matched_videos.length === 0) {
     logger.error(`Match: No videos matched for ${channel_slug}`);
     return;
   }
-
-  logger.info(`Match: Found ${matched_videos.length} possible matching videos`);
   logger.verbose(matched_videos);
+  logger.info(
+    `Match: Found ${matched_videos.length} possible matched videos for ${channel_slug}`
+  );
+
+    // Send matches to database
+    matched_videos.forEach(async (matched_video: any) => {
+      const { youtube_video, nebula_video, score } = matched_video;
+      // Dual match if perfect
+      if (score === 0 && ) {
+        await NebulaVideos.findOneAndUpdate(
+
+
+
+
 };
 
 export default matchVideos;

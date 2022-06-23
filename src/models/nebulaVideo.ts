@@ -6,6 +6,7 @@ const nebulaVideoSchema = new Schema(
   {
     id: {
       type: "String",
+      index: true,
     },
     slug: {
       type: "String",

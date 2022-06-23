@@ -26,6 +26,7 @@ import globalInit from "./store/store";
 import videosFromNebula from "./Functions/videosFromNebula";
 import registerCreatorInDB from "./Functions/registerCreatorInDB";
 import videosFromYoutube from "./Functions/videosFromYoutube";
+import matchVideos from "./Functions/matchVideos";
 app.use(auth);
 
 // Routes
@@ -114,6 +115,40 @@ app.get(
       } else {
         res.send(error);
       }
+    }
+  }
+);
+
+app.get(
+  "/match/:channel_slug/:rematch_all?/:rematch_nebula_slug?/:rematch_yt_id?",
+  async (req: Request, res: Response) => {
+    const channel_slug = req.params.channel_slug;
+    const rematch_all = req.params?.rematch_all === "true" ? true : false;
+
+    // HACK: #40
+    const rematch_nebula_slug = req.params?.rematch_nebula_slug
+      ? [req.params.rematch_nebula_slug]
+      : undefined;
+    const rematch_yt_id = req.params?.rematch_yt_id
+      ? [req.params.rematch_yt_id]
+      : undefined;
+
+    // TODO: #39 Change to post and change to body parser
+    if (!channel_slug) {
+      res.send("No channel_slug provided");
+      logger.error("No channel_slug provided");
+      return;
+    }
+    try {
+      await matchVideos(
+        channel_slug,
+        rematch_all,
+        rematch_nebula_slug,
+        rematch_yt_id
+      );
+    } catch (error: any) {
+      logger.error(error.message);
+      throw error;
     }
   }
 );

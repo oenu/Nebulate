@@ -112,7 +112,7 @@ const videosFromYoutube = async (
               break;
             }
 
-            console.log("Newvideos length: ", newVideos.length);
+            console.log("NewVideos length: ", newVideos.length);
             console.log("NewEpisodes length: ", newEpisodes.length);
             // If all videos are new, continue to the next page
             if (newVideos.length === newEpisodes.length) {
@@ -168,7 +168,7 @@ const videosFromYoutube = async (
         });
       });
 
-      console.log("Non conflicting videos: ", nonConflictingVideos.length);
+      // console.log("Non conflicting videos: ", nonConflictingVideos.length);
 
       if (nonConflictingVideos.length === 0) {
         logger.info(
@@ -199,7 +199,6 @@ const videosFromYoutube = async (
         logger.info(`YtScrape: ${nonConflictingVideos.length} videos inserted`);
         // TODO: #33 Implement last_scraped_date
 
-        console.log("Mongo response: ", mongoResponse);
         // Add video ids to creator
         if (mongoResponse[0]?.channel_slug) {
           try {

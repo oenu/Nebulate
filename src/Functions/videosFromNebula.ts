@@ -113,7 +113,7 @@ export const videosFromNebula = async (
       channel_slugs: video.channel_slugs,
       channel_title: video.channel_title,
       share_url: video.share_url,
-      channel: video.channel,
+      matched: false,
     };
   });
 

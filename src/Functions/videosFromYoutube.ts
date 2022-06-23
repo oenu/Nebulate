@@ -152,6 +152,7 @@ const videosFromYoutube = async (
           etag: video.etag,
           status: video.status.privacyStatus,
           channel_slug: channel_slug,
+          matched: false,
         };
       });
 

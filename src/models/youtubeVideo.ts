@@ -126,20 +126,16 @@ youtubeVideoSchema.methods.updateMatch = async function (
   matchStrength: number
 ): Promise<void> {
   if (this.nebula_video_object_id !== nebulaVideo._id) {
-    // remove the old match
     const oldNebulaVideo = await NebulaVideo.findById(
       this.nebula.video_object_id
     );
     if (oldNebulaVideo) {
-      await oldNebulaVideo.removeMatch(nebulaVideo);
+      if (oldNebulaVideo.match_strength) {
+        if (matchStrength > oldNebulaVideo.match_strength) return;
+        await oldNebulaVideo.removeMatch(nebulaVideo);
+      }
     }
-
-    // Set the new match
     await this.setMatch(nebulaVideo, matchStrength);
-  } else {
-    // update the match strength
-    this.match_strength = matchStrength;
-    await this.save();
   }
 };
 

@@ -33,10 +33,13 @@ interface NebulaVideoInterface {
 }
 
 interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
-  setMatch: (youtubeVideo: YoutubeVideoType, strength: number) => Promise<void>;
+  setMatch: (
+    youtubeVideo: YoutubeVideoType,
+    matchStrength: number
+  ) => Promise<void>;
   updateMatch: (
     youtubeVideo: YoutubeVideoType,
-    strength: number
+    matchStrength: number
   ) => Promise<void>;
   removeMatch: (nebulaVideo?: NebulaVideoType) => Promise<void>;
   findByNebulaVideoId: (nebulaVideoId: string) => Promise<NebulaVideoType>;
@@ -121,7 +124,7 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
 /**
  * Set a the nebula videos match parameters to a youtube video
  * @param youtubeVideo YoutubeVideoType The youtube video to match to
- * @param strength number The strength of the match
+ * @param matchStrength number The strength of the match
  * @returns {Promise<void>}
  * @memberof NebulaVideo
  */
@@ -139,6 +142,7 @@ nebulaVideoSchema.methods.setMatch = async function (
 /**
  * Update the match parameters of a nebula video
  * Note: This will remove the match from the old youtube video if it exists
+ * Note: If provided with a strength below zero it will always override the match
  * @param youtubeVideo  YoutubeVideoType The youtube video to match to
  * @param strength  number of strength of the match (lower is better)
  * @returns {Promise<void>}
@@ -146,25 +150,20 @@ nebulaVideoSchema.methods.setMatch = async function (
  */
 nebulaVideoSchema.methods.updateMatch = async function (
   youtubeVideo: YoutubeVideoType,
-  strength: number
+  matchStrength: number
 ) {
   // Check to see if the new video is the same as the old one
   if (this.youtube_video_object_id !== youtubeVideo._id) {
-    // remove the old match
-
     const oldYoutubeVideo = await YoutubeVideo.findById(
       this.youtube_video_object_id
     );
     if (oldYoutubeVideo) {
-      await oldYoutubeVideo.removeMatch(youtubeVideo);
+      if (oldYoutubeVideo.match_strength) {
+        if (matchStrength > oldYoutubeVideo?.match_strength) return;
+        await oldYoutubeVideo.removeMatch(youtubeVideo);
+      }
     }
-
-    // set the new match
-    await this.setMatch(youtubeVideo, strength);
-  } else {
-    // update the match strength
-    this.match_strength = strength;
-    await this.save();
+    await this.setMatch(youtubeVideo, matchStrength);
   }
 };
 

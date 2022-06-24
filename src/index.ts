@@ -17,6 +17,7 @@ declare global {
 // Mongoose
 import mongoose from "mongoose";
 import { connectDB } from "./config/dbConfig";
+import { NebulaVideo } from "./models/nebulaVideo";
 connectDB();
 
 // Middleware
@@ -158,6 +159,20 @@ app.get(
 app.get("/database", async (_req: Request, res: Response) => {
   await generateDatabase();
   res.send("Generated database");
+});
+
+app.get("/lookup/:youtube_video_id", async (_req: Request, res: Response) => {
+  const youtube_video_id = _req.params.youtube_video_id;
+  if (!youtube_video_id) {
+    res.send("No youtube_video_id provided");
+  } else {
+    const video = await NebulaVideo.findOne({
+      youtube_video_id: youtube_video_id,
+    }).lean();
+    if (video) {
+      res.send(video.slug);
+    }
+  }
 });
 
 // Start the server

@@ -120,10 +120,9 @@ app.get(
 );
 
 app.get(
-  "/match/:channel_slug/:rematch_all?/:rematch_nebula_slug?/:rematch_yt_id?",
+  "/match/:channel_slug/:rematch_nebula_slug?/:rematch_yt_id?",
   async (req: Request, res: Response) => {
     const channel_slug = req.params.channel_slug;
-    const rematch_all = req.params?.rematch_all === "true" ? true : false;
 
     // HACK: #40
     const rematch_nebula_slug = req.params?.rematch_nebula_slug
@@ -142,7 +141,7 @@ app.get(
     try {
       await matchVideos(
         channel_slug,
-        rematch_all,
+
         rematch_nebula_slug,
         rematch_yt_id
       );

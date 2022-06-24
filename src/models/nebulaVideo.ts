@@ -1,14 +1,53 @@
 // Video type and model
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
+import logger from "../config/logger";
+
+// Types
+import type { YoutubeVideoType } from "./youtubeVideo";
+
+// Mongo Models
+import { YoutubeVideo } from "./youtubeVideo";
 
 /**
  * nebulaVideoSchema schema
  * @constructor NebulaVideo
  */
-const nebulaVideoSchema = new Schema(
+
+export interface NebulaVideoInterface {
+  nebula_video_id: string;
+  slug: string;
+  title: string;
+  short_description: string;
+  duration: number;
+  published_at: Date;
+  channel_id: string;
+  channel_slug: string;
+  channel_slugs: string[];
+  channel_title: string;
+  share_url: string;
+  matched: boolean;
+  youtube_video_id?: string;
+  youtube_video_object_id?: mongoose.Schema.Types.ObjectId;
+  match_strength?: number;
+}
+
+interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
+  setMatch: (
+    youtubeVideo: YoutubeVideoType,
+    matchStrength: number
+  ) => Promise<void>;
+  updateMatch: (
+    youtubeVideo: YoutubeVideoType,
+    matchStrength: number
+  ) => Promise<void>;
+  removeMatch: (nebulaVideo?: NebulaVideoType) => Promise<void>;
+  findByNebulaVideoId: (nebulaVideoId: string) => Promise<NebulaVideoType>;
+}
+
+const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
   {
-    id: {
+    nebula_video_id: {
       // "video_episode:d49e13df-f1ed-4562-8209-6098de1e187f"
       type: "String",
       index: true,
@@ -80,8 +119,77 @@ const nebulaVideoSchema = new Schema(
   }
 );
 
-export type NebulaVideo = InferSchemaType<typeof nebulaVideoSchema>;
-export const NebulaVideo = mongoose.model<NebulaVideo>(
-  "NebulaVideo",
-  nebulaVideoSchema
-);
+// Methods
+
+/**
+ * Set a the nebula videos match parameters to a youtube video
+ * @param youtubeVideo YoutubeVideoType The youtube video to match to
+ * @param matchStrength number The strength of the match
+ * @returns {Promise<void>}
+ * @memberof NebulaVideo
+ */
+nebulaVideoSchema.methods.setMatch = async function (
+  youtubeVideo: YoutubeVideoType,
+  strength: number
+) {
+  this.matched = true;
+  this.youtube_video_object_id = youtubeVideo._id;
+  this.youtube_video_id = youtubeVideo.youtube_video_id;
+  this.match_strength = strength;
+  this.save();
+};
+
+/**
+ * Update the match parameters of a nebula video
+ * Note: This will remove the match from the old youtube video if it exists
+ * Note: If provided with a strength below zero it will always override the match
+ * @param youtubeVideo  YoutubeVideoType The youtube video to match to
+ * @param strength  number of strength of the match (lower is better)
+ * @returns {Promise<void>}
+ * @memberof NebulaVideo
+ */
+nebulaVideoSchema.methods.updateMatch = async function (
+  youtubeVideo: YoutubeVideoType,
+  matchStrength: number
+) {
+  // Check to see if the new video is the same as the old one
+  if (this.youtube_video_object_id !== youtubeVideo._id) {
+    const oldYoutubeVideo = await YoutubeVideo.findById(
+      this.youtube_video_object_id
+    );
+    if (oldYoutubeVideo) {
+      if (oldYoutubeVideo.match_strength) {
+        if (matchStrength > oldYoutubeVideo?.match_strength) return;
+        await oldYoutubeVideo.removeMatch(youtubeVideo);
+      }
+    }
+    await this.setMatch(youtubeVideo, matchStrength);
+  }
+};
+
+nebulaVideoSchema.methods.removeMatch = async function (
+  replacementVideo?: NebulaVideoType
+) {
+  logger.warn(
+    `Removing match for ${this.slug}, replacing with ${replacementVideo?.slug}`
+  );
+  this.matched = false;
+  this.youtube_video_object_id = null;
+  this.youtube_video_id = null;
+  this.match_strength = null;
+  await this.save();
+};
+
+nebulaVideoSchema.statics.findByNebulaVideoId = async function (
+  nebulaVideoId: string
+): Promise<NebulaVideoType | null> {
+  const response = await this.findOne({ nebula_video_id: nebulaVideoId });
+  return response || null;
+};
+
+export type NebulaVideoPreType = InferSchemaType<typeof nebulaVideoSchema>;
+
+export interface NebulaVideoType extends NebulaVideoPreType {
+  _id?: mongoose.Types.ObjectId;
+}
+export const NebulaVideo = mongoose.model("NebulaVideo", nebulaVideoSchema);

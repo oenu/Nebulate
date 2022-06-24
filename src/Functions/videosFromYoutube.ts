@@ -1,17 +1,18 @@
-// Language: typescript
 // Scrape youtube API to get videos for a creator
-
-// import axios from "axios";
 import logger from "../config/logger";
-import { Creator } from "../models/creator";
 import { youtube } from "@googleapis/youtube";
-import {
-  YoutubeVideo as VideoModel,
-  YoutubeVideo,
-} from "../models/youtubeVideo";
 import mongoose from "mongoose";
-
 const yt = youtube("v3");
+
+// Types
+import type {
+  YoutubeVideoInterface,
+  // YoutubeVideoType,
+} from "../models/youtubeVideo";
+
+// Models
+import { Creator } from "../models/creator";
+import { YoutubeVideo as VideoModel } from "../models/youtubeVideo";
 
 const videosFromYoutube = async (
   channel_slug: string,
@@ -95,7 +96,9 @@ const videosFromYoutube = async (
             // Filter out videos that are in the cache
             const newVideos = newEpisodes.filter((video: any) => {
               return !youtubeVideoCache.some((cacheVideo) => {
-                return cacheVideo.videoId === video.contentDetails.videoId;
+                return (
+                  cacheVideo.youtube_video_id === video.contentDetails.videoId
+                );
               });
             });
             // If no new videos were found, break the loop
@@ -128,43 +131,41 @@ const videosFromYoutube = async (
             }
           }
         }
-        if (response.data.items) {
-          // Debugging
-          console.log(response.data);
-        }
       }
-      console.log(videoBuffer[0].contentDetails);
-      console.log(typeof videoBuffer[0].contentDetails.videoPublishedAt);
 
       logger.info(
         `YtScrape: Scrape found ${videoBuffer.length} YT videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
       );
 
       // Convert the videoBuffer to an array of YoutubeVideo objects
-      const convertedVideos = videoBuffer.map((video: any): YoutubeVideo => {
-        return {
-          videoId: video.contentDetails.videoId,
-          publishedAt: new Date(video.contentDetails.videoPublishedAt),
-          playlist_id: video.snippet.playlistId,
-          channelTitle: video.snippet.channelTitle,
-          title: video.snippet.title,
-          channel_id: video.snippet.channelId,
-          etag: video.etag,
-          status: video.status.privacyStatus,
-          channel_slug: channel_slug,
-          matched: false,
-        };
-      });
+      const convertedVideos = videoBuffer.map(
+        (video: any): YoutubeVideoInterface => {
+          return {
+            youtube_video_id: video.contentDetails.videoId,
+            published_at: new Date(video.contentDetails.videoPublishedAt),
+            playlist_id: video.snippet.playlistId,
+            channelTitle: video.snippet.channelTitle,
+            title: video.snippet.title,
+            channel_id: video.snippet.channelId,
+            etag: video.etag,
+            status: video.status.privacyStatus,
+            channel_slug: channel_slug,
+            matched: false,
+          };
+        }
+      );
 
       // Check for conflicting videos in the database
       const existingVideos = await VideoModel.find({
-        videoId: { $in: convertedVideos.map((video: any) => video.videoId) },
-      }).select("videoId");
+        youtube_video_id: {
+          $in: convertedVideos.map((video: any) => video.youtube_video_id),
+        },
+      }).select("youtube_video_id");
 
       // Remove conflicting videos from the convertedVideos array
       const nonConflictingVideos = convertedVideos.filter((video: any) => {
         return !existingVideos.some((existingVideo) => {
-          return existingVideo.videoId === video.videoId;
+          return existingVideo.youtube_video_id === video.youtube_video_id;
         });
       });
 

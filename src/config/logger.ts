@@ -21,6 +21,11 @@ const logger = winston.createLogger({
     }),
     new winston.transports.File({
       format: winston.format.json(),
+      filename: path.join(__dirname, "..", "/logs", "warn.log"),
+      level: "warn",
+    }),
+    new winston.transports.File({
+      format: winston.format.json(),
       timestamp: true,
       filename: path.join(__dirname, "..", "/logs", "combined.log"),
     }),

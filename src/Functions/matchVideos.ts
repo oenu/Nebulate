@@ -98,7 +98,7 @@ const matchVideos = async (
       logger.info( "Match: Found a matched video that was already matched, comparing scores");
       if (youtube_matches[0].score < youtube_matches[0]?.youtube_video?.match_strength) {
         logger.warn("Match: New video has better score, replacing old video");
-        
+        nebula_video.updateMatch()
         
 
 

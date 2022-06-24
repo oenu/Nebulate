@@ -30,6 +30,7 @@ export interface NebulaVideoInterface {
   youtube_video_id?: string;
   youtube_video_object_id?: mongoose.Schema.Types.ObjectId;
   match_strength?: number;
+  creator_object_id?: mongoose.Schema.Types.ObjectId;
 }
 
 interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
@@ -111,6 +112,10 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
     match_strength: {
       // 0.5
       type: "Number",
+    },
+    creator_object_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Creator",
     },
   },
   {

@@ -117,6 +117,14 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
 );
 
 // Methods
+
+/**
+ * Set a the nebula videos match parameters to a youtube video
+ * @param youtubeVideo YoutubeVideoType The youtube video to match to
+ * @param strength number The strength of the match
+ * @returns {Promise<void>}
+ * @memberof NebulaVideo
+ */
 nebulaVideoSchema.methods.setMatch = async function (
   youtubeVideo: YoutubeVideoType,
   strength: number
@@ -128,6 +136,14 @@ nebulaVideoSchema.methods.setMatch = async function (
   this.save();
 };
 
+/**
+ * Update the match parameters of a nebula video
+ * Note: This will remove the match from the old youtube video if it exists
+ * @param youtubeVideo  YoutubeVideoType The youtube video to match to
+ * @param strength  number of strength of the match (lower is better)
+ * @returns {Promise<void>}
+ * @memberof NebulaVideo
+ */
 nebulaVideoSchema.methods.updateMatch = async function (
   youtubeVideo: YoutubeVideoType,
   strength: number
@@ -148,7 +164,7 @@ nebulaVideoSchema.methods.updateMatch = async function (
   } else {
     // update the match strength
     this.match_strength = strength;
-    this.save();
+    await this.save();
   }
 };
 
@@ -162,7 +178,7 @@ nebulaVideoSchema.methods.removeMatch = async function (
   this.youtube_video_object_id = null;
   this.youtube_video_id = null;
   this.match_strength = null;
-  this.save();
+  await this.save();
 };
 
 nebulaVideoSchema.statics.findByNebulaVideoId = async function (

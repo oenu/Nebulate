@@ -3,7 +3,9 @@
 const fs = require("fs");
 const path = require("path");
 
+import logger from "../config/logger";
 import { NebulaVideo } from "../models/nebulaVideo";
+import { YoutubeVideo } from "../models/youtubeVideo";
 
 interface videoPair {
   url: string;
@@ -22,9 +24,24 @@ const generateDatabase = async (): Promise<extensionDatabase> => {
   const nebulaVideos = await NebulaVideo.find({
     matched: true,
     youtube_video_id: { $exists: true },
-  }).select("youtube_video_id slug");
+  }).select("youtube_video_object_id slug creator_object_id");
 
-  // Separate out the videos that have a match
+  // Get up to date url for each video
+  const matched_pairs: Promise<videoPair | undefined>[] = await nebulaVideos
+    .map(async (video): Promise<videoPair | undefined> => {
+      const youtube_url = await YoutubeVideo.findById(
+        video.youtube_video_object_id
+      ).select("youtube_video_id");
+      if (youtube_url) {
+        return {
+          url: youtube_url.youtube_video_id,
+          slug: video.slug,
+        };
+      } else {
+        return;
+      }
+    })
+    .filter((pair) => pair !== undefined);
 
-  return;
+  logger.verbose(matched_pairs);
 };

@@ -14,7 +14,7 @@ import { YoutubeVideo } from "./youtubeVideo";
  * @constructor NebulaVideo
  */
 
-interface NebulaVideoInterface {
+export interface NebulaVideoInterface {
   nebula_video_id: string;
   slug: string;
   title: string;

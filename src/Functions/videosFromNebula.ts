@@ -4,7 +4,10 @@ import axios from "axios";
 import logger from "../config/logger";
 
 // Types
-import type { NebulaVideoType } from "../models/nebulaVideo";
+import type {
+  NebulaVideoInterface,
+  // NebulaVideoType,
+} from "../models/nebulaVideo";
 
 // Mongo Models
 import { Creator } from "../models/creator";
@@ -102,22 +105,24 @@ export const videosFromNebula = async (
   );
 
   // Convert to video objects
-  const convertedVideos = videoBuffer.map((video: any): NebulaVideoType => {
-    return {
-      nebula_video_id: video.id,
-      slug: video.slug,
-      title: video.title,
-      short_description: video.short_description,
-      duration: video.duration,
-      published_at: new Date(video.published_at),
-      channel_id: video.channel_id,
-      channel_slug: video.channel_slug,
-      channel_slugs: video.channel_slugs,
-      channel_title: video.channel_title,
-      share_url: video.share_url,
-      matched: false,
-    };
-  });
+  const convertedVideos = videoBuffer.map(
+    (video: any): NebulaVideoInterface => {
+      return {
+        nebula_video_id: video.id,
+        slug: video.slug,
+        title: video.title,
+        short_description: video.short_description,
+        duration: video.duration,
+        published_at: new Date(video.published_at),
+        channel_id: video.channel_id,
+        channel_slug: video.channel_slug,
+        channel_slugs: video.channel_slugs,
+        channel_title: video.channel_title,
+        share_url: video.share_url,
+        matched: false,
+      };
+    }
+  );
 
   // Check if videos are already in the database
   const existingVideos = await VideoModel.find({

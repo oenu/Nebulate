@@ -1,6 +1,13 @@
 // Video type and model
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
+import logger from "../config/logger";
+
+// Types
+import type { NebulaVideoType } from "./nebulaVideo";
+
+// Mongo Models
+import { NebulaVideo } from "./nebulaVideo";
 
 interface YoutubeVideoInterface {
   youtube_video_id: string;
@@ -18,7 +25,19 @@ interface YoutubeVideoInterface {
   matched?: boolean;
 }
 
-const youtubeVideoSchema = new Schema<YoutubeVideoInterface>(
+interface YoutubeVideoDocument
+  extends YoutubeVideoInterface,
+    mongoose.Document {
+  setMatch: (nebulaVideo: NebulaVideoType, strength: number) => Promise<void>;
+  updateMatch: (
+    nebulaVideo: NebulaVideoType,
+    strength: number
+  ) => Promise<void>;
+  removeMatch: (replacementVideo?: YoutubeVideoType) => Promise<void>;
+  findByYoutubeVideoId: (youtubeVideoId: string) => Promise<YoutubeVideoType>;
+}
+
+const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
   {
     // Youtube Response Fields ==================================================
     // Content Details Fields -------------------------------------------------------
@@ -89,6 +108,62 @@ const youtubeVideoSchema = new Schema<YoutubeVideoInterface>(
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );
+
+// Methods
+youtubeVideoSchema.methods.setMatch = async function (
+  nebulaVideo: NebulaVideoType,
+  matchStrength: number
+): Promise<void> {
+  this.matched = true;
+  this.nebula_video_object_id = nebulaVideo._id;
+  this.nebula_video_slug = nebulaVideo.slug;
+  this.match_strength = matchStrength;
+  this.save();
+};
+
+youtubeVideoSchema.methods.updateMatch = async function (
+  nebulaVideo: NebulaVideoType,
+  matchStrength: number
+): Promise<void> {
+  if (this.nebula_video_object_id !== nebulaVideo._id) {
+    // remove the old match
+    const oldNebulaVideo = await NebulaVideo.findById(
+      this.nebula.video_object_id
+    );
+    if (oldNebulaVideo) {
+      await oldNebulaVideo.removeMatch(nebulaVideo);
+    }
+
+    // Set the new match
+    await this.setMatch(nebulaVideo, matchStrength);
+  } else {
+    // update the match strength
+    this.match_strength = matchStrength;
+    this.save();
+  }
+};
+
+youtubeVideoSchema.methods.removeMatch = async function (
+  replacementVideo?: YoutubeVideoType
+): Promise<void> {
+  logger.warn(
+    `Removing match for ${this.title}, replacing with ${replacementVideo?.title}`
+  );
+  this.matched = false;
+  this.nebula_video_object_id = null;
+  this.nebula_video_slug = null;
+  this.match_strength = null;
+  this.save();
+};
+
+youtubeVideoSchema.statics.findByYoutubeVideoId = async function (
+  youtubeVideoId: string
+): Promise<YoutubeVideoType | null> {
+  const response = await YoutubeVideo.findOne({
+    youtube_video_id: youtubeVideoId,
+  });
+  return response || null;
+};
 
 export type YoutubeVideoPreType = InferSchemaType<typeof youtubeVideoSchema>;
 

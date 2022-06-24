@@ -74,13 +74,18 @@ const videosFromYoutube = async (
           newEpisodes.forEach((episode) => {
             videoBuffer.push(episode);
             scrapedVideos++;
-            console.log(episode.snippet?.title);
           });
 
+          // console.log(pagetokenBuffer);
           // Set the pagetokenBuffer to the next page token
           if (response.data.nextPageToken) {
-            logger.info(`YtScrape: Next page token found`);
+            logger.info(`YtScrape: Next page token found for ${channel_slug}`);
             pagetokenBuffer = response?.data?.nextPageToken;
+          } else {
+            logger.info(
+              `YtScrape: No next page token found for ${channel_slug}`
+            );
+            scrapedVideos = videoScrapeLimit * 2;
           }
 
           // If onlyScrapeNew is true, check if the video is in the cache
@@ -116,7 +121,7 @@ const videosFromYoutube = async (
             }
 
             console.log("NewVideos length: ", newVideos.length);
-            console.log("NewEpisodes length: ", newEpisodes.length);
+
             // If all videos are new, continue to the next page
             if (newVideos.length === newEpisodes.length) {
               logger.info(
@@ -151,6 +156,7 @@ const videosFromYoutube = async (
             status: video.status.privacyStatus,
             channel_slug: channel_slug,
             matched: false,
+            creator_object_id: creator._id,
           };
         }
       );

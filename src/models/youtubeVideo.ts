@@ -23,6 +23,7 @@ export interface YoutubeVideoInterface {
   nebula_video_slug?: string;
   match_strength?: number;
   matched?: boolean;
+  creator_object_id?: mongoose.Schema.Types.ObjectId;
 }
 
 interface YoutubeVideoDocument
@@ -101,6 +102,10 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
     },
     match_strength: {
       type: "Number",
+    },
+    creator_object_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Creator",
     },
   },
   {

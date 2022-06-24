@@ -27,6 +27,7 @@ import videosFromNebula from "./Functions/videosFromNebula";
 import registerCreatorInDB from "./Functions/registerCreatorInDB";
 import videosFromYoutube from "./Functions/videosFromYoutube";
 import matchVideos from "./Functions/matchVideos";
+import generateDatabase from "./database/database";
 app.use(auth);
 
 // Routes
@@ -153,6 +154,11 @@ app.get(
     }
   }
 );
+
+app.get("/database", async (_req: Request, res: Response) => {
+  await generateDatabase();
+  res.send("Generated database");
+});
 
 // Start the server
 mongoose.connection.once("open", async () => {

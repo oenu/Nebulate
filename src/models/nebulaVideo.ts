@@ -60,14 +60,18 @@ const nebulaVideoSchema = new Schema(
       type: "Boolean",
       default: false,
     },
-    youtubeVideo: {
+    youtube_video_object_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "YoutubeVideo",
     },
-    youtubeVideoId: {
+    youtube_video_id: {
       // "PtxNsc85KMw"
       type: "String",
       index: true,
+    },
+    match_strength: {
+      // 0.5
+      type: "Number",
     },
   },
   {

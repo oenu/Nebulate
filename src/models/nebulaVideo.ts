@@ -30,6 +30,7 @@ export interface NebulaVideoInterface {
   youtube_video_id?: string;
   youtube_video_object_id?: mongoose.Schema.Types.ObjectId;
   match_strength?: number;
+  creator_object_id?: mongoose.Schema.Types.ObjectId;
 }
 
 interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
@@ -112,6 +113,10 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
       // 0.5
       type: "Number",
     },
+    creator_object_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Creator",
+    },
   },
   {
     collection: "nebulaVideos",
@@ -163,6 +168,7 @@ nebulaVideoSchema.methods.updateMatch = async function (
         await oldYoutubeVideo.removeMatch(youtubeVideo);
       }
     }
+    // logger.info(`${this.title} :: ${youtubeVideo.title}`);
     await this.setMatch(youtubeVideo, matchStrength);
   }
 };

@@ -30,3 +30,5 @@ build/
 .env
 src/store/json_token.txt
 src/store/simple_key.txt
+src/database/key.pem
+src/database/simple_key.json

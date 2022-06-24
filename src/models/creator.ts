@@ -19,6 +19,7 @@ interface CreatorInterface {
   description: string;
   "zype-id": string;
   youtube_id: string;
+  youtube_channel_name: string;
   youtube_upload_id: string;
   last_scraped_nebula: Date;
   last_scraped_youtube: Date;
@@ -64,6 +65,9 @@ const creatorSchema: Schema<CreatorDocument> = new Schema(
       },
     ],
     youtube_id: {
+      type: "String",
+    },
+    youtube_channel_name: {
       type: "String",
     },
     youtube_upload_id: { type: "String" },

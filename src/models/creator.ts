@@ -118,5 +118,9 @@ creatorSchema.methods.getYoutubeVideos = async function (
   }
 };
 
-export type CreatorType = InferSchemaType<typeof creatorSchema>;
+export type CreatorPreType = InferSchemaType<typeof creatorSchema>;
+
+export interface CreatorType extends CreatorPreType {
+  _id: mongoose.Types.ObjectId;
+}
 export const Creator = mongoose.model("Creator", creatorSchema);

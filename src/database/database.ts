@@ -1,7 +1,7 @@
 // Gathers data from the database and creates a copy for distribution to the clients
 
-const fs = require("fs");
-const path = require("path");
+// const fs = require("fs");
+// const path = require("path");
 
 import logger from "../config/logger";
 import { NebulaVideo } from "../models/nebulaVideo";
@@ -27,21 +27,30 @@ const generateDatabase = async (): Promise<extensionDatabase> => {
   }).select("youtube_video_object_id slug creator_object_id");
 
   // Get up to date url for each video
-  const matched_pairs: Promise<videoPair | undefined>[] = await nebulaVideos
-    .map(async (video): Promise<videoPair | undefined> => {
-      const youtube_url = await YoutubeVideo.findById(
-        video.youtube_video_object_id
-      ).select("youtube_video_id");
-      if (youtube_url) {
-        return {
-          url: youtube_url.youtube_video_id,
-          slug: video.slug,
-        };
-      } else {
-        return;
-      }
-    })
-    .filter((pair) => pair !== undefined);
 
-  logger.verbose(matched_pairs);
+  let videoPairs: videoPair[] = [];
+  for (let index = 0; index < nebulaVideos.length; index++) {
+    const video = nebulaVideos[index];
+    if (!video?.youtube_video_object_id) continue;
+
+    const youtube_url = await YoutubeVideo.findById(
+      video.youtube_video_object_id
+    ).select("youtube_video_id");
+
+    if (youtube_url) {
+      videoPairs.push({
+        url: youtube_url.youtube_video_id,
+        slug: video.slug,
+      });
+    }
+  }
+  logger.verbose(videoPairs);
+  return {
+    videoPairs,
+    unmatchedVideos: [],
+    hash: "",
+    generatedAt: new Date(),
+  };
 };
+
+export default generateDatabase;

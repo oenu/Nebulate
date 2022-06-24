@@ -28,6 +28,14 @@ export const videosFromNebula = async (
     throw new Error(`Scrape: Creator ${channel_slug} does not exist in DB`);
   }
 
+  const creator = await Creator.findOne({ slug: channel_slug });
+  if (!creator) {
+    logger.error(`Scrape: Creator ${channel_slug} does not have a nebula_id`);
+    throw new Error(
+      `Scrape: Creator ${channel_slug} does not have a nebula_id`
+    );
+  }
+
   let urlBuffer = "";
   let videoBuffer = [];
   logger.info(`OnlyScrapeNew: ${onlyScrapeNew}`);
@@ -120,6 +128,7 @@ export const videosFromNebula = async (
         channel_title: video.channel_title,
         share_url: video.share_url,
         matched: false,
+        creator_object_id: creator._id,
       };
     }
   );

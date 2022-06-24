@@ -1,7 +1,7 @@
 {
   "name": "Nebulate",
   "version": "0.0.1",
-  "main": "index.ts",
+  "main": "index.js",
   "author": "Oenu",
   "license": "MIT",
   "dependencies": {
@@ -25,7 +25,7 @@
     "typesync": "^0.9.1"
   },
   "scripts": {
-    "start": "node ./build/index.ts",
+    "start": "node ./dist/index.js",
     "build": "tsc -p .",
     "dev": "nodemon ./src/index.ts",
     "lint": "eslint ."

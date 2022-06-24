@@ -1,17 +1,18 @@
-// Language: typescript
 // Scrape youtube API to get videos for a creator
-
-// import axios from "axios";
 import logger from "../config/logger";
-import { Creator } from "../models/creator";
 import { youtube } from "@googleapis/youtube";
-import {
-  YoutubeVideo as VideoModel,
-  YoutubeVideo,
-} from "../models/youtubeVideo";
 import mongoose from "mongoose";
-
 const yt = youtube("v3");
+
+// Types
+import type {
+  YoutubeVideoInterface,
+  // YoutubeVideoType,
+} from "../models/youtubeVideo";
+
+// Models
+import { Creator } from "../models/creator";
+import { YoutubeVideo as VideoModel } from "../models/youtubeVideo";
 
 const videosFromYoutube = async (
   channel_slug: string,
@@ -95,7 +96,9 @@ const videosFromYoutube = async (
             // Filter out videos that are in the cache
             const newVideos = newEpisodes.filter((video: any) => {
               return !youtubeVideoCache.some((cacheVideo) => {
-                return cacheVideo.videoId === video.contentDetails.videoId;
+                return (
+                  cacheVideo.youtube_video_id === video.contentDetails.videoId
+                );
               });
             });
             // If no new videos were found, break the loop
@@ -112,7 +115,7 @@ const videosFromYoutube = async (
               break;
             }
 
-            console.log("Newvideos length: ", newVideos.length);
+            console.log("NewVideos length: ", newVideos.length);
             console.log("NewEpisodes length: ", newEpisodes.length);
             // If all videos are new, continue to the next page
             if (newVideos.length === newEpisodes.length) {
@@ -128,46 +131,45 @@ const videosFromYoutube = async (
             }
           }
         }
-        if (response.data.items) {
-          // Debugging
-          console.log(response.data);
-        }
       }
-      console.log(videoBuffer[0].contentDetails);
-      console.log(typeof videoBuffer[0].contentDetails.videoPublishedAt);
 
       logger.info(
         `YtScrape: Scrape found ${videoBuffer.length} YT videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
       );
 
       // Convert the videoBuffer to an array of YoutubeVideo objects
-      const convertedVideos = videoBuffer.map((video: any): YoutubeVideo => {
-        return {
-          videoId: video.contentDetails.videoId,
-          publishedAt: new Date(video.contentDetails.videoPublishedAt),
-          playlist_id: video.snippet.playlistId,
-          channelTitle: video.snippet.channelTitle,
-          title: video.snippet.title,
-          channel_id: video.snippet.channelId,
-          etag: video.etag,
-          status: video.status.privacyStatus,
-          channel_slug: channel_slug,
-        };
-      });
+      const convertedVideos = videoBuffer.map(
+        (video: any): YoutubeVideoInterface => {
+          return {
+            youtube_video_id: video.contentDetails.videoId,
+            published_at: new Date(video.contentDetails.videoPublishedAt),
+            playlist_id: video.snippet.playlistId,
+            channelTitle: video.snippet.channelTitle,
+            title: video.snippet.title,
+            channel_id: video.snippet.channelId,
+            etag: video.etag,
+            status: video.status.privacyStatus,
+            channel_slug: channel_slug,
+            matched: false,
+          };
+        }
+      );
 
       // Check for conflicting videos in the database
       const existingVideos = await VideoModel.find({
-        videoId: { $in: convertedVideos.map((video: any) => video.videoId) },
-      }).select("videoId");
+        youtube_video_id: {
+          $in: convertedVideos.map((video: any) => video.youtube_video_id),
+        },
+      }).select("youtube_video_id");
 
       // Remove conflicting videos from the convertedVideos array
       const nonConflictingVideos = convertedVideos.filter((video: any) => {
         return !existingVideos.some((existingVideo) => {
-          return existingVideo.videoId === video.videoId;
+          return existingVideo.youtube_video_id === video.youtube_video_id;
         });
       });
 
-      console.log("Non conflicting videos: ", nonConflictingVideos.length);
+      // console.log("Non conflicting videos: ", nonConflictingVideos.length);
 
       if (nonConflictingVideos.length === 0) {
         logger.info(
@@ -198,7 +200,6 @@ const videosFromYoutube = async (
         logger.info(`YtScrape: ${nonConflictingVideos.length} videos inserted`);
         // TODO: #33 Implement last_scraped_date
 
-        console.log("Mongo response: ", mongoResponse);
         // Add video ids to creator
         if (mongoResponse[0]?.channel_slug) {
           try {

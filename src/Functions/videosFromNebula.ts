@@ -1,12 +1,17 @@
 // Scrapes api for a creator and returns an array of video objects
-
-import type { NebulaVideo } from "../models/nebulaVideo";
-import { NebulaVideo as VideoModel } from "../models/nebulaVideo";
 import mongoose from "mongoose";
-// Imports
 import axios from "axios";
 import logger from "../config/logger";
+
+// Types
+import type {
+  NebulaVideoInterface,
+  // NebulaVideoType,
+} from "../models/nebulaVideo";
+
+// Mongo Models
 import { Creator } from "../models/creator";
+import { NebulaVideo as VideoModel } from "../models/nebulaVideo";
 
 /**
  * Scrapes api for a creator and returns an array of video objects
@@ -100,21 +105,24 @@ export const videosFromNebula = async (
   );
 
   // Convert to video objects
-  const convertedVideos = videoBuffer.map((video: any): NebulaVideo => {
-    return {
-      slug: video.slug,
-      title: video.title,
-      short_description: video.short_description,
-      duration: video.duration,
-      published_at: new Date(video.published_at),
-      channel_id: video.channel_id,
-      channel_slug: video.channel_slug,
-      channel_slugs: video.channel_slugs,
-      channel_title: video.channel_title,
-      share_url: video.share_url,
-      channel: video.channel,
-    };
-  });
+  const convertedVideos = videoBuffer.map(
+    (video: any): NebulaVideoInterface => {
+      return {
+        nebula_video_id: video.id,
+        slug: video.slug,
+        title: video.title,
+        short_description: video.short_description,
+        duration: video.duration,
+        published_at: new Date(video.published_at),
+        channel_id: video.channel_id,
+        channel_slug: video.channel_slug,
+        channel_slugs: video.channel_slugs,
+        channel_title: video.channel_title,
+        share_url: video.share_url,
+        matched: false,
+      };
+    }
+  );
 
   // Check if videos are already in the database
   const existingVideos = await VideoModel.find({

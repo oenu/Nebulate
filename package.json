@@ -9,6 +9,7 @@
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "fuse.js": "^6.6.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.4.0",
     "pino-pretty": "^8.0.0",

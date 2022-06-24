@@ -1,8 +1,12 @@
-import path from "path";
 const winston = require("winston");
+import path from "path";
+import { format } from "winston";
+
+// const verboseFormat = format.printf(() => {
+//   return `Verbose message`;
+// });
 
 const logger = winston.createLogger({
-  level: "info",
   // defaultMeta: { service: "user-service" },
   transports: [
     new winston.transports.File({
@@ -17,6 +21,11 @@ const logger = winston.createLogger({
     }),
     new winston.transports.File({
       format: winston.format.json(),
+      filename: path.join(__dirname, "..", "/logs", "warn.log"),
+      level: "warn",
+    }),
+    new winston.transports.File({
+      format: winston.format.json(),
       timestamp: true,
       filename: path.join(__dirname, "..", "/logs", "combined.log"),
     }),
@@ -28,10 +37,41 @@ if (process.env.NODE_ENV !== "production") {
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
+        winston.format.prettyPrint(),
         winston.format.splat(),
         winston.format.simple()
-        // winston.format.prettyPrint(),
       ),
+    })
+  );
+  logger.add(
+    new winston.transports.File({
+      format: winston.format.combine(
+        winston.format.json(),
+        format((info: any) => {
+          return info.level === "verbose" ? info : false;
+        })()
+      ),
+      timestamp: true,
+      filename: path.join(__dirname, "..", "/logs", "verbose.log"),
+      level: "verbose",
+    })
+  );
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        format((info: any) => {
+          return info.level === "verbose" ? info : false;
+        })(),
+        // verboseFormat,
+        // winston.format.colorize(),
+        // winston.format.prettyPrint(),
+        // winston.format.simple()
+        winston.format.colorize(),
+        winston.format.printf((log: any) => `${log.level}: Wrote to file`)
+      ),
+      timestamp: true,
+      filename: path.join(__dirname, "..", "/logs", "verbose.log"),
+      level: "verbose",
     })
   );
 }

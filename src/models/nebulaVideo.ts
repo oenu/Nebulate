@@ -80,8 +80,8 @@ const nebulaVideoSchema = new Schema(
   }
 );
 
-export type NebulaVideo = InferSchemaType<typeof nebulaVideoSchema>;
-export const NebulaVideo = mongoose.model<NebulaVideo>(
+export type NebulaVideoType = InferSchemaType<typeof nebulaVideoSchema>;
+export const NebulaVideo = mongoose.model<NebulaVideoType>(
   "NebulaVideo",
   nebulaVideoSchema
 );

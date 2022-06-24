@@ -38,6 +38,7 @@ interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
     strength: number
   ) => Promise<void>;
   removeMatch: () => Promise<void>;
+  findByNebulaVideoId: (nebulaVideoId: string) => Promise<NebulaVideoType>;
 }
 
 const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
@@ -152,6 +153,12 @@ nebulaVideoSchema.methods.removeMatch = async function () {
   this.youtube_video_id = null;
   this.match_strength = null;
   this.save();
+};
+
+nebulaVideoSchema.statics.findByNebulaVideoId = async function (
+  nebulaVideoId: string
+) {
+  return await this.findOne({ nebula_video_id: nebulaVideoId });
 };
 
 export type NebulaVideoPreType = InferSchemaType<typeof nebulaVideoSchema>;

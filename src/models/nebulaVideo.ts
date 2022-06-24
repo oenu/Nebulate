@@ -168,6 +168,7 @@ nebulaVideoSchema.methods.updateMatch = async function (
         await oldYoutubeVideo.removeMatch(youtubeVideo);
       }
     }
+    // logger.info(`${this.title} :: ${youtubeVideo.title}`);
     await this.setMatch(youtubeVideo, matchStrength);
   }
 };

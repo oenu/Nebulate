@@ -2,6 +2,12 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
+// Types
+import type { YoutubeVideoType } from "./youtubeVideo";
+
+// Mongo Models
+import { YoutubeVideo } from "./youtubeVideo";
+
 /**
  * nebulaVideoSchema schema
  * @constructor NebulaVideo
@@ -98,6 +104,46 @@ const nebulaVideoSchema = new Schema<NebulaVideoInterface>(
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );
+
+nebulaVideoSchema.methods.setMatch = async function (
+  youtubeVideo: YoutubeVideoType,
+  strength: number
+) {
+  this.matched = true;
+  this.youtube_video_object_id = youtubeVideo._id;
+  this.youtube_video_id = youtubeVideo.youtube_video_id;
+  this.match_strength = strength;
+  this.save();
+};
+
+nebulaVideoSchema.methods.updateMatch = async function (
+  youtubeVideo: YoutubeVideoType,
+  strength: number
+) {
+  // remove the old match
+  if (this.youtube_video_object_id) {
+    const oldYoutubeVideo = await YoutubeVideo.findById(
+      this.youtube_video_object_id
+    );
+    if (oldYoutubeVideo) {
+      await oldYoutubeVideo.removeMatch(this);
+    }
+  }
+  // set the new match
+  this.matched = true;
+  this.youtube_video_object_id = youtubeVideo._id;
+  this.youtube_video_id = youtubeVideo.youtube_video_id;
+  this.match_strength = strength;
+  this.save();
+};
+
+nebulaVideoSchema.methods.removeMatch = async function () {
+  this.matched = false;
+  this.youtube_video_object_id = null;
+  this.youtube_video_id = null;
+  this.match_strength = null;
+  this.save();
+};
 
 export type NebulaVideoPreType = InferSchemaType<typeof nebulaVideoSchema>;
 

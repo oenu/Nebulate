@@ -93,7 +93,9 @@ const videosFromYoutube = async (
             // Filter out videos that are in the cache
             const newVideos = newEpisodes.filter((video: any) => {
               return !youtubeVideoCache.some((cacheVideo) => {
-                return cacheVideo.videoId === video.contentDetails.videoId;
+                return (
+                  cacheVideo.youtube_video_id === video.contentDetails.videoId
+                );
               });
             });
             // If no new videos were found, break the loop
@@ -136,8 +138,8 @@ const videosFromYoutube = async (
       const convertedVideos = videoBuffer.map(
         (video: any): YoutubeVideoType => {
           return {
-            videoId: video.contentDetails.videoId,
-            publishedAt: new Date(video.contentDetails.videoPublishedAt),
+            youtube_video_id: video.contentDetails.videoId,
+            published_at: new Date(video.contentDetails.videoPublishedAt),
             playlist_id: video.snippet.playlistId,
             channelTitle: video.snippet.channelTitle,
             title: video.snippet.title,
@@ -152,13 +154,15 @@ const videosFromYoutube = async (
 
       // Check for conflicting videos in the database
       const existingVideos = await VideoModel.find({
-        videoId: { $in: convertedVideos.map((video: any) => video.videoId) },
-      }).select("videoId");
+        youtube_video_id: {
+          $in: convertedVideos.map((video: any) => video.youtube_video_id),
+        },
+      }).select("youtube_video_id");
 
       // Remove conflicting videos from the convertedVideos array
       const nonConflictingVideos = convertedVideos.filter((video: any) => {
         return !existingVideos.some((existingVideo) => {
-          return existingVideo.videoId === video.videoId;
+          return existingVideo.youtube_video_id === video.youtube_video_id;
         });
       });
 

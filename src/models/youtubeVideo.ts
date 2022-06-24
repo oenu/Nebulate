@@ -9,7 +9,7 @@ import type { NebulaVideoType } from "./nebulaVideo";
 // Mongo Models
 import { NebulaVideo } from "./nebulaVideo";
 
-interface YoutubeVideoInterface {
+export interface YoutubeVideoInterface {
   youtube_video_id: string;
   published_at: Date;
   playlist_id: string;

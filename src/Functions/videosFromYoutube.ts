@@ -5,7 +5,10 @@ import mongoose from "mongoose";
 const yt = youtube("v3");
 
 // Types
-import type { YoutubeVideoType } from "../models/youtubeVideo";
+import type {
+  YoutubeVideoInterface,
+  // YoutubeVideoType,
+} from "../models/youtubeVideo";
 
 // Models
 import { Creator } from "../models/creator";
@@ -136,7 +139,7 @@ const videosFromYoutube = async (
 
       // Convert the videoBuffer to an array of YoutubeVideo objects
       const convertedVideos = videoBuffer.map(
-        (video: any): YoutubeVideoType => {
+        (video: any): YoutubeVideoInterface => {
           return {
             youtube_video_id: video.contentDetails.videoId,
             published_at: new Date(video.contentDetails.videoPublishedAt),

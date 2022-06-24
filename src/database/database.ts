@@ -3,4 +3,28 @@
 const fs = require("fs");
 const path = require("path");
 
-const generateDatabase = (): void => {};
+import { NebulaVideo } from "../models/nebulaVideo";
+
+interface videoPair {
+  url: string;
+  slug: string;
+}
+
+interface extensionDatabase {
+  videoPairs: videoPair[];
+  unmatchedVideos: string[];
+  hash: string;
+  generatedAt: Date;
+}
+
+const generateDatabase = async (): Promise<extensionDatabase> => {
+  // Get all nebula videos
+  const nebulaVideos = await NebulaVideo.find({
+    matched: true,
+    youtube_video_id: { $exists: true },
+  }).select("youtube_video_id slug");
+
+  // Separate out the videos that have a match
+
+  return;
+};

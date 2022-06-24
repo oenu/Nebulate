@@ -146,6 +146,8 @@ app.get(
         rematch_nebula_slug,
         rematch_yt_id
       );
+
+      res.send(`Matched ${channel_slug}`);
     } catch (error: any) {
       logger.error(error.message);
       throw error;

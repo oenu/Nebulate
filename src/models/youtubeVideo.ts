@@ -2,17 +2,33 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
-const youtubeVideoSchema = new Schema(
+interface YoutubeVideoInterface {
+  youtube_video_id: string;
+  published_at: Date;
+  playlist_id: string;
+  channelTitle: string;
+  title: string;
+  channel_id: string;
+  etag: string;
+  status: string;
+  channel_slug: string;
+  nebula_video_object_id?: mongoose.Schema.Types.ObjectId;
+  nebula_video_slug?: string;
+  match_strength?: number;
+  matched?: boolean;
+}
+
+const youtubeVideoSchema = new Schema<YoutubeVideoInterface>(
   {
     // Youtube Response Fields ==================================================
     // Content Details Fields -------------------------------------------------------
-    videoId: {
+    youtube_video_id: {
       // "SfZrnoo1GPM"
       // Can be used to identify the video from a url eg (https://www.youtube.com/watch?v=SfZrnoo1GPM)
       type: "String",
       index: true,
     },
-    videoPublishedAt: {
+    published_at: {
       // 2020-01-01T00:00:00.000Z
       type: "Date",
     },
@@ -29,10 +45,7 @@ const youtubeVideoSchema = new Schema(
       // "Real Lawyer Reacts to Will Smith Slapping Chris Rock"
       type: "String",
     },
-    publishedAt: {
-      // 2022-03-29T17:08:56Z
-      type: "Date",
-    },
+
     channel_id: {
       // "UCpa-Zb0ZcQjTCPP1Dx_1M8Q"
       type: "String",
@@ -53,11 +66,11 @@ const youtubeVideoSchema = new Schema(
       type: "String",
       index: true,
     },
-    nebulaVideo: {
+    nebula_video_object_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "NebulaVideo",
     },
-    nebulaVideoSlug: {
+    nebula_video_slug: {
       // "real-lawyer-reacts-to-will-smith-slapping-chris-rock"
       type: "String",
       index: true,
@@ -67,6 +80,9 @@ const youtubeVideoSchema = new Schema(
       index: true,
       default: false,
     },
+    match_strength: {
+      type: "Number",
+    },
   },
   {
     collection: "youtubeVideos",
@@ -74,7 +90,12 @@ const youtubeVideoSchema = new Schema(
   }
 );
 
-export type YoutubeVideoType = InferSchemaType<typeof youtubeVideoSchema>;
+export type YoutubeVideoPreType = InferSchemaType<typeof youtubeVideoSchema>;
+
+export interface YoutubeVideoType extends YoutubeVideoPreType {
+  _id?: mongoose.Types.ObjectId;
+}
+
 export const YoutubeVideo = mongoose.model<YoutubeVideoType>(
   "YoutubeVideo",
   youtubeVideoSchema

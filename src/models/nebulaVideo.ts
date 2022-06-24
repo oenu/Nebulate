@@ -6,9 +6,28 @@ import { Schema, InferSchemaType } from "mongoose";
  * nebulaVideoSchema schema
  * @constructor NebulaVideo
  */
-const nebulaVideoSchema = new Schema(
+
+interface NebulaVideoInterface {
+  nebula_video_id: string;
+  slug: string;
+  title: string;
+  short_description: string;
+  duration: number;
+  published_at: Date;
+  channel_id: string;
+  channel_slug: string;
+  channel_slugs: string[];
+  channel_title: string;
+  share_url: string;
+  matched: boolean;
+  youtube_video_id?: string;
+  youtube_video_object_id?: mongoose.Schema.Types.ObjectId;
+  match_strength?: number;
+}
+
+const nebulaVideoSchema = new Schema<NebulaVideoInterface>(
   {
-    id: {
+    nebula_video_id: {
       // "video_episode:d49e13df-f1ed-4562-8209-6098de1e187f"
       type: "String",
       index: true,
@@ -80,8 +99,9 @@ const nebulaVideoSchema = new Schema(
   }
 );
 
-export type NebulaVideoType = InferSchemaType<typeof nebulaVideoSchema>;
-export const NebulaVideo = mongoose.model<NebulaVideoType>(
-  "NebulaVideo",
-  nebulaVideoSchema
-);
+export type NebulaVideoPreType = InferSchemaType<typeof nebulaVideoSchema>;
+
+export interface NebulaVideoType extends NebulaVideoPreType {
+  _id?: mongoose.Types.ObjectId;
+}
+export const NebulaVideo = mongoose.model("NebulaVideo", nebulaVideoSchema);

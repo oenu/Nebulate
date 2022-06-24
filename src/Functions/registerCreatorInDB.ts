@@ -78,7 +78,7 @@ const registerCreatorInDB = async (channel_slug: string) => {
         if (res.data?.items) {
           logger.info(`Adding ${channel_slug} to the database`);
           await Creator.create({
-            id: response.data.details.id,
+            nebula_id: response.data.details.id,
             slug: response.data.details.slug,
             title: response.data.details.title,
             description: response.data.details.description,

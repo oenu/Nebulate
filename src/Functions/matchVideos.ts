@@ -1,5 +1,5 @@
 import logger from "../config/logger";
-import { Creator } from "../models/creator";
+import { Creator, CreatorType } from "../models/creator";
 import videosFromNebula from "./videosFromNebula";
 import videosFromYoutube from "./videosFromYoutube";
 import {
@@ -8,7 +8,7 @@ import {
 } from "../models/youtubeVideo";
 import { NebulaVideo as NebulaVideos } from "../models/nebulaVideo";
 import Fuse from "fuse.js";
-import type FuseResult from "fuse.js";
+
 /**
  * Match Nebula videos to Youtube videos, from the database
  * @param  {string} channel_slug - The channel slug
@@ -62,65 +62,13 @@ const matchVideos = async (
   }
 
   // Get creator's youtube videos
-  let youtube_videos: YoutubeVideos[] = [];
-  // Get specific youtube video/videos if passed in
-  if (rematch_yt_id) {
-    const specificYtVideos = await YoutubeVideos.find({
-      youtube_id: { $in: rematch_yt_id },
-    }).select("title videoId");
-    if (specificYtVideos && specificYtVideos.length > 0) {
-      youtube_videos.push(...specificYtVideos);
-    } else {
-      throw new Error(`Match: Youtube video ${rematch_yt_id} not found in DB`);
-    }
-  }
-
-  // Get all youtube videos if no specific video was passed in
-  if (!rematch_yt_id) {
-    youtube_videos = await YoutubeVideos.find({
-      _id: {
-        $in: creator.youtube_videos?.map((video: any) => {
-          return video._id;
-        }),
-      },
-    }).select("title videoId");
-    if (!youtube_videos) {
-      throw new Error(`Match: No youtube videos found for ${channel_slug}`);
-    }
-    logger.info(`Match: Found ${youtube_videos.length} youtube videos`);
-  }
-
+  const youtube_videos: YoutubeVideo[] = await creator.getYoutubeVideos(
+    rematch_yt_id
+  );
   // Get creator's nebula videos
-  let nebula_videos: NebulaVideos[] = [];
-  // Get specific nebula video/videos if passed in
-  if (rematch_nebula_slug) {
-    const specificNebVideos = await NebulaVideos.find({
-      slug: { $in: rematch_nebula_slug },
-    }).select("title id slug");
-    if (specificNebVideos && specificNebVideos.length > 0) {
-      nebula_videos.push(...specificNebVideos);
-    } else {
-      throw new Error(
-        `Match: Nebula video ${rematch_nebula_slug} not found in DB`
-      );
-    }
-  }
-
-  // Get all nebula videos if no specific video was passed in
-  if (!rematch_nebula_slug) {
-    nebula_videos = await NebulaVideos.find({
-      _id: {
-        $in: creator.nebula_videos?.map((video: any) => {
-          return video._id;
-        }),
-      },
-    }).select("title id slug");
-    if (!nebula_videos) {
-      throw new Error(`Match: No nebula videos found for ${channel_slug}`);
-    }
-  }
-
-  logger.verbose(nebula_videos[0]);
+  const nebula_videos: NebulaVideos[] = await creator.getNebulaVideos(
+    rematch_nebula_slug
+  );
 
   // Match youtube videos to nebula videos
   logger.info(
@@ -182,6 +130,82 @@ const matchVideos = async (
 
 export default matchVideos;
 
+// //#region Get Nebula Videos
+// const getNebulaVideos = async (
+//   channel_slug: string,
+//   creator: CreatorType,
+//   rematch_nebula_slug?: Array<string>
+// ) => {
+//   let nebula_videos: NebulaVideos[] = [];
+//   // Get specific nebula video/videos if passed in
+//   if (rematch_nebula_slug) {
+//     const specificNebVideos = await NebulaVideos.find({
+//       slug: { $in: rematch_nebula_slug },
+//     }).select("title id slug");
+//     if (specificNebVideos && specificNebVideos.length > 0) {
+//       nebula_videos.push(...specificNebVideos);
+//     } else {
+//       throw new Error(
+//         `Match: Nebula video ${rematch_nebula_slug} not found in DB`
+//       );
+//     }
+//   }
+
+//   // Get all nebula videos if no specific video was passed in
+//   if (!rematch_nebula_slug) {
+//     nebula_videos = await NebulaVideos.find({
+//       _id: {
+//         $in: creator.nebula_videos?.map((video: any) => {
+//           return video._id;
+//         }),
+//       },
+//     }).select("title id slug");
+//     if (!nebula_videos) {
+//       throw new Error(`Match: No nebula videos found for ${channel_slug}`);
+//     }
+//   }
+// };
+// //#region Get Youtube Videos
+// const getYoutubeVideos = async (
+//   channel_slug: string,
+//   creator: CreatorType,
+//   rematch_yt_id?: Array<string>
+// ) => {
+//   let youtube_videos: YoutubeVideos[] = [];
+
+//   // Get specific youtube video/videos if passed in
+//   if (rematch_yt_id) {
+//     const specificYtVideos = await YoutubeVideos.find({
+//       youtube_id: { $in: rematch_yt_id },
+//     }).select("title videoId");
+//     if (specificYtVideos && specificYtVideos.length > 0) {
+//       youtube_videos.push(...specificYtVideos);
+//     } else {
+//       throw new Error(`Match: Youtube video ${rematch_yt_id} not found in DB`);
+//     }
+//     return youtube_videos;
+//   }
+
+//   // Get all youtube videos if no specific video was passed in
+//   else if (!rematch_yt_id) {
+//     youtube_videos = await YoutubeVideos.find({
+//       _id: {
+//         $in: creator.youtube_videos?.map((video: any) => {
+//           return video._id;
+//         }),
+//       },
+//     }).select("title videoId");
+//     if (!youtube_videos) {
+//       throw new Error(`Match: No youtube videos found for ${channel_slug}`);
+//     }
+//     // logger.info(`Match: Found ${youtube_videos.length} youtube videos`);
+//     return youtube_videos;
+//   } else {
+//     throw new Error(`Match: No youtube videos found for ${channel_slug}`);
+//   }
+// };
+
+//#region  --- Matcher Function ---
 // Match videos to each other
 const matcher = async (
   nebula_videos: Array<NebulaVideos>,
@@ -197,10 +221,10 @@ const matcher = async (
 
   let match_sets: Array<MatchResult> = [];
 
-  // Match youtube videos to nebula videos using fuse.js sorted by score
   nebula_videos.forEach((nebula_video: NebulaVideos) => {
     if (!nebula_video.title) return;
 
+    // Match youtube videos to nebula videos using fuse.js sorted by score
     const youtube_matches = fuse.search(nebula_video.title);
 
     // if there are matches, add them to the match_sets
@@ -217,6 +241,7 @@ const matcher = async (
         ),
       });
     }
+    return;
   });
 
   return match_sets;
@@ -231,3 +256,5 @@ interface MatchResult {
   nebula_video: NebulaVideos;
   youtube_matches: Array<YoutubeMatches>;
 }
+
+//#endregion --- Matcher Function ---

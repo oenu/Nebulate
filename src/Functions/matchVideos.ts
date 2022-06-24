@@ -134,6 +134,8 @@ const matchVideos = async (
   );
   const matchedArray = youtube_videos.map((youtube_video: any) => {
     const match = fuse.search(youtube_video.title);
+    // This returns the nebula video that matches best to the current youtube video
+    logger.info(match[0]?.item.title);
     let bestMatch: any = {};
     if (match.length === 0) {
       // No match returned from fuse.js, return null
@@ -146,7 +148,7 @@ const matchVideos = async (
       if (rematch_all) {
         return match[0];
       }
-      
+
       // If there are multiple matches, rank them by match and score and return the best match
 
       const previouslyUnmatched = match.filter((match: any) => {
@@ -168,8 +170,8 @@ const matchVideos = async (
     if (bestMatch.item) {
       // logger.info("Item matched with score: " + bestMatch.score);
       return {
-        youtube_video: bestMatch.item,
-        nebula_video: nebula_videos[bestMatch.refIndex],
+        youtube_video: youtube_videos[bestMatch.refIndex],
+        nebula_video: bestMatch.item,
         score: bestMatch.score,
       };
     } else {
@@ -186,21 +188,45 @@ const matchVideos = async (
     logger.error(`Match: No videos matched for ${channel_slug}`);
     return;
   }
-  logger.verbose(matched_videos);
+  // logger.verbose(matched_videos);
   logger.info(
     `Match: Found ${matched_videos.length} possible matched videos for ${channel_slug}`
   );
 
-    // Send matches to database
-    matched_videos.forEach(async (matched_video: any) => {
-      const { youtube_video, nebula_video, score } = matched_video;
-      // Dual match if perfect
-      if (score === 0 && ) {
-        await NebulaVideos.findOneAndUpdate(
+  // Send matches to database
+  matched_videos.forEach(async (matched_video: any) => {
+    logger.verbose(matched_video);
+    const { youtube_video, nebula_video, score } = matched_video;
+    if (!youtube_video?.videoId || youtube_video.videoId === "") {
+      // Youtube video id is null or empty, skip
+      return;
+    }
 
-
-
-
+    // Update the matched video in the database if the score is less than the previous match_strength
+    const res = await NebulaVideos.findOneAndUpdate(
+      {
+        $or: [
+          {
+            $and: [
+              { _id: nebula_video._id },
+              { match_strength: { $gt: score } },
+            ],
+          },
+          {
+            $and: [{ _id: nebula_video._id }, { matched: false }],
+          },
+        ],
+      },
+      {
+        matched: true,
+        match_strength: score,
+        youtube_video_id: youtube_video.videoId,
+        youtube_video_object_id: youtube_video._id,
+      }
+    );
+    logger.verbose(res);
+  });
+  return;
 };
 
 export default matchVideos;

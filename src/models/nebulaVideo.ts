@@ -31,7 +31,16 @@ interface NebulaVideoInterface {
   match_strength?: number;
 }
 
-const nebulaVideoSchema = new Schema<NebulaVideoInterface>(
+interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
+  setMatch: (youtubeVideo: YoutubeVideoType, strength: number) => Promise<void>;
+  updateMatch: (
+    youtubeVideo: YoutubeVideoType,
+    strength: number
+  ) => Promise<void>;
+  removeMatch: () => Promise<void>;
+}
+
+const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
   {
     nebula_video_id: {
       // "video_episode:d49e13df-f1ed-4562-8209-6098de1e187f"

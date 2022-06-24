@@ -1,24 +1,23 @@
 import logger from "../config/logger";
-import {
-  Creator,
-  // CreatorType
-} from "../models/creator";
+import Fuse from "fuse.js";
+
+// Functions
 import videosFromNebula from "./videosFromNebula";
 import videosFromYoutube from "./videosFromYoutube";
-import type {
-  // YoutubeVideo,
-  YoutubeVideo as YoutubeVideos,
-} from "../models/youtubeVideo";
+
+// Types
 import type { NebulaVideoType } from "../models/nebulaVideo";
-import { NebulaVideo as NebulaVideos } from "../models/nebulaVideo";
-import Fuse from "fuse.js";
+import type { YoutubeVideoType } from "../models/youtubeVideo";
+
+// Mongo Models
+import { Creator } from "../models/creator";
+import { NebulaVideo } from "../models/nebulaVideo";
 
 /**
  * Match Nebula videos to Youtube videos, from the database
  * @param  {string} channel_slug - The channel slug
  * @param  {Array.<string>} rematch_nebula_slug? - The slug of the video to rematch
  * @param  {Array.<string>} rematch_yt_id? - The youtube id of the video to rematch
- * @param {boolean} rematch_all? - Whether to attempt to rematch all videos
  *
  */
 const matchVideos = async (
@@ -39,15 +38,9 @@ const matchVideos = async (
     throw new Error(`Match: Creator ${channel_slug} not found in DB`);
   }
 
-  // Check to see if creator has youtube id
-  if (!creator.youtube_id) {
-    throw new Error(`Match: Creator ${channel_slug} has no youtube id`);
-  }
-
   // Check the last time the creator's nebula videos were scraped
-  const { last_scraped_nebula, last_scraped_youtube } = creator;
-
   // If the creator's videos were scraped more than 4 hours ago, scrape them again
+  const { last_scraped_nebula, last_scraped_youtube } = creator;
   if (
     last_scraped_nebula &&
     last_scraped_youtube &&
@@ -66,19 +59,13 @@ const matchVideos = async (
   }
 
   // Get creator's youtube videos
-  const youtube_videos: YoutubeVideos[] = await creator.getYoutubeVideos(
+  const youtube_videos: YoutubeVideoType[] = await creator.getYoutubeVideos(
     rematch_yt_id
   );
   // Get creator's nebula videos
   const nebula_videos: NebulaVideoType[] = await creator.getNebulaVideos(
     rematch_nebula_slug
   );
-
-  console.log(
-    "------------------------------------------------------",
-    nebula_videos[0] instanceof NebulaVideos
-  );
-  logger.verbose(nebula_videos[0]);
 
   // Match youtube videos to nebula videos
   logger.info(
@@ -112,7 +99,7 @@ const matchVideos = async (
     }
 
     // Update the matched video in the database if the score is less than the previous match_strength
-    const res = await NebulaVideos.findOneAndUpdate(
+    const res = await NebulaVideo.findOneAndUpdate(
       {
         $or: [
           {
@@ -144,7 +131,7 @@ export default matchVideos;
 // Match videos to each other
 const matcher = async (
   nebula_videos: Array<NebulaVideoType>,
-  youtube_videos: Array<YoutubeVideos>
+  youtube_videos: Array<YoutubeVideoType>
 ) => {
   const fuse = new Fuse(youtube_videos, {
     keys: ["title"],
@@ -167,7 +154,7 @@ const matcher = async (
       match_sets.push({
         nebula_video: nebula_video,
         youtube_matches: youtube_matches.map(
-          (match: Fuse.FuseResult<YoutubeVideos>) => {
+          (match: Fuse.FuseResult<YoutubeVideoType>) => {
             return {
               youtube_video: match.item,
               score: match.score,
@@ -183,7 +170,7 @@ const matcher = async (
 };
 
 interface YoutubeMatches {
-  youtube_video: YoutubeVideos;
+  youtube_video: YoutubeVideoType;
   score: number;
 }
 

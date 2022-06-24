@@ -1,14 +1,18 @@
 // Register creator in DB
-
 import axios from "axios";
-
 import logger from "../config/logger";
-import { Creator } from "../models/creator";
-import videosFromNebula from "./videosFromNebula";
 import { youtube } from "@googleapis/youtube";
-import youtubeIds from "../config/youtubeIds";
-import videosFromYoutube from "./videosFromYoutube";
 const yt = youtube("v3");
+
+// Files
+import youtubeIds from "../config/youtubeIds";
+
+// Functions
+import videosFromNebula from "./videosFromNebula";
+import videosFromYoutube from "./videosFromYoutube";
+
+// Mongo Models
+import { Creator } from "../models/creator";
 
 const registerCreatorInDB = async (channel_slug: string) => {
   // Check if creator exists in DB

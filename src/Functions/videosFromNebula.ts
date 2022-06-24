@@ -1,12 +1,14 @@
 // Scrapes api for a creator and returns an array of video objects
-
-import type { NebulaVideo } from "../models/nebulaVideo";
-import { NebulaVideo as VideoModel } from "../models/nebulaVideo";
 import mongoose from "mongoose";
-// Imports
 import axios from "axios";
 import logger from "../config/logger";
+
+// Types
+import type { NebulaVideoType } from "../models/nebulaVideo";
+
+// Mongo Models
 import { Creator } from "../models/creator";
+import { NebulaVideo as VideoModel } from "../models/nebulaVideo";
 
 /**
  * Scrapes api for a creator and returns an array of video objects
@@ -100,7 +102,7 @@ export const videosFromNebula = async (
   );
 
   // Convert to video objects
-  const convertedVideos = videoBuffer.map((video: any): NebulaVideo => {
+  const convertedVideos = videoBuffer.map((video: any): NebulaVideoType => {
     return {
       id: video.id,
       slug: video.slug,

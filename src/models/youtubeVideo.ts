@@ -74,8 +74,8 @@ const youtubeVideoSchema = new Schema(
   }
 );
 
-export type YoutubeVideo = InferSchemaType<typeof youtubeVideoSchema>;
-export const YoutubeVideo = mongoose.model<YoutubeVideo>(
+export type YoutubeVideoType = InferSchemaType<typeof youtubeVideoSchema>;
+export const YoutubeVideo = mongoose.model<YoutubeVideoType>(
   "YoutubeVideo",
   youtubeVideoSchema
 );

@@ -118,7 +118,7 @@ youtubeVideoSchema.methods.setMatch = async function (
   this.nebula_video_object_id = nebulaVideo._id;
   this.nebula_video_slug = nebulaVideo.slug;
   this.match_strength = matchStrength;
-  this.save();
+  await this.save();
 };
 
 youtubeVideoSchema.methods.updateMatch = async function (
@@ -139,7 +139,7 @@ youtubeVideoSchema.methods.updateMatch = async function (
   } else {
     // update the match strength
     this.match_strength = matchStrength;
-    this.save();
+    await this.save();
   }
 };
 
@@ -153,7 +153,7 @@ youtubeVideoSchema.methods.removeMatch = async function (
   this.nebula_video_object_id = null;
   this.nebula_video_slug = null;
   this.match_strength = null;
-  this.save();
+  await this.save();
 };
 
 youtubeVideoSchema.statics.findByYoutubeVideoId = async function (

@@ -155,7 +155,6 @@ const videosFromYoutube = async (
             etag: video.etag,
             status: video.status.privacyStatus,
             channel_slug: channel_slug,
-            matched: false,
             creator_object_id: creator._id,
           };
         }

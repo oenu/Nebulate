@@ -19,10 +19,10 @@ export interface YoutubeVideoInterface {
   etag: string;
   status: string;
   channel_slug: string;
-  nebula_video_object_id?: mongoose.Schema.Types.ObjectId;
-  nebula_video_slug?: string;
-  match_strength?: number;
-  matched?: boolean;
+  // nebula_video_object_id?: mongoose.Schema.Types.ObjectId;
+  // nebula_video_slug?: string;
+  // match_strength?: number;
+  // matched?: boolean;
   creator_object_id?: mongoose.Schema.Types.ObjectId;
 }
 

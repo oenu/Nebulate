@@ -34,3 +34,4 @@ src/store/simple_key.txt
 src/database/key.pem
 src/database/simple_key.json
 src/lookup_table/key.pem
+src/lookup_table/lookup_table.json

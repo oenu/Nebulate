@@ -15,7 +15,6 @@ interface VideoEntry {
 
 interface LookupTable {
   videos: VideoEntry[];
-  unmatchedVideos: string[];
   hash: string;
   generatedAt: Date;
 }
@@ -37,16 +36,17 @@ const generateLookupTable = async (
   }).select("youtube_video_id channel_slug _id");
   logger.log(`Table Gen: Found ${youtubeVideos.length} youtube videos`);
 
-  // Create lookup table
+  /** ===========================================================================
+   * Note: We are not using the Matched property of the Nebula videos as
+   *      the lookup table is only used to determine if a youtube video
+   *     is a match for /any/ of the nebula videos. In other words, we
+   *    are verifying that the youtube video is a match for at least one
+   *   of the nebula videos and relying on the request for redirect to respond
+   *  with the correct video.
+   * ===========================================================================
+   */
+
   const videoEntries = youtubeVideos.map((youtubeVideo): VideoEntry => {
-    /**
-     * Note: We are not using the Matched property of the Nebula videos as
-     *      the lookup table is only used to determine if a youtube video
-     *     is a match for /any/ of the nebula videos. In other words, we
-     *    are verifying that the youtube video is a match for at least one
-     *   of the nebula videos and relying on the request for redirect to respond
-     *  with the correct video.
-     */
     return {
       url: youtubeVideo.youtube_video_id,
       channel_slug: youtubeVideo.channel_slug,
@@ -60,8 +60,7 @@ const generateLookupTable = async (
   });
 
   const lookup_prototype = {
-    videoEntries: videoEntries,
-    unmatchedVideos: unmatchedVideos.map((video) => video.youtube_video_id),
+    videos: videoEntries,
     generatedAt: new Date(),
   };
 
@@ -69,18 +68,18 @@ const generateLookupTable = async (
   const privatePem = fs.readFileSync(path.join(__dirname, "/key.pem"));
   const key = privatePem.toString();
   const sign = crypto.createSign("RSA-SHA256");
-  sign.update(JSON.stringify(database_prototype));
+  sign.update(JSON.stringify(lookup_prototype));
   const sig = sign.sign(key, "hex");
 
-  const database: extensionDatabase = {
-    ...database_prototype,
+  const table: LookupTable = {
+    ...lookup_prototype,
     hash: sig,
   };
   await fs.promises.writeFile(
-    path.join(__dirname, "/simple_key.json"),
-    JSON.stringify(database),
+    path.join(__dirname, "/lookup_table.json"),
+    JSON.stringify(table),
     "utf-8"
   );
-  logger.verbose(database);
-  return database;
+  logger.verbose(table);
+  return table;
 };

@@ -1,13 +1,13 @@
 // Video type and model
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
-import logger from "../config/logger";
+// import logger from "../config/logger";
 
 // Types
 import type { NebulaVideoType } from "./nebulaVideo";
 
 // Mongo Models
-import { NebulaVideo } from "./nebulaVideo";
+// import { NebulaVideo } from "./nebulaVideo";
 
 export interface YoutubeVideoInterface {
   youtube_video_id: string;

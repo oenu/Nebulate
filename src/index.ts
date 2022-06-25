@@ -29,12 +29,33 @@ import registerCreatorInDB from "./Functions/registerCreatorInDB";
 import videosFromYoutube from "./Functions/videosFromYoutube";
 import matchVideos from "./Functions/matchVideos";
 import generateDatabase from "./database/database";
+import generateLookupTable from "./lookup_table/lookupTable";
 app.use(auth);
 
 // Routes
 app.get("/", (_req, res: Response) => {
   res.send("Hello World!");
   logger.info("Hello World!");
+});
+
+app.get("/generateDB", async (_req, res: Response) => {
+  await generateDatabase()
+    .then((database) => {
+      res.send(database);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+});
+
+app.get("/generateTable", async (_req, res: Response) => {
+  await generateLookupTable()
+    .then((lookupTable) => {
+      res.send(lookupTable);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
 });
 
 app.get(

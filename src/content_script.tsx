@@ -1,13 +1,16 @@
-console.log("Content script running_0");
+console.log("CS: init");
 // Runs in the context of the youtube tab
 
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
+chrome.runtime.onMessage.addListener((obj, sender) => {
   const { type, value, videoId } = obj;
-
   if (type === "NEW") {
-    newVideoLoaded(videoId);
+    if (videoId === current_video_id) {
+    } else if (videoId !== undefined) {
+      console.log("CS: New video loaded: " + videoId);
+      newVideoLoaded(videoId);
+    }
   }
-  response("ok");
+  return;
 });
 
 // Types
@@ -18,7 +21,6 @@ interface Video {
 }
 
 // (() => {
-console.log("Content script running");
 let youtube_left_controls: Element | null = null;
 let youtube_player: Element | null = null;
 let current_video_id: string | null = null;
@@ -40,9 +42,7 @@ const redirectHandler = async () => {
   // nebulaRedirect(nebular_redirect_url);
 };
 
-// What to do when a new video is loaded
 const newVideoLoaded = async (videoId: string) => {
-  console.log("newVideoLoaded: " + videoId);
   current_video_id = videoId;
 
   const nebulate_button_exists =
@@ -84,3 +84,6 @@ const nebulaRedirect = async (url: string) => {
 //   // newVideoLoaded();
 // })();
 // Start listening to messages from the background script
+
+// IDEA: #1 Highlight the video with a blue border if it has a match
+// IDEA: #4 Whenever on a nebula creators video, highlight the creator / indicate that they are a nebula creator

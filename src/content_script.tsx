@@ -28,6 +28,10 @@ let current_video_id: string | null = null;
 const redirectHandler = async () => {
   // Request redirect address for current video
   console.log("Requesting redirect address for current video");
+  chrome.runtime.sendMessage({
+    type: "REDIRECT_REQUEST",
+    videoId: current_video_id,
+  });
 
   console.log(youtube_player);
   // fetch(`http://localhost:3000/lookup/${current_video_id}`)
@@ -64,8 +68,8 @@ const newVideoLoaded = async (videoId: string) => {
   }
 };
 
+// Check if video has a known match
 const checkIfVideoKnown = async (videoId: string) => {
-  // Check if video has a known match
   console.log("CS: Checking if video has a known match");
   chrome.storage.local.get([videoId], (obj: any) => {
     const video = obj[videoId] ? JSON.parse(obj[videoId]) : null;
@@ -80,10 +84,6 @@ const nebulaRedirect = async (url: string) => {
     url: url,
   });
 };
-
-//   // newVideoLoaded();
-// })();
-// Start listening to messages from the background script
 
 // IDEA: #1 Highlight the video with a blue border if it has a match
 // IDEA: #4 Whenever on a nebula creators video, highlight the creator / indicate that they are a nebula creator

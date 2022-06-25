@@ -39,7 +39,8 @@
     "unlimitedStorage",
     "tabs",
     "activeTab",
-    "scripting"
+    "scripting",
+    "alarms"
   ],
 
   "host_permissions": ["https://*.youtube.com/*"]

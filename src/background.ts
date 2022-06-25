@@ -1,30 +1,16 @@
-// Register a listener that runs in the background.
-console.log("background.js");
-let server: string;
+import { refreshTable } from "./functions/refreshTable";
+import { getInstallType } from "./utils/getInstallType";
 
-// Check if in development mode.
-chrome.management.getSelf((info) => {
-  switch (info.installType) {
-    case "development":
-      console.log("background.js: in development mode");
-      server = "http://localhost:3000/";
-      break;
-    case "normal":
-      server = ""; // TODO: #2 Set up a server for production.
-      break;
-    case "sideload":
-      throw new Error("Sideloading is not supported.");
-      break;
-    case "other":
-      throw new Error("Other install types are not supported.");
-      break;
-    default:
-      break;
-  }
-});
+declare global {
+  var server: string;
+}
+(async () => {
+  global.server = await getInstallType();
+  console.log("background.js: server: " + server);
+})();
 
+// When the page url is equal to a youtube video url, send a message to the content script.
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  // When the page url is equal to a youtube video url, send a message to the content script.
   console.log(tab.url);
   if (tab.status === "complete") {
     if (tab.url && tab.url.includes("youtube.com/watch")) {
@@ -46,13 +32,25 @@ chrome.runtime.onMessage.addListener(function (request) {
   );
   if (request.type === "NEBULA_REDIRECT") {
     chrome.tabs.create({ url: request.url });
+  } else if (request.type === "REDIRECT_REQUEST") {
   }
 });
 
-chrome.runtime.onStartup.addListener(function () {
+// Background functions ======================================================
+
+chrome.runtime.onInstalled.addListener(async function () {
+  console.log("background.js: onInstalled");
+  fetch(`${server}/api/install`, {
+    method: "POST",
+  });
+  await refreshTable();
+});
+
+chrome.runtime.onStartup.addListener(async function () {
   console.log("background.js: onStartup");
-  // Check when last updated
-  chrome.storage.sync.get("lastUpdated", (result) => {
+
+  // Check when the lookup table was last updated
+  chrome.storage.local.get("lastUpdated", async (result) => {
     if (result.lastUpdated) {
       const lastUpdated = new Date(result.lastUpdated);
       const now = new Date();
@@ -60,46 +58,18 @@ chrome.runtime.onStartup.addListener(function () {
       const hours = Math.floor(diff / (1000 * 60 * 60));
       if (hours > 6) {
         console.log("background.js: last updated more than 6 hours ago");
-        refreshLookupTable()
-          .then(() => {
-            console.log("background.js: lookup table refreshed");
-          })
-          .catch((err) => {
-            console.log("background.js: error refreshing lookup table: " + err);
-          });
+        await refreshTable();
       }
     }
   });
-});
-
-const refreshLookupTable = async (): Promise<void> => {
-  // IDEA: #3 Send the current version number of lookup table to server when requesting a new one.
-  fetch(`${server}/api/table`)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("background.js: fetched lookup table");
-      console.log(data);
-      chrome.storage.sync.set({ lookupTable: data });
-      chrome.storage.sync.set({ lastUpdated: new Date() });
-      Promise.resolve;
-    })
-    .catch((error) => {
-      console.log("background.js: error fetching lookup table");
-      console.log(error);
-      Promise.reject(error);
-    });
-};
-
-// First Install or Update
-chrome.runtime.onInstalled.addListener(function () {
-  fetch(`${server}/api/register`, {
-    method: "POST",
+  chrome.alarms.create("refreshTable", {
+    delayInMinutes: 900,
   });
-  refreshLookupTable();
 });
 
-interface LookupTable {
-  url: string;
-  slug: string;
-  matched: boolean;
-}
+chrome.alarms.onAlarm.addListener(async function (alarm) {
+  console.log("background.js: alarm triggered: " + alarm.name);
+  if (alarm.name === "refreshTable") {
+    await refreshTable();
+  }
+});

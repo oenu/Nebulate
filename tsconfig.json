@@ -7,9 +7,9 @@
     }
   },
   "compilerOptions": {
-    "lib": ["es2021"],
-    "module": "es2022",
-    "target": "es2021",
+    "lib": ["es6"],
+    "module": "commonjs",
+    "target": "es6",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -27,7 +27,9 @@
     "noUnusedParameters": true,
     "importsNotUsedAsValues": "error",
     "checkJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules"]

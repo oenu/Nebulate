@@ -7,7 +7,7 @@ import logger from "../config/logger";
 import type { YoutubeVideoType } from "./youtubeVideo";
 
 // Mongo Models
-import { YoutubeVideo } from "./youtubeVideo";
+// import { YoutubeVideo } from "./youtubeVideo";
 
 /**
  * nebulaVideoSchema schema
@@ -30,6 +30,7 @@ export interface NebulaVideoInterface {
   youtube_video_id?: string;
   youtube_video_object_id?: mongoose.Schema.Types.ObjectId;
   match_strength?: number;
+  creator_object_id?: mongoose.Schema.Types.ObjectId;
 }
 
 interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
@@ -112,6 +113,10 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
       // 0.5
       type: "Number",
     },
+    creator_object_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Creator",
+    },
   },
   {
     collection: "nebulaVideos",
@@ -151,20 +156,43 @@ nebulaVideoSchema.methods.setMatch = async function (
 nebulaVideoSchema.methods.updateMatch = async function (
   youtubeVideo: YoutubeVideoType,
   matchStrength: number
-) {
-  // Check to see if the new video is the same as the old one
-  if (this.youtube_video_object_id !== youtubeVideo._id) {
-    const oldYoutubeVideo = await YoutubeVideo.findById(
-      this.youtube_video_object_id
-    );
-    if (oldYoutubeVideo) {
-      if (oldYoutubeVideo.match_strength) {
-        if (matchStrength > oldYoutubeVideo?.match_strength) return;
-        await oldYoutubeVideo.removeMatch(youtubeVideo);
+): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    // Check to see if the new video is the same as the old one
+    if (this.youtube_video_object_id === youtubeVideo._id) {
+      // The new video is the same as the old one -- Update the match strength
+      logger.info(
+        `Match update: ${this.slug}: ${this.match_strength} ==> ${matchStrength}`
+      );
+      this.match_strength = matchStrength;
+      await this.save();
+      resolve();
+    }
+
+    // Check to see if the youtube video is matched to another nebula video
+    if (youtubeVideo._id) {
+      const existingNebulaMatch = await NebulaVideo.findOne({
+        youtube_video_object_id: youtubeVideo._id,
+      });
+
+      if (existingNebulaMatch) {
+        // Compare the match strengths
+        if (
+          existingNebulaMatch.match_strength &&
+          matchStrength < existingNebulaMatch.match_strength
+        ) {
+          // This match is closer, remove the old match
+          await existingNebulaMatch.removeMatch(this.toObject());
+        } else {
+          // This match is worse, keep the old match
+          reject(false);
+        }
       }
     }
+    // No other nebula video is currently matched to this youtube video -- Set match
     await this.setMatch(youtubeVideo, matchStrength);
-  }
+    resolve();
+  });
 };
 
 nebulaVideoSchema.methods.removeMatch = async function (

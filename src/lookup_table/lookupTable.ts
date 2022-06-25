@@ -20,39 +20,47 @@ interface LookupTable {
   generatedAt: Date;
 }
 
-const generateLookupTable = async (): Promise<LookupTable> => {
-  // Get all nebula videos
+const generateLookupTable = async (
+  maximumMatchDistance?: number
+): Promise<LookupTable> => {
+  // Get all matched nebula videos
+  const matchLimit = maximumMatchDistance || 2;
   const nebulaVideos = await NebulaVideo.find({
-    matched: true,
     youtube_video_id: { $exists: true },
-  }).select("youtube_video_object_id slug creator_object_id");
+    match_strength: { $lte: matchLimit },
+  }).select("youtube_video_object_id channel_slug");
+  logger.info(`Table Gen: Found ${nebulaVideos.length} matched nebula videos`);
 
-  // Get up to date url for each video
-
-  let videoPairs: VideoEntry[] = [];
-  for (let index = 0; index < nebulaVideos.length; index++) {
-    const video = nebulaVideos[index];
-    if (!video?.youtube_video_object_id) continue;
-
-    const youtube_url = await YoutubeVideo.findById(
-      video.youtube_video_object_id
-    ).select("youtube_video_id");
-
-    if (youtube_url) {
-      videoPairs.push({
-        url: youtube_url.youtube_video_id,
-        slug: video.slug,
-      });
-    }
-  }
-
-  const unmatchedVideos = await YoutubeVideo.find({
-    matched: false,
+  // Get all youtube videos
+  const youtubeVideos = await YoutubeVideo.find({
     youtube_video_id: { $exists: true },
-  }).select("youtube_video_id");
+  }).select("youtube_video_id channel_slug _id");
+  logger.log(`Table Gen: Found ${youtubeVideos.length} youtube videos`);
 
-  const database_prototype = {
-    videoPairs: videoPairs,
+  // Create lookup table
+  const videoEntries = youtubeVideos.map((youtubeVideo): VideoEntry => {
+    /**
+     * Note: We are not using the Matched property of the Nebula videos as
+     *      the lookup table is only used to determine if a youtube video
+     *     is a match for /any/ of the nebula videos. In other words, we
+     *    are verifying that the youtube video is a match for at least one
+     *   of the nebula videos and relying on the request for redirect to respond
+     *  with the correct video.
+     */
+    return {
+      url: youtubeVideo.youtube_video_id,
+      channel_slug: youtubeVideo.channel_slug,
+      matched: nebulaVideos.some((nebulaVideo) => {
+        return nebulaVideo.youtube_video_object_id
+          ? nebulaVideo.youtube_video_object_id.toString() ===
+              youtubeVideo._id.toString()
+          : false;
+      }),
+    };
+  });
+
+  const lookup_prototype = {
+    videoEntries: videoEntries,
     unmatchedVideos: unmatchedVideos.map((video) => video.youtube_video_id),
     generatedAt: new Date(),
   };

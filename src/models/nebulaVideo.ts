@@ -159,17 +159,37 @@ nebulaVideoSchema.methods.updateMatch = async function (
 ) {
   // Check to see if the new video is the same as the old one
   if (this.youtube_video_object_id !== youtubeVideo._id) {
-    const oldYoutubeVideo = await YoutubeVideo.findById(
-      this.youtube_video_object_id
-    );
-    if (oldYoutubeVideo) {
-      if (oldYoutubeVideo.match_strength) {
-        if (matchStrength > oldYoutubeVideo?.match_strength) return;
-        await oldYoutubeVideo.removeMatch(youtubeVideo);
+    // Check to see if the youtube video is matched to another nebula video
+    const existingNebulaMatch = await NebulaVideo.findById({
+      youtube_video_object_id: youtubeVideo._id,
+    });
+
+    if (existingNebulaMatch) {
+      // Compare the match strengths
+      if (
+        existingNebulaMatch.match_strength &&
+        matchStrength < existingNebulaMatch.match_strength
+      ) {
+        // This match is closer, remove the old match
+        await existingNebulaMatch.removeMatch();
+      } else {
+        // This match is worse, keep the old match
+        return;
       }
+    } else {
+      // No other nebula video is matched to this youtube video
+      // Set the match
+      await this.setMatch(youtubeVideo, matchStrength);
     }
+
     // logger.info(`${this.title} :: ${youtubeVideo.title}`);
-    await this.setMatch(youtubeVideo, matchStrength);
+  } else {
+    // The new video is the same as the old one -- Update the match strength
+    logger.info(
+      `Match strength update: ${this.slug}: ${this.match_strength} ==> ${matchStrength}`
+    );
+    this.match_strength = matchStrength;
+    this.save();
   }
 };
 

@@ -15,13 +15,14 @@ interface CreatorEntry {
 
 interface LookupTable {
   creators: CreatorEntry[];
-  hash: string;
   generatedAt: Date;
+  hash: string;
 }
 
 const generateLookupTable = async (
   maximumMatchDistance?: number
 ): Promise<LookupTable> => {
+  console.time("generateLookupTable");
   // Get all matched nebula videos
   const matchLimit = maximumMatchDistance || 2;
   const nebulaVideos = await NebulaVideo.find({
@@ -31,7 +32,6 @@ const generateLookupTable = async (
     .select("youtube_video_object_id channel_slug")
     .lean();
   logger.info(`Table Gen: Found ${nebulaVideos.length} matched nebula videos`);
-
   // Get all youtube videos
   const youtubeVideos = await YoutubeVideo.find({})
     .select("youtube_video_id channel_slug")
@@ -39,6 +39,7 @@ const generateLookupTable = async (
   logger.info(`Table Gen: Found ${youtubeVideos.length} youtube videos`);
 
   const creatorSlugs = [...new Set(nebulaVideos.map((v) => v.channel_slug))];
+  logger.info(`Table Gen: Found ${creatorSlugs.length} creators`);
 
   const videoEntries = youtubeVideos.map((youtubeVideo) => {
     return {
@@ -54,9 +55,8 @@ const generateLookupTable = async (
   });
 
   const lookup_prototype = {
-    videos: videoEntries,
     generatedAt: new Date(),
-    creators: creatorSlugs.map((creatorSlug) => {
+    creators: creatorSlugs.map<CreatorEntry>((creatorSlug) => {
       const creatorVideos = videoEntries.filter((v) => v.slug === creatorSlug);
       const matched = creatorVideos.filter((v) => v.matched);
       const notMatched = creatorVideos.filter((v) => !v.matched);
@@ -88,6 +88,7 @@ const generateLookupTable = async (
     "utf-8"
   );
   logger.verbose(table);
+  console.timeEnd("generateLookupTable");
   return table;
 };
 

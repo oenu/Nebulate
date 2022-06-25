@@ -38,7 +38,7 @@ app.get("/", (_req, res: Response) => {
 });
 
 app.get(
-  "/update/:channel_slug/:onlySearchNew?/:searchLimit?",
+  "/nebula/:channel_slug/:onlySearchNew?/:searchLimit?",
   async (req: Request, res: Response) => {
     const { channel_slug } = req.params;
     const onlySearchNew = req.params.onlySearchNew

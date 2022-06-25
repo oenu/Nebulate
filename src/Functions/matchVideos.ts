@@ -100,42 +100,19 @@ const matchVideos = async (
       if (match === undefined) return;
 
       const { youtube_video, score } = match;
-      if (match.youtube_video.matched === false) {
-        modified_videos.push({
-          nebula_title: nebula_video.title,
-          youtube_title: youtube_video.title,
-          score: score,
+      await nebula_video
+        .updateMatch(youtube_video, score)
+        .then(() => {
+          modified_videos.push({
+            nebula_title: nebula_video.title,
+            youtube_title: youtube_video.title,
+            score,
+          });
+          index = youtube_matches.length * 2;
+        })
+        .catch((error) => {
+          if (error !== false) throw error;
         });
-        await nebula_video.updateMatch(youtube_video, score);
-
-        break;
-      } else {
-        // Compare scores
-        const { match_strength } = match.youtube_video;
-        if (!match_strength) {
-          // Item is matched but has no match_strength, override it with the new score
-          modified_videos.push({
-            nebula_title: nebula_video.title,
-            youtube_title: youtube_video.title,
-            score: score,
-          });
-          await nebula_video.updateMatch(youtube_video, score);
-
-          break;
-        }
-
-        if (match_strength > score) {
-          modified_videos.push({
-            nebula_title: nebula_video.title,
-            youtube_title: youtube_video.title,
-            score: score,
-          });
-          await nebula_video.updateMatch(youtube_video, score);
-          break;
-        } else {
-          // Do nothing
-        }
-      }
     }
   });
 

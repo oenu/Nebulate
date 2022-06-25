@@ -9,7 +9,7 @@
   "compilerOptions": {
     "lib": ["es6"],
     "module": "commonjs",
-    "target": "es5",
+    "target": "es6",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

@@ -1,5 +1,6 @@
 import { checkTable } from "./functions/checkTable";
 import { refreshTable } from "./functions/refreshTable";
+import requestSlug from "./functions/requestSlug";
 
 export const server_url = "http://localhost:3000";
 
@@ -25,6 +26,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
             if (video) {
               // Send the video id and slug to the content script.
               chrome.tabs.sendMessage(tabId, {
+                known: video.known,
                 type: "NEW_VIDEO",
                 videoId: videoId,
                 slug: video.slug,
@@ -40,15 +42,17 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   }
 });
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener(async function (request) {
   try {
     console.log(
       "background.js: received redirect request from content script: " +
         JSON.stringify(request)
     );
     if (request.type === "NEBULA_REDIRECT") {
-      chrome.tabs.create({ url: request.url });
-    } else if (request.type === "REDIRECT_REQUEST") {
+      // Request the slug from the server.
+      console.log(request);
+      const nebula_slug = await requestSlug(request.url);
+      console.log("background.js: received slug: " + nebula_slug);
     }
   } catch (error) {
     console.log(error);

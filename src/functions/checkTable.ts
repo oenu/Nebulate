@@ -1,6 +1,7 @@
 // Check the local table for the given url
 
 export interface Match {
+  known?: boolean;
   matched?: boolean;
   slug?: string;
 }
@@ -13,10 +14,11 @@ export const checkTable = async (url: string) => {
   let video: Match = {};
 
   // Check each creators matched videos
-  console.log(lookupTable);
+
   for (let index = 0; index < lookupTable.creators.length; index++) {
     const creator = lookupTable.creators[index];
     if (creator.matched.includes(url)) {
+      video.known = true;
       video.slug = creator.slug;
       video.matched = true;
       break;
@@ -34,6 +36,7 @@ export const checkTable = async (url: string) => {
   for (let index = 0; index < lookupTable.creators.length; index++) {
     const creator = lookupTable.creators[index];
     if (creator.not_matched.includes(url)) {
+      video.known = true;
       video.slug = creator.slug;
       video.matched = false;
       break;

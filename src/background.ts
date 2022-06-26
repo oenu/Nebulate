@@ -53,6 +53,11 @@ chrome.runtime.onMessage.addListener(async function (request) {
       console.log(request);
       const nebula_slug = await requestSlug(request.url);
       console.log("background.js: received slug: " + nebula_slug);
+
+      chrome.tabs.create({
+        url: `https://nebula.app/videos/${nebula_slug}`,
+        active: true,
+      });
     }
   } catch (error) {
     console.log(error);

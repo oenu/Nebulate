@@ -22,6 +22,8 @@ interface Video {
 
 // (() => {
 let youtube_left_controls: Element | null = null;
+let youtube_right_controls: Element | null = null;
+let youtube_volume_controls: Element | null = null;
 let youtube_player: Element | null = null;
 let current_video_id: string | null = null;
 
@@ -53,18 +55,21 @@ const newVideoLoaded = async (videoId: string) => {
     document.getElementsByClassName("nebulate-btn")[0];
 
   if (!nebulate_button_exists) {
-    const nebulate_button = document.createElement("img");
+    const nebulate_button_right = document.createElement("img");
+    nebulate_button_right.src = chrome.runtime.getURL(
+      "assets/nebula_temp_light.png"
+    );
+    nebulate_button_right.className = "ytp-button " + "nebulate-btn";
+    nebulate_button_right.title = "RIGHT View this video on Nebula";
 
-    nebulate_button.src = chrome.runtime.getURL("assets/nebulate.png");
-    nebulate_button.className = "ytp-button " + "nebulate-btn";
-    nebulate_button.title = "View this video on Nebula";
+    youtube_right_controls =
+      document.getElementsByClassName("ytp-right-controls")[0];
+    // // document.getElementsByClassName("ytp-left-controls")[0];
+    // youtube_player = document.getElementsByClassName("video-stream")[0];
 
-    youtube_left_controls =
-      document.getElementsByClassName("ytp-left-controls")[0];
-    youtube_player = document.getElementsByClassName("video-stream")[0];
+    youtube_right_controls.prepend(nebulate_button_right);
 
-    youtube_left_controls.appendChild(nebulate_button);
-    nebulate_button.addEventListener("click", redirectHandler);
+    nebulate_button_right.addEventListener("click", redirectHandler);
   }
 };
 

@@ -4,6 +4,7 @@ import type { Response, Request } from "express";
 const app = express();
 
 import registerCreatorInDB from "../Functions/registerCreatorInDB";
+import matchVideos from "../Functions/matchVideos";
 
 app.get("/:channel_slug", async (req: Request, res: Response) => {
   // TODO: Change to post
@@ -18,6 +19,8 @@ app.get("/:channel_slug", async (req: Request, res: Response) => {
   try {
     await registerCreatorInDB(channel_slug);
     res.send(`Registered ${channel_slug}`);
+
+    await matchVideos(channel_slug);
   } catch (error: any) {
     logger.error(error.message);
 

@@ -8,6 +8,7 @@ export const refreshTable = async (): Promise<void> => {
     if (data) {
       console.log("background.js: received lookup table, saving to storage");
       await chrome.storage.local.set({ lookupTable: data });
+
       await chrome.storage.local.set({ lastUpdated: new Date() });
 
       // chrome.tabs.query(

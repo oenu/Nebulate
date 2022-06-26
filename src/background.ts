@@ -1,3 +1,4 @@
+import { checkTable } from "./functions/checkTable";
 import { refreshTable } from "./functions/refreshTable";
 
 export const server_url = "http://localhost:3000";
@@ -5,7 +6,7 @@ export const server_url = "http://localhost:3000";
 let currentVideo_url = "";
 
 // When the page url is equal to a youtube video url, send a message to the content script.
-chrome.tabs.onUpdated.addListener(function (tabId, _changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   try {
     if (currentVideo_url == tab.url) {
       return;
@@ -16,13 +17,22 @@ chrome.tabs.onUpdated.addListener(function (tabId, _changeInfo, tab) {
         // Strip out the video id from the url.
         const queryParameters = tab.url.split("?")[1];
         const urlParameters = new URLSearchParams(queryParameters);
-        console.log("sending message to content script");
-        console.log(urlParameters.get("v"));
+        const videoId = urlParameters.get("v");
 
-        chrome.tabs.sendMessage(tabId, {
-          type: "NEW",
-          videoId: urlParameters.get("v"),
-        });
+        if (videoId) {
+          // Check the local table for the given url
+          await checkTable(videoId).then((video) => {
+            if (video) {
+              // Send the video id and slug to the content script.
+              chrome.tabs.sendMessage(tabId, {
+                type: "NEW_VIDEO",
+                videoId: videoId,
+                slug: video.slug,
+                matched: video.matched,
+              });
+            }
+          });
+        }
       }
     }
   } catch (error) {

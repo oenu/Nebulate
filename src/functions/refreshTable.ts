@@ -9,17 +9,6 @@ export const refreshTable = async (): Promise<void> => {
       console.log("background.js: received lookup table, saving to storage");
       await chrome.storage.local.set({ lookupTable: data });
       await chrome.storage.local.set({ lastUpdated: new Date() });
-
-      // chrome.tabs.query(
-      //   { active: true, currentWindow: true, url: "https://%.youtube.com/*" },
-      //   function (tabs) {
-      //     if (tabs.length && tabs[0].id) {
-      //       chrome.tabs.sendMessage(tabs[0].id, {
-      //         type: "UPDATE_TABLE",
-      //       });
-      //     }
-      //   }
-      // );
     }
   } catch (error) {
     console.log(error);

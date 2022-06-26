@@ -28,7 +28,9 @@
         "assets/bookmark.png",
         "assets/play.png",
         "assets/delete.png",
-        "assets/save.png"
+        "assets/save.png",
+        "assets/nebula_temp_dark.png",
+        "assets/nebula_temp_light.png"
       ],
       "matches": ["https://*.youtube.com/*"]
     }
@@ -43,5 +45,5 @@
     "alarms"
   ],
 
-  "host_permissions": ["https://*.youtube.com/*"]
+  "host_permissions": ["https://*.youtube.com/*", "*localhost:*"]
 }

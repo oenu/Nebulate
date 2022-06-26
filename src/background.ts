@@ -1,11 +1,13 @@
+import { checkTable } from "./functions/checkTable";
 import { refreshTable } from "./functions/refreshTable";
+import requestSlug from "./functions/requestSlug";
 
 export const server_url = "http://localhost:3000";
 
 let currentVideo_url = "";
 
 // When the page url is equal to a youtube video url, send a message to the content script.
-chrome.tabs.onUpdated.addListener(function (tabId, _changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   try {
     if (currentVideo_url == tab.url) {
       return;
@@ -16,13 +18,23 @@ chrome.tabs.onUpdated.addListener(function (tabId, _changeInfo, tab) {
         // Strip out the video id from the url.
         const queryParameters = tab.url.split("?")[1];
         const urlParameters = new URLSearchParams(queryParameters);
-        console.log("sending message to content script");
-        console.log(urlParameters.get("v"));
+        const videoId = urlParameters.get("v");
 
-        chrome.tabs.sendMessage(tabId, {
-          type: "NEW",
-          videoId: urlParameters.get("v"),
-        });
+        if (videoId) {
+          // Check the local table for the given url
+          await checkTable(videoId).then((video) => {
+            if (video) {
+              // Send the video id and slug to the content script.
+              chrome.tabs.sendMessage(tabId, {
+                known: video.known,
+                type: "NEW_VIDEO",
+                videoId: videoId,
+                slug: video.slug,
+                matched: video.matched,
+              });
+            }
+          });
+        }
       }
     }
   } catch (error) {
@@ -30,15 +42,22 @@ chrome.tabs.onUpdated.addListener(function (tabId, _changeInfo, tab) {
   }
 });
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener(async function (request) {
   try {
     console.log(
       "background.js: received redirect request from content script: " +
         JSON.stringify(request)
     );
     if (request.type === "NEBULA_REDIRECT") {
-      chrome.tabs.create({ url: request.url });
-    } else if (request.type === "REDIRECT_REQUEST") {
+      // Request the slug from the server.
+      console.log(request);
+      const nebula_slug = await requestSlug(request.url);
+      console.log("background.js: received slug: " + nebula_slug);
+
+      chrome.tabs.create({
+        url: `https://nebula.app/videos/${nebula_slug}`,
+        active: true,
+      });
     }
   } catch (error) {
     console.log(error);

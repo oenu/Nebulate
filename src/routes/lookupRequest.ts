@@ -1,11 +1,13 @@
 import express from "express";
-import type { Response } from "express";
+import type { Response, Request } from "express";
 const app = express();
 
 import { NebulaVideo } from "../models/nebulaVideo";
 
-app.get("/lookup/:youtube_video_id", async (_req, res: Response) => {
-  const youtube_video_id = _req.params.youtube_video_id;
+app.get("/:youtubevideoid", async (req: Request, res: Response) => {
+  console.time("lookup");
+  const youtube_video_id = req.params.youtubevideoid;
+  console.log("Responding to req for " + youtube_video_id);
   if (!youtube_video_id) {
     res.send("No youtube_video_id provided");
   } else {
@@ -14,8 +16,11 @@ app.get("/lookup/:youtube_video_id", async (_req, res: Response) => {
     }).lean();
     if (video) {
       res.send(video.slug);
+    } else {
+      res.status(204).send("No video found");
     }
   }
+  console.timeEnd("lookup");
 });
 
 module.exports = app;

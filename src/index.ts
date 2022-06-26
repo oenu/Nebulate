@@ -1,5 +1,7 @@
 import express from "express";
 const app = express();
+const cors = require("cors");
+app.use(cors());
 
 import "dotenv/config";
 
@@ -28,10 +30,10 @@ app.use(auth);
 
 // Routes
 const generateDatabase = require("./routes/generateDatabase");
-app.use("/generate/database", generateDatabase);
+app.use("/database", generateDatabase);
 
 const generateLookupTable = require("./routes/generateTable");
-app.use("/generate/table", generateLookupTable);
+app.use("/api/table", generateLookupTable);
 
 const scrapeNebula = require("./routes/scrapeNebula");
 app.use("/scrape/nebula", scrapeNebula);
@@ -46,7 +48,7 @@ const matchVideos = require("./routes/matchVideos");
 app.use("/match", matchVideos);
 
 const lookupRequest = require("./routes/lookupRequest");
-app.use("/lookup", lookupRequest);
+app.use("/api/lookup", lookupRequest);
 
 // Start the server
 mongoose.connection.once("open", async () => {

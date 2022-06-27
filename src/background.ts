@@ -3,6 +3,8 @@ import { refreshTable } from "./functions/refreshTable";
 import requestSlug from "./functions/requestSlug";
 
 export const server_url = "http://localhost:3000";
+console.log("canyouhearme");
+const redirect_preference = false;
 
 let currentVideo_url = "";
 
@@ -44,29 +46,54 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
 
 chrome.runtime.onMessage.addListener(async function (request) {
   try {
-    console.log(
-      "background.js: received redirect request from content script: " +
-        JSON.stringify(request)
-    );
     if (request.type === "NEBULA_REDIRECT") {
-      // Request the slug from the server.
-      console.log(request);
+      console.log(
+        "background.js: received redirect request from content script: " +
+          JSON.stringify(request)
+      );
+
       const nebula_slug = await requestSlug(request.url);
+      if (!nebula_slug) {
+        console.log("background.js: no slug returned");
+        return;
+      }
       console.log("background.js: received slug: " + nebula_slug);
 
-      chrome.tabs.create({
-        url: `https://nebula.app/videos/${nebula_slug}`,
-        active: true,
+      if (nebula_slug && nebula_slug.length > 0) {
+        console.log("getting from storage");
+        chrome.storage.local.get("preferNewTab", (result) => {
+          console.log(result.preferNewTab);
+          if (result.preferNewTab === true) {
+            chrome.tabs.create({
+              url: `https://nebula.app/videos/${nebula_slug}`,
+              active: true,
+            });
+          } else {
+            // Redirect the user to the nebula page.
+            chrome.tabs.update(request.tabId, {
+              url: `https://nebula.app/videos/${nebula_slug}`,
+            });
+          }
+        });
+      } else {
+        throw new Error("No slug returned");
+        console.log("background.js: no slug returned");
+      }
+    }
+  } catch (error: any) {
+    console.log(error);
+    if (error.message === "No slug returned") {
+      chrome.tabs.sendMessage(request.tabId, {
+        type: "NO_SLUG_REDIRECT",
       });
     }
-  } catch (error) {
-    console.log(error);
   }
 });
 
 // Background functions ======================================================
 
 chrome.runtime.onInstalled.addListener(async function () {
+  chrome.storage.local.set({ preferNewTab: false });
   try {
     console.log("set server_url to: " + server_url);
     fetch(`${server_url}/api/install`, {

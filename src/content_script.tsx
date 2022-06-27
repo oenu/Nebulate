@@ -11,7 +11,10 @@ chrome.runtime.onMessage.addListener((obj, sender) => {
       console.log("CS: New video loaded: " + videoId);
       newVideoLoaded(videoId, known, matched, slug);
     }
+  } else if (type === "NO_SLUG_REDIRECT") {
+    handleNoSlugRedirect();
   }
+
   return;
 });
 
@@ -28,6 +31,10 @@ let youtube_right_controls: Element | null = null;
 let youtube_volume_controls: Element | null = null;
 let youtube_player: Element | null = null;
 let current_video_id: string | null = null;
+
+const handleNoSlugRedirect = async () => {
+  console.log("CS: No slug redirect");
+};
 
 const redirectHandler = async () => {
   // Request redirect address for current video

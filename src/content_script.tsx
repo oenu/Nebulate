@@ -16,7 +16,11 @@ chrome.runtime.onMessage.addListener((message) => {
   console.log(message.videoId);
   switch (type) {
     case "NEW_VIDEO":
-      console.log("CS: New known video loaded");
+      console.log(
+        "CS: New video loaded, known: %s, matched: %s",
+        message.known,
+        message.matched
+      );
       const { videoId, slug, matched, known } = message;
       newVideoLoaded(videoId, known, matched, slug);
       break;

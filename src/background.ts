@@ -89,18 +89,22 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
           "background.js: received Creator redirect request from content script: " +
             JSON.stringify(request)
         );
-        chrome.storage.local.get("preferNewTab", (result) => {
-          if (result.preferNewTab === true) {
-            chrome.tabs.create({
-              url: `https://nebula.app/${request.creator_slug}`,
-              active: true,
-            });
-          } else {
-            chrome.tabs.update(request.tabId, {
-              url: `https://nebula.app/${request.creator_slug}`,
-            });
-          }
-        });
+
+        const response = await checkTable(request.url);
+        if (response?.creator_slug) {
+          chrome.storage.local.get("preferNewTab", (result) => {
+            if (result.preferNewTab === true) {
+              chrome.tabs.create({
+                url: `https://nebula.app/${response.creator_slug}`,
+                active: true,
+              });
+            } else {
+              chrome.tabs.update(request.tabId, {
+                url: `https://nebula.app/${response.creator_slug}`,
+              });
+            }
+          });
+        }
         break;
     }
   } catch (error: any) {

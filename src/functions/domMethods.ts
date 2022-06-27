@@ -91,57 +91,24 @@ export const generateCreatorStyling = () => {
 
 // let youtube_left_controls: Element | null = null;
 let youtube_right_controls: Element | null = null;
+let sponsor_button: Element | null = null;
 
-export const addCreatorButton = (creator_slug: string) => {
-  // const creator_button = document.createElement("button");
-  // creator_button.className = "nebulate-creator-button";
-  // creator_button.innerHTML = "Nebulate Creator";
-  // creator_button.addEventListener("click", () => {
-  //   redirectHandler(Messages.CREATOR_REDIRECT);
-  // });
-  const nebulate_button_exists = document.getElementById("nebulate-video-btn");
-  if (!nebulate_button_exists) {
-    const nebulate_button = document.createElement("img");
-    nebulate_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
-
-    // Assign DOM element attributes
-    nebulate_button.className = "ytp-button " + "nebulate-video-btn";
-    nebulate_button.id = "nebulate-video-btn";
-    nebulate_button.title = "RIGHT View this video on Nebula";
-
-    youtube_right_controls =
-      document.getElementsByClassName("ytp-right-controls")[0];
-
-    youtube_right_controls.prepend(nebulate_button);
-    nebulate_button.addEventListener("click", () => {
-      redirectHandler(Messages.CREATOR_REDIRECT);
-    });
-    return;
-  } else {
-    console.debug("addNebulaControls: Nebulate button already exists");
-    return;
-  }
-};
-
-export const addNebulaControls = () => {
-  // Add nebula controls
-  const nebulate_button_exists = document.getElementById(
-    "nebulate-creator-btn"
+export const addCreatorButton = () => {
+  const creator_button_exists = document.getElementById(
+    CSS_CLASSES.NEBULA_VIDEO_BTN
   );
-  if (!nebulate_button_exists) {
+  if (!creator_button_exists) {
     const creator_button = document.createElement("img");
     creator_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
 
     // Assign DOM element attributes
-    creator_button.className = "ytp-button " + "nebulate-creator-btn";
-    creator_button.id = "nebulate-creator-btn";
-    creator_button.title = "RIGHT View this creator on Nebula";
+    creator_button.className = "ytp-button " + CSS_CLASSES.CREATOR_BUTTON;
+    creator_button.id = CSS_CLASSES.CREATOR_BUTTON;
+    creator_button.title = "View this creator on Nebula";
 
-    youtube_right_controls =
-      document.getElementsByClassName("ytp-right-controls")[0];
+    sponsor_button = document.getElementById("sponsor-button");
 
-    document.querySelector("#sponsor-button")?.prepend(creator_button);
-
+    sponsor_button?.prepend(creator_button);
     creator_button.addEventListener("click", () => {
       redirectHandler(Messages.CREATOR_REDIRECT);
     });
@@ -152,11 +119,40 @@ export const addNebulaControls = () => {
   }
 };
 
-export const removeNebulaControls = () => {
-  console.debug("removeNebulaControls");
-  const nebulate_button = document.getElementById("nebulate-video-btn");
-  if (nebulate_button) {
-    console.log("removeNebulaControls: Nebulate button exists");
-    nebulate_button.remove();
+export const removeCreatorButton = () => {
+  const creator_button = document.getElementById(CSS_CLASSES.CREATOR_BUTTON);
+  if (creator_button) creator_button.remove();
+};
+
+export const addNebulaControls = () => {
+  // Add nebula controls
+  const nebulate_button_exists = document.getElementById(
+    CSS_CLASSES.NEBULA_VIDEO_BTN
+  );
+  if (!nebulate_button_exists) {
+    const nebulate_button = document.createElement("img");
+    nebulate_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
+
+    // Assign DOM element attributes
+    nebulate_button.className = "ytp-button " + CSS_CLASSES.NEBULA_VIDEO_BTN;
+    nebulate_button.id = CSS_CLASSES.NEBULA_VIDEO_BTN;
+    nebulate_button.title = "RIGHT View this video on Nebula";
+
+    youtube_right_controls =
+      document.getElementsByClassName("ytp-right-controls")[0];
+
+    youtube_right_controls.prepend(nebulate_button);
+    nebulate_button.addEventListener("click", () => {
+      redirectHandler(Messages.NEBULA_REDIRECT);
+    });
+    return;
+  } else {
+    console.debug("addNebulaControls: Nebulate button already exists");
+    return;
   }
+};
+
+export const removeNebulaControls = () => {
+  const nebulate_button = document.getElementById(CSS_CLASSES.NEBULA_VIDEO_BTN);
+  if (nebulate_button) nebulate_button.remove();
 };

@@ -2,7 +2,7 @@ console.log("CS: init");
 // Runs in the context of the youtube tab
 
 // const videoCss = require("./css/video.css");
-import { Messages } from "./enums";
+import { CSS, Messages } from "./enums";
 
 import {
   addNebulaControls,
@@ -81,17 +81,19 @@ const newVideoLoaded = async (
   current_video_id = videoId;
 
   // Remove nebula styling to enable animation
-  unloadCSS();
+  unloadCSS(CSS.NEBULA_VIDEO);
+  unloadCSS(CSS.CREATOR);
 
   const nebulate_styling_exists = document.getElementById("nebulate-extension");
   if (known) {
-    if (!nebulate_styling_exists) loadCSS("nebula");
+    if (!nebulate_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
     // Add button to redirect to nebula
     if (matched) addNebulaControls();
     // Remove button to redirect to nebula
     else removeNebulaControls();
   } else {
-    unloadCSS();
+    unloadCSS(CSS.NEBULA_VIDEO);
+    unloadCSS(CSS.CREATOR);
     removeNebulaControls();
   }
 };

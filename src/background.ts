@@ -1,6 +1,7 @@
 import { checkTable } from "./functions/checkTable";
 import { refreshTable } from "./functions/refreshTable";
 import requestSlug from "./functions/requestSlug";
+import { Alarms, Messages } from "./enums";
 
 export const server_url = "http://localhost:3000";
 console.log("canyouhearme");
@@ -31,7 +32,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
     if (video) {
       // Video from Nebula creator found
       chrome.tabs.sendMessage(tabId, {
-        type: "NEW_VIDEO",
+        type: Messages.NEW_VIDEO,
         known: video.known, // If the Youtube video is from a Nebula Creator
         videoId: videoId, // The video id
         slug: video.slug, // The creator slug
@@ -40,7 +41,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
     } else {
       // Unknown Youtube Video
       chrome.tabs.sendMessage(tabId, {
-        type: "NEW_VIDEO",
+        type: Messages.NEW_VIDEO,
         known: false,
       });
     }
@@ -51,18 +52,20 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
 
 chrome.runtime.onMessage.addListener(async function (request) {
   try {
-    if (request.type === "NEBULA_REDIRECT") {
+    if (request.type === Messages.NEBULA_REDIRECT) {
       console.log(
         "background.js: received redirect request from content script: " +
           JSON.stringify(request)
       );
 
+      // Fetch Slug from server
       const nebula_slug = await requestSlug(request.url);
       if (!nebula_slug) {
         console.log("background.js: no slug returned");
         return;
       }
-      console.log("background.js: received slug: " + nebula_slug);
+
+      console.debug("background.js: received slug: " + nebula_slug);
 
       if (nebula_slug && nebula_slug.length > 0) {
         console.log("getting from storage");
@@ -89,7 +92,7 @@ chrome.runtime.onMessage.addListener(async function (request) {
     console.log(error);
     if (error.message === "No slug returned") {
       chrome.tabs.sendMessage(request.tabId, {
-        type: "NO_SLUG_REDIRECT",
+        type: Messages.NO_SLUG_REDIRECT,
       });
     }
   }
@@ -124,9 +127,14 @@ chrome.runtime.onStartup.addListener(async function () {
           console.log("background.js: last updated more than 6 hours ago");
           await refreshTable();
         }
+      } else {
+        console.log("background.js: last updated never");
+        await refreshTable();
       }
     });
-    chrome.alarms.create("refreshTable", {
+
+    // Schedule the lookup table update
+    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
       delayInMinutes: 900,
     });
   } catch (error) {
@@ -136,7 +144,11 @@ chrome.runtime.onStartup.addListener(async function () {
 
 chrome.alarms.onAlarm.addListener(async function (alarm) {
   console.log("background.js: alarm triggered: " + alarm.name);
-  if (alarm.name === "refreshTable") {
-    await refreshTable();
+  switch (alarm.name) {
+    case Alarms.UPDATE_LOOKUP_TABLE:
+      await refreshTable();
+      break;
+    default:
+      console.log("background.js: unknown alarm");
   }
 });

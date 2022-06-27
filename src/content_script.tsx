@@ -5,10 +5,12 @@ console.log("CS: init");
 import { CSS, Messages } from "./enums";
 
 import {
+  addCreatorButton,
   addNebulaControls,
   loadCSS,
   removeNebulaControls,
   unloadCSS,
+  removeCreatorButton,
 } from "./functions/domMethods";
 
 let creator_slug: string;
@@ -54,12 +56,6 @@ const handleNoSlugRedirect = async () => {
   console.log("CS: No slug redirect");
 };
 
-const insertCSS = async (css: string) => {
-  const style = document.createElement("style");
-  style.innerHTML = css;
-  document.head.appendChild(style);
-};
-
 export const redirectHandler = async (message: Messages) => {
   // Request redirect address for current video
   console.log("Requesting redirect address for current video");
@@ -75,7 +71,6 @@ export const redirectHandler = async (message: Messages) => {
     case Messages.CREATOR_REDIRECT:
       chrome.runtime.sendMessage({
         type: Messages.CREATOR_REDIRECT,
-        creator_slug: creator_slug,
         url: current_video_id,
       });
       break;
@@ -101,15 +96,15 @@ const newVideoLoaded = async (
 
   const nebulate_styling_exists = document.getElementById("nebulate-extension");
   if (known) {
+    addCreatorButton();
     if (!nebulate_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
-    // Add button to redirect to nebula
     if (matched) addNebulaControls();
-    // Remove button to redirect to nebula
     else removeNebulaControls();
   } else {
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
     removeNebulaControls();
+    removeCreatorButton();
   }
 };
 

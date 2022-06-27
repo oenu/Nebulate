@@ -1,35 +1,58 @@
 import { redirectHandler } from "../content_script";
+import { CSS, CSS_CLASSES } from "../enums";
 
-export const loadCSS = (css: string) => {
-  if (css === "nebula") {
+export const loadCSS = (css: CSS) => {
+  if (css === CSS.NEBULA) {
     const head = document.head || document.getElementsByTagName("head")[0];
     const style = document.createElement("style");
-    style.className = "nebulate-video-css";
+    style.className = CSS_CLASSES.NEBULA;
     style.textContent = generateNebulaStyling();
-    console.debug("loading styling");
+    console.debug("loadCSS: loading styling" + css);
+    setTimeout(() => {
+      head.appendChild(style);
+    }, 2000);
+  }
+  if (css === CSS.CREATOR) {
+    const head = document.head || document.getElementsByTagName("head")[0];
+    const style = document.createElement("style");
+    style.className = CSS_CLASSES.CREATOR;
+    style.textContent = generateCreatorStyling();
+    console.debug("loadCSS: loading styling" + css);
     setTimeout(() => {
       head.appendChild(style);
     }, 2000);
   }
 };
 
-export const unloadCSS = () => {
+export const unloadCSS = (css: CSS) => {
   console.debug("unloadCSS: unloading styling");
   try {
-    let cssNodes = document.getElementsByClassName("nebulate-video-css");
-    for (let element of cssNodes) {
-      element.remove();
+    switch (css) {
+      case CSS.NEBULA:
+        for (let element of document.getElementsByClassName(
+          CSS_CLASSES.NEBULA
+        )) {
+          element.remove();
+        }
+        break;
+      case CSS.CREATOR:
+        for (let element of document.getElementsByClassName(
+          "nebulate-creator-css"
+        )) {
+          element.remove();
+        }
+        break;
     }
   } catch (error) {
-    console.warn("Unload CSS: Could not find nebulate-video-css node");
+    console.warn(`Unload CSS: Could not find ${css} node`);
     return;
   }
 };
 
-export const setBg = (css: string) => {
-  unloadCSS();
-  setTimeout(() => loadCSS(css));
-};
+// export const setBg = (css: string) => {
+//   unloadCSS( );
+//   setTimeout(() => loadCSS(css));
+// };
 
 export const generateNebulaStyling = () => {
   // Default case for video player for glow effect
@@ -73,6 +96,15 @@ export const generateNebulaStyling = () => {
     console.info("generateNebulaStyling: Vertical video detected");
 
   return player_height > player_width ? shorts_css : default_css;
+};
+
+// IDEA: #10 Add css for creator home channel to identify as nebula creator
+export const generateCreatorStyling = () => {
+  let creator_css = `#owner {
+
+
+}`;
+  return creator_css;
 };
 
 // let youtube_left_controls: Element | null = null;

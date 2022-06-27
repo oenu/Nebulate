@@ -4,9 +4,9 @@ export const loadCSS = (css: string) => {
   if (css === "nebula") {
     const head = document.head || document.getElementsByTagName("head")[0];
     const style = document.createElement("style");
-    style.id = "nebulate-extension";
+    style.className = "nebulate-video-css";
     style.textContent = generateNebulaStyling();
-    console.log("loading styling");
+    console.debug("loading styling");
     setTimeout(() => {
       head.appendChild(style);
     }, 2000);
@@ -14,13 +14,14 @@ export const loadCSS = (css: string) => {
 };
 
 export const unloadCSS = () => {
-  console.debug("unloadCSS: uloading styling");
-  var cssNode = document.getElementById("nebulate-extension");
-  if (cssNode) {
-    cssNode.remove();
-    return;
-  } else {
-    console.log("Unload CSS: Could not find nebulate-extension node");
+  console.debug("unloadCSS: unloading styling");
+  try {
+    let cssNodes = document.getElementsByClassName("nebulate-video-css");
+    for (let element of cssNodes) {
+      element.remove();
+    }
+  } catch (error) {
+    console.warn("Unload CSS: Could not find nebulate-video-css node");
     return;
   }
 };
@@ -68,18 +69,14 @@ export const generateNebulaStyling = () => {
   if (!player) return default_css; // Assume video exists
   const player_width = parseInt(window.getComputedStyle(player).width, 10);
   const player_height = parseInt(window.getComputedStyle(player).height, 10);
-  console.assert(
-    player_height > player_width,
-    "generateNebulaStyling: Vertical video detected"
-  );
+  if (player_height > player_width)
+    console.info("generateNebulaStyling: Vertical video detected");
 
   return player_height > player_width ? shorts_css : default_css;
 };
 
 // let youtube_left_controls: Element | null = null;
 let youtube_right_controls: Element | null = null;
-let youtube_volume_controls: Element | null = null;
-let youtube_player: Element | null = null;
 
 export const addNebulaControls = () => {
   // Add nebula controls
@@ -100,27 +97,16 @@ export const addNebulaControls = () => {
     nebulate_button.addEventListener("click", redirectHandler);
     return;
   } else {
-    console.log("addNebulaControls: Nebulate button already exists");
+    console.debug("addNebulaControls: Nebulate button already exists");
     return;
   }
 };
 
 export const removeNebulaControls = () => {
-  console.log("removeNebulaControls");
+  console.debug("removeNebulaControls");
   const nebulate_button = document.getElementById("nebulate-btn");
   if (nebulate_button) {
     console.log("removeNebulaControls: Nebulate button exists");
     nebulate_button.remove();
   }
 };
-
-/**
- * const css = `html body {
- * background: url(${url}); \n
- * image-rendering: crisp-edges; \n
- * image-rendering: -webkit-optimize-contrast; \n
- * background-size:     cover; \n
- * background-repeat:   no-repeat; \n
- * background-position: center center; \n
- * }\n`;
- */

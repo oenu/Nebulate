@@ -17,4 +17,6 @@ export enum CSS {
 export enum CSS_CLASSES {
   NEBULA = "nebulate-video-css",
   CREATOR = "nebulate-creator-css",
+  NEBULA_VIDEO_BTN = "nebulate-video-btn",
+  CREATOR_BUTTON = "nebulate-creator-btn",
 }

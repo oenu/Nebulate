@@ -2,6 +2,7 @@ export enum Messages {
   NEW_VIDEO = "NEW_VIDEO",
   NO_SLUG_REDIRECT = "NO_SLUG_REDIRECT",
   NEBULA_REDIRECT = "NEBULA_REDIRECT",
+  CREATOR_REDIRECT = "CREATOR_REDIRECT",
 }
 
 export enum Alarms {

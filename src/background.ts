@@ -9,35 +9,40 @@ const redirect_preference = false;
 let currentVideo_url = "";
 
 // When the page url is equal to a youtube video url, send a message to the content script.
+
+// Message Router
 chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   try {
-    if (currentVideo_url == tab.url) {
-      return;
-    }
-    if (tab.status === "complete") {
-      if (tab.url && tab.url.includes("youtube.com/watch")) {
-        currentVideo_url = tab.url;
-        // Strip out the video id from the url.
-        const queryParameters = tab.url.split("?")[1];
-        const urlParameters = new URLSearchParams(queryParameters);
-        const videoId = urlParameters.get("v");
+    // Filters
+    // if (currentVideo_url == tab.url) return;
+    if (tab.status !== "complete") return;
+    if (!tab.url || !tab.url.includes("youtube.com/watch")) return;
 
-        if (videoId) {
-          // Check the local table for the given url
-          await checkTable(videoId).then((video) => {
-            if (video) {
-              // Send the video id and slug to the content script.
-              chrome.tabs.sendMessage(tabId, {
-                known: video.known,
-                type: "NEW_VIDEO",
-                videoId: videoId,
-                slug: video.slug,
-                matched: video.matched,
-              });
-            }
-          });
-        }
-      }
+    // Strip out the video id from the url.
+    currentVideo_url = tab.url;
+    const queryParameters = tab.url.split("?")[1];
+    const urlParameters = new URLSearchParams(queryParameters);
+    const videoId = urlParameters.get("v");
+    if (!videoId) return;
+
+    // Check the local table for the given url
+    const video = await checkTable(videoId);
+
+    if (video) {
+      // Video from Nebula creator found
+      chrome.tabs.sendMessage(tabId, {
+        type: "NEW_VIDEO",
+        known: video.known, // If the Youtube video is from a Nebula Creator
+        videoId: videoId, // The video id
+        slug: video.slug, // The creator slug
+        matched: video.matched, // If the Youtube video is matched to a Nebula Video
+      });
+    } else {
+      // Unknown Youtube Video
+      chrome.tabs.sendMessage(tabId, {
+        type: "NEW_VIDEO",
+        known: false,
+      });
     }
   } catch (error) {
     console.log(error);

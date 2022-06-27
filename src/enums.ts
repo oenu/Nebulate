@@ -9,7 +9,7 @@ export enum Alarms {
 }
 
 export enum CSS {
-  NEBULA = "NEBULA",
+  NEBULA_VIDEO = "NEBULA_VIDEO",
   CREATOR = "CREATOR",
 }
 

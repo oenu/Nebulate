@@ -2,7 +2,7 @@ import { redirectHandler } from "../content_script";
 import { CSS, CSS_CLASSES } from "../enums";
 
 export const loadCSS = (css: CSS) => {
-  if (css === CSS.NEBULA) {
+  if (css === CSS.NEBULA_VIDEO) {
     const head = document.head || document.getElementsByTagName("head")[0];
     const style = document.createElement("style");
     style.className = CSS_CLASSES.NEBULA;
@@ -28,7 +28,7 @@ export const unloadCSS = (css: CSS) => {
   console.debug("unloadCSS: unloading styling");
   try {
     switch (css) {
-      case CSS.NEBULA:
+      case CSS.NEBULA_VIDEO:
         for (let element of document.getElementsByClassName(
           CSS_CLASSES.NEBULA
         )) {
@@ -53,22 +53,30 @@ export const unloadCSS = (css: CSS) => {
 //   unloadCSS( );
 //   setTimeout(() => loadCSS(css));
 // };
-
+// IDEA: #11 Animated background slow transition through nebula colors, options menu
 export const generateNebulaStyling = () => {
   // Default case for video player for glow effect
+  // transition: box-shadow 0.5s ease-in-out 2s;
   let default_css = `#player {
-    transition: box-shadow 0.5s ease-in-out 2s;
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); \n     
+    transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); \n
+            box-shadow: -10px 0 40px rgb(62,	187,	243), 10px 0 40px rgb(88,	80,	209	);
+            border-radius: 10px;
+          };
+
+  #player-theater-container {
+  transition: box-shadow 0.5s ease-in-out 2s;
+    
       box-shadow: \n
-      inset 0 0 60px whitesmoke, \n
-      inset 20px 0 80px #f0f, \n
-      inset -20px 0 80px #0ff, \n
-      inset 20px 0 300px #f0f, \n
-      inset -20px 0 300px #0ff, \n
+box-shadow: -10px 0 40px rgb(62,	187,	243), 10px 0 40px rgb(88,	80,	209	);
+
+
+
+
       0 0 50px #fff, \n
       -10px 0 80px #f0f, \n
       10px 0 80px #0ff; \n
-  }\n`;
+  };\n
+  `;
 
   // Select Internal video player to get tight side styling
   let shorts_css = `#movie_player > div.html5-video-container > video {

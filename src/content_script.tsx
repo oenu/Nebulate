@@ -1,21 +1,35 @@
 console.log("CS: init");
 // Runs in the context of the youtube tab
 
-chrome.runtime.onMessage.addListener((obj, sender) => {
-  console.log(obj);
-  const { type } = obj;
-  if (type === "NEW_VIDEO") {
-    const { videoId, slug, matched, known } = obj;
-    if (videoId === current_video_id) {
-    } else if (videoId !== undefined) {
-      console.log("CS: New video loaded: " + videoId);
-      newVideoLoaded(videoId, known, matched, slug);
-    }
-  } else if (type === "NO_SLUG_REDIRECT") {
-    handleNoSlugRedirect();
-  }
+// const videoCss = require("./css/video.css");
+import { Messages } from "./enums";
 
-  return;
+import {
+  addNebulaControls,
+  loadCSS,
+  removeNebulaControls,
+  unloadCSS,
+} from "./functions/domMethods";
+
+chrome.runtime.onMessage.addListener((message) => {
+  const { type } = message;
+  console.log(message.videoId);
+  switch (type) {
+    case "NEW_VIDEO":
+      console.log("CS: New known video loaded");
+      const { videoId, slug, matched, known } = message;
+      newVideoLoaded(videoId, known, matched, slug);
+      break;
+
+    case "NO_SLUG_FROM_REDIRECT":
+      console.log("CS: No slug from redirect request");
+      handleNoSlugRedirect();
+      break;
+
+    default:
+      console.log("CS: Unknown message type");
+      break;
+  }
 });
 
 // Types
@@ -26,22 +40,25 @@ interface Video {
 }
 
 // (() => {
-let youtube_left_controls: Element | null = null;
-let youtube_right_controls: Element | null = null;
-let youtube_volume_controls: Element | null = null;
-let youtube_player: Element | null = null;
+
 let current_video_id: string | null = null;
 
 const handleNoSlugRedirect = async () => {
   console.log("CS: No slug redirect");
 };
 
-const redirectHandler = async () => {
+const insertCSS = async (css: string) => {
+  const style = document.createElement("style");
+  style.innerHTML = css;
+  document.head.appendChild(style);
+};
+
+export const redirectHandler = async () => {
   // Request redirect address for current video
   console.log("Requesting redirect address for current video");
 
   chrome.runtime.sendMessage({
-    type: "NEBULA_REDIRECT",
+    type: Messages.NEBULA_REDIRECT,
     url: current_video_id,
   });
 };
@@ -58,24 +75,20 @@ const newVideoLoaded = async (
   slug?: string
 ) => {
   current_video_id = videoId;
-  const nebulate_button_exists = document.getElementById("nebulate-btn");
 
-  if (!nebulate_button_exists) {
-    const nebulate_button_right = document.createElement("img");
-    nebulate_button_right.src = chrome.runtime.getURL(
-      "assets/nebula_temp_light.png"
-    );
-    nebulate_button_right.className = "ytp-button " + "nebulate-btn";
-    nebulate_button_right.id = "nebulate-btn";
-    nebulate_button_right.title = "RIGHT View this video on Nebula";
+  // Remove nebula styling to enable animation
+  unloadCSS();
 
-    youtube_right_controls =
-      document.getElementsByClassName("ytp-right-controls")[0];
-    // // document.getElementsByClassName("ytp-left-controls")[0];
-    // youtube_player = document.getElementsByClassName("video-stream")[0];
-
-    youtube_right_controls.prepend(nebulate_button_right);
-    nebulate_button_right.addEventListener("click", redirectHandler);
+  const nebulate_styling_exists = document.getElementById("nebulate-extension");
+  if (known) {
+    if (!nebulate_styling_exists) loadCSS("nebula");
+    // Add button to redirect to nebula
+    if (matched) addNebulaControls();
+    // Remove button to redirect to nebula
+    else removeNebulaControls();
+  } else {
+    unloadCSS();
+    removeNebulaControls();
   }
 };
 

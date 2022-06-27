@@ -11,6 +11,8 @@ import {
   unloadCSS,
 } from "./functions/domMethods";
 
+let creator_slug: string;
+
 chrome.runtime.onMessage.addListener((message) => {
   const { type } = message;
   console.log(message.videoId);
@@ -21,8 +23,9 @@ chrome.runtime.onMessage.addListener((message) => {
         message.known,
         message.matched
       );
-      const { videoId, slug, matched, known } = message;
-      newVideoLoaded(videoId, known, matched, slug);
+      const { videoId, matched, known } = message;
+      creator_slug = message.creator_slug;
+      newVideoLoaded(videoId, known, matched, creator_slug);
       break;
 
     case "NO_SLUG_FROM_REDIRECT":
@@ -57,14 +60,26 @@ const insertCSS = async (css: string) => {
   document.head.appendChild(style);
 };
 
-export const redirectHandler = async () => {
+export const redirectHandler = async (message: Messages) => {
   // Request redirect address for current video
   console.log("Requesting redirect address for current video");
 
-  chrome.runtime.sendMessage({
-    type: Messages.NEBULA_REDIRECT,
-    url: current_video_id,
-  });
+  switch (message) {
+    case Messages.NEBULA_REDIRECT:
+      chrome.runtime.sendMessage({
+        type: Messages.NEBULA_REDIRECT,
+        url: current_video_id,
+      });
+      break;
+
+    case Messages.CREATOR_REDIRECT:
+      chrome.runtime.sendMessage({
+        type: Messages.CREATOR_REDIRECT,
+        creator_slug: creator_slug,
+        url: current_video_id,
+      });
+      break;
+  }
 };
 
 // Send message to background script to open new tab

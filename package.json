@@ -46,10 +46,6 @@
     "lint": "eslint .",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "test": "jest --watch --detectOpenHandles --runInBand",
-    "jest": {
-      "transform": {
-        "^.+\\.[t|j]sx?$": "babel-jest"
-      }
-    }
+    "test:ci": "jest --ci --reporters='default' --reporters='./github-actions-reporter'"
   }
 }

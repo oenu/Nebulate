@@ -27,6 +27,9 @@ describe("database tests", () => {
   });
 
   afterAll(async () => {
+    await mongoose.connection.dropCollection("creators");
+    await mongoose.connection.dropCollection("nebulaVideos");
+    await mongoose.connection.dropCollection("youtubeVideos");
     await mongoose.connection.close();
   });
 
@@ -48,8 +51,8 @@ describe("database tests", () => {
     });
 
     it("should be able to find a creator in the database", async () => {
-      const testCreator = await Creator.findOne({ slug: "test_slug" });
-      expect(testCreator?.slug).toBe("test_slug");
+      const testCreator = await Creator.findOne({ slug: "test_creator_slug" });
+      expect(testCreator?.slug).toBe("test_creator_slug");
     });
   });
 

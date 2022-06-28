@@ -60,7 +60,7 @@ export const videosFromNebula = async (
   logger.info(`Scrape: ${nebula_videos.length} un-scraped videos to be added`);
   await nebulaVideosToDb(nebula_videos);
   await creator.logScrape("nebula");
-  return;
+  return nebula_videos;
 };
 
 const scrapeNebula = async (

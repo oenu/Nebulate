@@ -43,12 +43,6 @@ const videosFromYoutube = async (
       `YtScrape: Creator ${channel_slug} does not have a youtube_upload_id`
     );
 
-  if (
-    process.env.YOUTUBE_API_KEY === "" ||
-    process.env.YOUTUBE_API_KEY === null
-  )
-    throw new Error(`YtScrape: Youtube api key missing`);
-
   let youtube_videos = await scrapeYoutube(
     channel_slug,
     videoScrapeLimit,
@@ -70,6 +64,7 @@ const videosFromYoutube = async (
   await youtubeVideosToDb(youtube_videos);
   await creator.logScrape("youtube");
   logger.info(`YtScrape: ${youtube_videos.length} videos found`);
+  return youtube_videos;
 };
 
 export default videosFromYoutube;

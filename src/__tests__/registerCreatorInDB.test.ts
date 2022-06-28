@@ -24,7 +24,6 @@ describe("database tests", () => {
       throw new Error("DATABASE_TESTING_URI not set");
     }
     await mongoose.connect(process.env.DATABASE_TESTING_URI);
-    console.log("connected to mongoose");
   });
 
   afterAll(async () => {

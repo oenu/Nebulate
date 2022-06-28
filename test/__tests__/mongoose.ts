@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { Creator } from "../models/creator";
-import { NebulaVideo } from "../models/nebulaVideo";
-import { YoutubeVideo } from "../models/youtubeVideo";
+import { Creator } from "../../src/models/creator";
+import { NebulaVideo } from "../../src/models/nebulaVideo";
+import { YoutubeVideo } from "../../src/models/youtubeVideo";
 
 // Mocks
 

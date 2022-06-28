@@ -50,6 +50,6 @@
     "lint": "eslint .",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "test": "jest --watch --detectOpenHandles --runInBand",
-    "test:ci": "jest --ci --reporters=default --reporters=jest-junit"
+    "test:ci": "jest --ci"
   }
 }

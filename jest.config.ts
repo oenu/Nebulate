@@ -5,6 +5,8 @@ const config = {
   setupFilesAfterEnv: ["<rootDir>/test/setupFile.ts"],
   silent: false,
   modulePathIgnorePatterns: ["<rootDir>/dist/", "<rootDir>/node_modules/"],
+
+  reporters: ["default", "jest-junit"],
 };
 
 export default config;

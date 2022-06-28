@@ -171,7 +171,7 @@ const scrapeYoutube = async (
         youtube_video_id: video.contentDetails.videoId,
         published_at: new Date(video.contentDetails.videoPublishedAt),
         playlist_id: video.snippet.playlistId,
-        channelTitle: video.snippet.channelTitle,
+        channel_title: video.snippet.channelTitle,
         title: video.snippet.title,
         channel_id: video.snippet.channelId,
         etag: video.etag,

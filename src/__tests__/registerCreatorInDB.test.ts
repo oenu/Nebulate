@@ -1,6 +1,8 @@
 // const mongoose = require('mongoose');
 require("dotenv").config("./.env");
 
+//https://github.com/shelfio/jest-mongodb
+
 // beforeAll(async () => {
 //   await mongoose.connect(process.env.DATABASE_TESTING_URI, {
 //     useNewUrlParser: true,

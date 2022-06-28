@@ -4,7 +4,7 @@ import requestSlug from "./functions/requestSlug";
 import { Alarms, Messages } from "./enums";
 
 export const server_url = "http://localhost:3000";
-console.log("canyouhearme");
+
 const redirect_preference = false;
 
 let currentVideo_url = "";
@@ -133,38 +133,70 @@ chrome.runtime.onInstalled.addListener(async function () {
     });
     console.log("background.js: installed");
     await refreshTable();
+
+    console.log((await chrome.management.getSelf()).installType);
+    setUpdateTableAlarm();
   } catch (error) {
     console.log(error);
   }
 });
 
 chrome.runtime.onStartup.addListener(async function () {
-  try {
-    // Check when the lookup table was last updated
-    chrome.storage.local.get("lastUpdated", async (result) => {
-      if (result.lastUpdated) {
-        const lastUpdated = new Date(result.lastUpdated);
-        const now = new Date();
-        const diff = now.getTime() - lastUpdated.getTime();
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        if (hours > 6) {
-          console.log("background.js: last updated more than 6 hours ago");
-          await refreshTable();
-        }
-      } else {
-        console.log("background.js: last updated never");
+  // Check when the lookup table was last updated
+  chrome.storage.local.get("lastUpdated", async (result) => {
+    if (result.lastUpdated) {
+      const lastUpdated = new Date(result.lastUpdated);
+      const now = new Date();
+      const diff = now.getTime() - lastUpdated.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      if (hours > 6) {
+        console.log("background.js: last updated more than 6 hours ago");
         await refreshTable();
       }
-    });
+    } else {
+      console.log("background.js: last updated never");
+      await refreshTable();
+    }
+  });
+});
 
-    // Schedule the lookup table update
-    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 900,
-    });
-  } catch (error) {
-    console.log(error);
+// Schedule the lookup table update
+// Check for alarms
+chrome.alarms.get(Alarms.UPDATE_LOOKUP_TABLE, (alarm) => {
+  if (alarm) {
+    console.log("background.js: alarm exists");
+  } else {
+    console.log("background.js: alarm does not exist");
+    setUpdateTableAlarm();
   }
 });
+
+const setUpdateTableAlarm = async (interval?: number) => {
+  console.log("background.js: setting alarm");
+  if (interval) {
+    console.log(
+      "background.js: Setting table update alarm with interval: " + interval
+    );
+    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
+      delayInMinutes: interval,
+    });
+    return;
+  }
+
+  if ((await chrome.management.getSelf()).installType === "development") {
+    console.log(
+      "background.js: Development mode: scheduling update every 1 minute"
+    );
+    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
+      delayInMinutes: 1,
+    });
+  } else {
+    console.log("background.js: scheduling update every 2 hours");
+    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
+      delayInMinutes: 2 * 60,
+    });
+  }
+};
 
 chrome.alarms.onAlarm.addListener(async function (alarm) {
   console.log("background.js: alarm triggered: " + alarm.name);

@@ -2,34 +2,46 @@ console.log("CS: init");
 // Runs in the context of the youtube tab
 
 // const videoCss = require("./css/video.css");
-import { Messages } from "./enums";
+import { CSS, Messages } from "./enums";
 
 import {
+  // addCreatorButton,
   addNebulaControls,
   loadCSS,
   removeNebulaControls,
   unloadCSS,
+  // removeCreatorButton,
 } from "./functions/domMethods";
+
+let creator_slug: string;
 
 chrome.runtime.onMessage.addListener((message) => {
   const { type } = message;
   console.log(message.videoId);
   switch (type) {
-    case "NEW_VIDEO":
+    case Messages.NEW_VIDEO:
       console.log(
         "CS: New video loaded, known: %s, matched: %s",
         message.known,
         message.matched
       );
-      const { videoId, slug, matched, known } = message;
-      newVideoLoaded(videoId, known, matched, slug);
+      const { videoId, matched, known } = message;
+      creator_slug = message.creator_slug;
+      newVideoLoaded(videoId, known, matched, creator_slug);
       break;
 
-    case "NO_SLUG_FROM_REDIRECT":
+    case Messages.NO_SLUG_REDIRECT:
       console.log("CS: No slug from redirect request");
       handleNoSlugRedirect();
       break;
 
+    case Messages.CLEAR:
+      console.log("CS: Clearing all styling");
+      unloadCSS(CSS.NEBULA_VIDEO);
+      unloadCSS(CSS.CREATOR);
+      removeNebulaControls();
+      // removeCreatorButton();
+      break;
     default:
       console.log("CS: Unknown message type");
       break;
@@ -51,20 +63,25 @@ const handleNoSlugRedirect = async () => {
   console.log("CS: No slug redirect");
 };
 
-const insertCSS = async (css: string) => {
-  const style = document.createElement("style");
-  style.innerHTML = css;
-  document.head.appendChild(style);
-};
-
-export const redirectHandler = async () => {
+export const redirectHandler = async (message: Messages) => {
   // Request redirect address for current video
   console.log("Requesting redirect address for current video");
 
-  chrome.runtime.sendMessage({
-    type: Messages.NEBULA_REDIRECT,
-    url: current_video_id,
-  });
+  switch (message) {
+    case Messages.NEBULA_REDIRECT:
+      chrome.runtime.sendMessage({
+        type: Messages.NEBULA_REDIRECT,
+        url: current_video_id,
+      });
+      break;
+
+    case Messages.CREATOR_REDIRECT:
+      chrome.runtime.sendMessage({
+        type: Messages.CREATOR_REDIRECT,
+        url: current_video_id,
+      });
+      break;
+  }
 };
 
 // Send message to background script to open new tab
@@ -81,18 +98,21 @@ const newVideoLoaded = async (
   current_video_id = videoId;
 
   // Remove nebula styling to enable animation
-  unloadCSS();
+  unloadCSS(CSS.NEBULA_VIDEO);
+  unloadCSS(CSS.CREATOR);
 
   const nebulate_styling_exists = document.getElementById("nebulate-extension");
   if (known) {
-    if (!nebulate_styling_exists) loadCSS("nebula");
-    // Add button to redirect to nebula
+    // addCreatorButton();
+    loadCSS(CSS.CREATOR);
+    if (!nebulate_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
     if (matched) addNebulaControls();
-    // Remove button to redirect to nebula
     else removeNebulaControls();
   } else {
-    unloadCSS();
+    unloadCSS(CSS.NEBULA_VIDEO);
+    unloadCSS(CSS.CREATOR);
     removeNebulaControls();
+    // removeCreatorButton();
   }
 };
 

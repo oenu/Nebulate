@@ -3,7 +3,7 @@
 export interface Match {
   known?: boolean;
   matched?: boolean;
-  slug?: string;
+  creator_slug?: string;
 }
 
 export const checkTable = async (url: string) => {
@@ -19,12 +19,12 @@ export const checkTable = async (url: string) => {
     const creator = lookupTable.creators[index];
     if (creator.matched.includes(url)) {
       video.known = true;
-      video.slug = creator.slug;
+      video.creator_slug = creator.slug;
       video.matched = true;
       break;
     }
   }
-  if (video.slug) {
+  if (video.creator_slug) {
     console.log(
       "background.js: found youtube and nebula video in lookup table"
     );
@@ -37,12 +37,12 @@ export const checkTable = async (url: string) => {
     const creator = lookupTable.creators[index];
     if (creator.not_matched.includes(url)) {
       video.known = true;
-      video.slug = creator.slug;
+      video.creator_slug = creator.slug;
       video.matched = false;
       break;
     }
   }
-  if (video.slug) {
+  if (video.creator_slug) {
     console.log("background.js: youtube video found in lookup table");
     console.timeEnd("checkTable");
     return video;

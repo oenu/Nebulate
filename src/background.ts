@@ -17,7 +17,12 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
     // Filters
     // if (currentVideo_url == tab.url) return;
     if (tab.status !== "complete") return;
-    if (!tab.url || !tab.url.includes("youtube.com/watch")) return;
+    if (!tab.url || !tab.url.includes("youtube.com/watch")) {
+      chrome.tabs.sendMessage(tabId, {
+        type: Messages.CLEAR,
+      });
+      return;
+    }
 
     // Strip out the video id from the url.
     currentVideo_url = tab.url;
@@ -35,7 +40,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
         type: Messages.NEW_VIDEO,
         known: video.known, // If the Youtube video is from a Nebula Creator
         videoId: videoId, // The video id
-        slug: video.slug, // The creator slug
+        slug: video.creator_slug, // The creator slug
         matched: video.matched, // If the Youtube video is matched to a Nebula Video
       });
     } else {
@@ -50,43 +55,62 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   }
 });
 
-chrome.runtime.onMessage.addListener(async function (request) {
+chrome.runtime.onMessage.addListener(async function (request, sender) {
   try {
-    if (request.type === Messages.NEBULA_REDIRECT) {
-      console.log(
-        "background.js: received redirect request from content script: " +
-          JSON.stringify(request)
-      );
+    switch (request.type) {
+      case Messages.NEBULA_REDIRECT:
+        console.log(
+          "background.js: received redirect request from content script: " +
+            JSON.stringify(request)
+        );
+        // Fetch Slug from server
+        const nebula_slug = await requestSlug(request.url);
+        if (!nebula_slug) {
+          console.log("background.js: no slug returned");
+          return;
+        }
+        console.debug("background.js: received slug: " + nebula_slug);
+        if (nebula_slug && nebula_slug.length > 0) {
+          chrome.storage.local.get("preferNewTab", (result) => {
+            if (result.preferNewTab === true) {
+              chrome.tabs.create({
+                url: `https://nebula.app/videos/${nebula_slug}`,
+                active: true,
+              });
+            } else {
+              chrome.tabs.update(request.tabId, {
+                url: `https://nebula.app/videos/${nebula_slug}`,
+              });
+            }
+          });
+        } else {
+          throw new Error("No slug returned");
+          console.log("background.js: no slug returned");
+        }
+        break;
 
-      // Fetch Slug from server
-      const nebula_slug = await requestSlug(request.url);
-      if (!nebula_slug) {
-        console.log("background.js: no slug returned");
-        return;
-      }
+      case Messages.CREATOR_REDIRECT:
+        console.log(
+          "background.js: received Creator redirect request from content script: " +
+            JSON.stringify(request)
+        );
 
-      console.debug("background.js: received slug: " + nebula_slug);
-
-      if (nebula_slug && nebula_slug.length > 0) {
-        console.log("getting from storage");
-        chrome.storage.local.get("preferNewTab", (result) => {
-          console.log(result.preferNewTab);
-          if (result.preferNewTab === true) {
-            chrome.tabs.create({
-              url: `https://nebula.app/videos/${nebula_slug}`,
-              active: true,
-            });
-          } else {
-            // Redirect the user to the nebula page.
-            chrome.tabs.update(request.tabId, {
-              url: `https://nebula.app/videos/${nebula_slug}`,
-            });
-          }
-        });
-      } else {
-        throw new Error("No slug returned");
-        console.log("background.js: no slug returned");
-      }
+        const response = await checkTable(request.url);
+        if (response?.creator_slug) {
+          chrome.storage.local.get("preferNewTab", (result) => {
+            if (result.preferNewTab === true) {
+              chrome.tabs.create({
+                url: `https://nebula.app/${response.creator_slug}`,
+                active: true,
+              });
+            } else {
+              chrome.tabs.update(request.tabId, {
+                url: `https://nebula.app/${response.creator_slug}`,
+              });
+            }
+          });
+        }
+        break;
     }
   } catch (error: any) {
     console.log(error);

@@ -17,7 +17,7 @@ interface CreatorInterface {
   slug: string;
   title: string;
   description: string;
-  "zype-id": string;
+  zype_id: string;
   youtube_id: string;
   youtube_channel_name: string;
   youtube_upload_id: string;
@@ -49,7 +49,7 @@ const creatorSchema: Schema<CreatorDocument> = new Schema(
     description: {
       type: "String",
     },
-    "zype-id": {
+    zype_id: {
       type: "String",
     },
     nebula_videos: [

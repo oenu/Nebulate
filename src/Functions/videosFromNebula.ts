@@ -44,7 +44,7 @@ export const videosFromNebula = async (
   if (!videoScrapeLimit) {
     videoScrapeLimit = 20;
   }
-
+  logger.info(`Register: Scraping ${channel_slug}'s videos`);
   for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
     try {
       const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;

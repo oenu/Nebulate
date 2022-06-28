@@ -17,7 +17,12 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
     // Filters
     // if (currentVideo_url == tab.url) return;
     if (tab.status !== "complete") return;
-    if (!tab.url || !tab.url.includes("youtube.com/watch")) return;
+    if (!tab.url || !tab.url.includes("youtube.com/watch")) {
+      chrome.tabs.sendMessage(tabId, {
+        type: Messages.CLEAR,
+      });
+      return;
+    }
 
     // Strip out the video id from the url.
     currentVideo_url = tab.url;

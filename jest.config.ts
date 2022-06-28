@@ -6,7 +6,7 @@ const config = {
   silent: false,
   modulePathIgnorePatterns: ["<rootDir>/dist/", "<rootDir>/node_modules/"],
 
-  reporters: ["default", "jest-junit"],
+  reporters: ["default", ["jest-junit", { outputDirectory: "./test/reports" }]],
 };
 
 export default config;

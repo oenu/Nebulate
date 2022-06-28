@@ -6,24 +6,19 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3 # checkout the repo
-      - run: yarn install --immutable --immutable-cache --check-cache # install packages
       - run: |
           touch .env
           echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
           echo SCRAPE_PASS=${{ secrets.SCRAPE_PASS }} >> .env
           echo SCRAPE_USER=${{ secrets.SCRAPE_USER }} >> .env
           echo YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }} >> .env
-      - run: |
-          touch .test
-          echo Testerino >> .test
-          echo "$(<.test)"
-
+      - uses: actions/checkout@v3 # checkout the repo
+      - run: yarn install --immutable --immutable-cache --check-cache # install packages
       - run: yarn test:ci # run tests (configured to use jest-junit reporter)
       - name: Test Reporter
         uses: dorny/test-reporter@v1.5.0
         if: success() || failure() # run this step even if previous step failed
         with:
           name: JEST Tests # Name of the check run which will be created
-          path: reports/jest-*.xml # Path to test results
+          path: ./test/reports/jest-*.xml # Path to test results
           reporter: jest-junit # Format of test results

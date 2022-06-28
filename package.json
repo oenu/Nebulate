@@ -16,6 +16,7 @@
     "fuse.js": "^6.6.2",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.7.0",
+    "mongodb-memory-server": "^8.7.1",
     "mongoose": "^6.4.0",
     "pino-pretty": "^8.0.0",
     "ts-jest": "^28.0.5",
@@ -44,7 +45,7 @@
     "dev": "nodemon ./src/index.ts",
     "lint": "eslint .",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
-    "test": "jest --watch --detectOpenHandles",
+    "test": "jest --watch --detectOpenHandles --runInBand",
     "jest": {
       "transform": {
         "^.+\\.[t|j]sx?$": "babel-jest"

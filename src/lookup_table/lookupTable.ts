@@ -25,7 +25,7 @@ const serveLookupTable = async (
   maximumMatchDistance?: number
 ): Promise<LookupTable | true> => {
   logger.info("Table Serve: serving lookup table");
-  if (maximum_table_age === undefined) maximum_table_age = 60;
+  if (maximum_table_age === undefined) maximum_table_age = 10;
 
   // Check how old the lookup table is
   const lookupTablePath = path.join(__dirname, "/lookup_table.json");

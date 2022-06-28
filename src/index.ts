@@ -45,6 +45,9 @@ app.use("/match", matchVideos);
 const lookupRequest = require("./routes/lookupRequest");
 app.use("/api/lookup", lookupRequest);
 
+const registerAllCreators = require("./routes/registerAllCreators");
+app.use("/register_all_serious", registerAllCreators);
+
 // Start the server
 mongoose.connection.once("open", async () => {
   // Initialize global variables
@@ -54,15 +57,3 @@ mongoose.connection.once("open", async () => {
     logger.info(`Server is running on port ${port}`);
   });
 });
-
-import youtubeIds from "./store/youtubeIds";
-
-let youtubeIdsArray: string[] = [];
-
-youtubeIds.forEach((creator) => {
-  if (typeof creator.youtube_id === "string") {
-    youtubeIdsArray.push(creator.slug);
-  }
-});
-
-logger.verbose(youtubeIdsArray);

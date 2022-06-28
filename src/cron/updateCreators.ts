@@ -31,6 +31,9 @@ const updateCreatorsCron = async () => {
       // Run less often due to the time it takes to match
       await creator.matchVideos();
     }
+
+    // Wait for 1 minute before checking the next creator
+    await new Promise((resolve) => setTimeout(resolve, 60000));
   }
 };
 

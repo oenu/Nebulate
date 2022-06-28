@@ -2,7 +2,18 @@ on:
   pull_request:
   push:
 jobs:
+  set-env:
+    name: Set environment Variables
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          touch .env
+          echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
+          echo SCRAPE_PASS=${{ secrets.SCRAPE_PASS }} >> .env
+          echo SCRAPE_USER=${{ secrets.SCRAPE_USER }} >> .env
+          echo YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }} >> .env
   build-test:
+    needs: set-env
     name: Build & Test
     runs-on: ubuntu-latest
     steps:

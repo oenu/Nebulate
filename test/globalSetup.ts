@@ -16,7 +16,6 @@ export const globalSetup = async () => {
     const uri = instance.getUri();
     (global as any).__MONGOINSTANCE = instance;
     process.env.MONGO_URI = uri.slice(0, uri.lastIndexOf("/"));
-    console.log("global" + process.env.TEST);
   } else {
     process.env.MONGO_URI = `mongodb://${config.IP}:${config.Port}`;
   }

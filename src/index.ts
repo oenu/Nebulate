@@ -13,9 +13,6 @@ declare global {
   var key: string;
 }
 
-// Token store initialization
-console.log("index" + process.env.TEST);
-
 // Mongoose
 import mongoose from "mongoose";
 import { connectDB } from "./config/dbConfig";

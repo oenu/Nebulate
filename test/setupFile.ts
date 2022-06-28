@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 beforeAll(async () => {
   // put your client connection code here, example with mongoose:
   await mongoose.connect(process.env.MONGO_URI as string);
-  console.log("setup" + process.env.TEST);
 });
 
 afterAll(async () => {

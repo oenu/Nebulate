@@ -1,9 +1,8 @@
+import "dotenv/config";
 import express from "express";
 const app = express();
 const cors = require("cors");
 app.use(cors());
-
-import "dotenv/config";
 
 // Constants
 const port = process.env.PORT || 3000;
@@ -13,8 +12,6 @@ declare global {
   var token: string;
   var key: string;
 }
-
-// Token store initialization
 
 // Mongoose
 import mongoose from "mongoose";

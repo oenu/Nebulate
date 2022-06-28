@@ -36,3 +36,4 @@ src/database/simple_key.json
 src/lookup_table/key.pem
 src/lookup_table/lookup_table.json
 globalConfig.json
+junit.xml

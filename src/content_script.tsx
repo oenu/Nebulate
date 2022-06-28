@@ -101,14 +101,20 @@ const newVideoLoaded = async (
   unloadCSS(CSS.NEBULA_VIDEO);
   unloadCSS(CSS.CREATOR);
 
-  const nebulate_styling_exists = document.getElementById("nebulate-extension");
+  const video_styling_exists =
+    document.getElementsByClassName("nebulate-extension")[0];
+
   if (known) {
     // addCreatorButton();
+    // Highlight creator
     loadCSS(CSS.CREATOR);
-    if (!nebulate_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
-    if (matched) addNebulaControls();
-    else removeNebulaControls();
+    if (matched) {
+      // Highlight video
+      addNebulaControls();
+      if (!video_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
+    } else removeNebulaControls();
   } else {
+    // Unknown video, remove nebula controls and styling
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
     removeNebulaControls();

@@ -32,6 +32,7 @@ interface CreatorDocument extends CreatorInterface, mongoose.Document {
   test: () => Promise<void>;
   getNebulaVideos: (nebula_slugs?: string[]) => Promise<NebulaVideoType[]>;
   getYoutubeVideos: (youtube_ids?: string[]) => Promise<YoutubeVideoType[]>;
+  logScrape: (type: string, date?: Date) => Promise<void>;
 }
 
 const creatorSchema: Schema<CreatorDocument> = new Schema(
@@ -120,6 +121,19 @@ creatorSchema.methods.getYoutubeVideos = async function (
       $and: [{ youtube_id: { $in: youtube_ids } }, { channel_slug: this.slug }],
     });
   }
+};
+
+creatorSchema.methods.logScrape = async function (
+  type: string,
+  date?: Date
+): Promise<void> {
+  if (!date) date = new Date();
+  if (type === "nebula") {
+    this.last_scraped_nebula = date;
+  } else if (type === "youtube") {
+    this.last_scraped_youtube = date;
+  }
+  await this.save();
 };
 
 export type CreatorPreType = InferSchemaType<typeof creatorSchema>;

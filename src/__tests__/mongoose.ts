@@ -10,7 +10,7 @@ import { YoutubeVideo } from "../models/youtubeVideo";
 
 describe("mongoose tests", () => {
   it("should be able to find env variables", () => {
-    console.log("jest test" + process.env.test);
+    console.log("jest test" + process.env.TEST);
     expect(process.env.DATABASE_URI).toBeDefined();
   });
 

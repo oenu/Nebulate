@@ -44,7 +44,7 @@
     "dev": "nodemon ./src/index.ts",
     "lint": "eslint .",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
-    "test": "jest --watch",
+    "test": "jest --watch --detectOpenHandles",
     "jest": {
       "transform": {
         "^.+\\.[t|j]sx?$": "babel-jest"

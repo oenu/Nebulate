@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2 # checkout the repo
       - run: yarn install --immutable --immutable-cache --check-cache # install packages
-      - run: npm test # run tests (configured to use jest-junit reporter)
+      - run: yarn test:ci # run tests (configured to use jest-junit reporter)
 
       - name: Test Reporter
         uses: dorny/test-reporter@v1.5.0

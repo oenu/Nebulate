@@ -5,7 +5,7 @@ import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
 
 // Files
-import youtubeIds from "../config/youtubeIds";
+import youtubeIds from "../store/youtubeIds";
 
 // Functions
 import videosFromNebula from "./videosFromNebula";

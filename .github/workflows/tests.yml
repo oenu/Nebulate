@@ -17,7 +17,7 @@ jobs:
       - run: |
           touch .test
           echo Testerino >> .test
-          echo .test
+          echo "$(<.test)"
 
       - run: yarn test:ci # run tests (configured to use jest-junit reporter)
       - name: Test Reporter

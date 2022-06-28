@@ -2,7 +2,7 @@ const config = {
   preset: "ts-jest",
   globalSetup: "<rootDir>/test/globalSetup.ts",
   globalTeardown: "<rootDir>/test/globalTeardown.ts",
-  setupFilesAfterEnv: ["<rootDir>/test/setupFile.ts"],
+  setupFilesAfterEnv: ["<rootDir>/test/setupFile.ts", "dotenv/config"],
   silent: false,
   modulePathIgnorePatterns: ["<rootDir>/dist/", "<rootDir>/node_modules/"],
 

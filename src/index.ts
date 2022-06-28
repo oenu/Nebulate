@@ -14,6 +14,7 @@ declare global {
 }
 
 // Token store initialization
+console.log("index" + process.env.test);
 
 // Mongoose
 import mongoose from "mongoose";

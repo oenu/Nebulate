@@ -5,7 +5,7 @@ const config = {
   setupFilesAfterEnv: ["<rootDir>/test/setupFile.ts", "dotenv/config"],
   silent: false,
   modulePathIgnorePatterns: ["<rootDir>/dist/", "<rootDir>/node_modules/"],
-
+  watchPathIgnorePatterns: ["globalConfig"],
   reporters: ["default", ["jest-junit", { outputDirectory: "./test/reports" }]],
 };
 

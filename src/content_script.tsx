@@ -5,12 +5,12 @@ console.log("CS: init");
 import { CSS, Messages } from "./enums";
 
 import {
-  addCreatorButton,
+  // addCreatorButton,
   addNebulaControls,
   loadCSS,
   removeNebulaControls,
   unloadCSS,
-  removeCreatorButton,
+  // removeCreatorButton,
 } from "./functions/domMethods";
 
 let creator_slug: string;
@@ -96,7 +96,8 @@ const newVideoLoaded = async (
 
   const nebulate_styling_exists = document.getElementById("nebulate-extension");
   if (known) {
-    addCreatorButton();
+    // addCreatorButton();
+    loadCSS(CSS.CREATOR);
     if (!nebulate_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
     if (matched) addNebulaControls();
     else removeNebulaControls();
@@ -104,7 +105,7 @@ const newVideoLoaded = async (
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
     removeNebulaControls();
-    removeCreatorButton();
+    // removeCreatorButton();
   }
 };
 

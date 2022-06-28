@@ -14,13 +14,11 @@ jobs:
           echo SCRAPE_PASS=${{ secrets.SCRAPE_PASS }} >> .env
           echo SCRAPE_USER=${{ secrets.SCRAPE_USER }} >> .env
           echo YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }} >> .env
-          echo TEST=${{ secrets.YOUTUBE_API_KEY }} >> .env
-
       - run: yarn test:ci # run tests (configured to use jest-junit reporter)
       - name: Test Reporter
         uses: dorny/test-reporter@v1.5.0
         if: success() || failure() # run this step even if previous step failed
         with:
           name: JEST Tests # Name of the check run which will be created
-          path: ./test/reports/jest-*.xml # Path to test results
+          path: ./test/reports/junit.xml # Path to test results
           reporter: jest-junit # Format of test results

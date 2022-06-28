@@ -55,9 +55,9 @@ mongoose.connection.once("open", async () => {
   });
 });
 
-import youtubeIds from "./config/youtubeIds";
+import youtubeIds from "./store/youtubeIds";
 
-let youtubeIdsArray = ["hi"];
+let youtubeIdsArray: string[] = [];
 
 youtubeIds.forEach((creator) => {
   if (typeof creator.youtube_id === "string") {

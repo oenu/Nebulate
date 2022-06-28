@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((message) => {
   const { type } = message;
   console.log(message.videoId);
   switch (type) {
-    case "NEW_VIDEO":
+    case Messages.NEW_VIDEO:
       console.log(
         "CS: New video loaded, known: %s, matched: %s",
         message.known,
@@ -30,11 +30,18 @@ chrome.runtime.onMessage.addListener((message) => {
       newVideoLoaded(videoId, known, matched, creator_slug);
       break;
 
-    case "NO_SLUG_FROM_REDIRECT":
+    case Messages.NO_SLUG_REDIRECT:
       console.log("CS: No slug from redirect request");
       handleNoSlugRedirect();
       break;
 
+    case Messages.CLEAR:
+      console.log("CS: Clearing all styling");
+      unloadCSS(CSS.NEBULA_VIDEO);
+      unloadCSS(CSS.CREATOR);
+      removeNebulaControls();
+      // removeCreatorButton();
+      break;
     default:
       console.log("CS: Unknown message type");
       break;

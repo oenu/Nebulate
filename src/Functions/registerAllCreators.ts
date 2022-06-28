@@ -23,8 +23,10 @@ const registerAllCreators = async () => {
     `registerAllCreators: estimated time: ${new_slugs.length * 2} minutes`
   );
 
+  let remaining_slugs = new_slugs.length;
   for (const slug of new_slugs) {
     if (await Creator.exists({ slug })) {
+      remaining_slugs--;
       console.info("registerAllCreators: Creator already in DB");
       continue;
     }
@@ -32,10 +34,13 @@ const registerAllCreators = async () => {
     // Begin registration
     try {
       await registerCreatorInDB(slug);
+      await (await Creator.findOne({ slug }))?.matchVideos();
     } catch (error) {
       logger.info("registerAllCreators: Failed to register creator", { slug });
       logger.error(error);
     } finally {
+      remaining_slugs--;
+      logger.info(`registerAllCreators: ${remaining_slugs} creators remaining`);
       console.timeLog("registerAllCreators", "Sleeping for 1 minute");
       await new Promise((resolve) => setTimeout(resolve, 60000));
     }

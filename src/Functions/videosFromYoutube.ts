@@ -110,12 +110,13 @@ const scrapeYoutube = async (
       // console.log(pagetokenBuffer);
       // Set the pagetokenBuffer to the next page token
       if (response.data.nextPageToken) {
-        logger.info(`scrapeYoutube: Next page token found for ${channel_slug}`);
+        // logger.info(`scrapeYoutube: Next page token found for ${channel_slug}`);
         pagetokenBuffer = response?.data?.nextPageToken;
       } else {
-        logger.info(
-          `scrapeYoutube: No next page token found for ${channel_slug}`
-        );
+        // logger.info(
+        //   `scrapeYoutube: No next page token found for ${channel_slug}`
+        // );
+        logger.info("scrapeYoutube: Reached end of page tokens");
         scrapedVideos = videoScrapeLimit * 2;
       }
 

@@ -69,7 +69,7 @@ const registerCreatorInDB = async (channel_slug: string) => {
   await videosFromYoutube(channel_slug, false, 700);
 };
 
-const creatorFromNebula = async (channel_slug: string) => {
+export const creatorFromNebula = async (channel_slug: string) => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
     const response = await axios.get(url, {
@@ -88,7 +88,7 @@ const creatorFromNebula = async (channel_slug: string) => {
   }
 };
 
-const idFromYoutube = async (channel_slug: string) => {
+export const idFromYoutube = async (channel_slug: string) => {
   try {
     const creatorYtId = youtubeIds.find(
       (creator) => creator.slug === channel_slug
@@ -101,7 +101,7 @@ const idFromYoutube = async (channel_slug: string) => {
   }
 };
 
-const creatorFromYoutube = async (creatorYtId: string) => {
+export const creatorFromYoutube = async (creatorYtId: string) => {
   const response = await yt.channels.list({
     id: [creatorYtId],
     auth: process.env.YOUTUBE_API_KEY as string,

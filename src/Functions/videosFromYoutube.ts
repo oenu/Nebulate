@@ -187,7 +187,7 @@ const scrapeYoutube = async (
   return convertedVideos;
 };
 
-const removeYoutubeDuplicates = async (
+export const removeYoutubeDuplicates = async (
   youtube_videos: YoutubeVideoInterface[]
 ): Promise<YoutubeVideoInterface[]> => {
   // Check for conflicting videos in the database
@@ -206,7 +206,9 @@ const removeYoutubeDuplicates = async (
   return nonConflictingVideos;
 };
 
-const youtubeVideosToDb = async (youtube_videos: YoutubeVideoInterface[]) => {
+export const youtubeVideosToDb = async (
+  youtube_videos: YoutubeVideoInterface[]
+) => {
   // Insert the nonConflictingVideos into the database
   const mongoResponse = await VideoModel.insertMany(youtube_videos);
   logger.info(`YtScrape: ${youtube_videos.length} videos inserted`);

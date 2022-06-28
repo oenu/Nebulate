@@ -63,7 +63,7 @@ export const videosFromNebula = async (
   return nebula_videos;
 };
 
-const scrapeNebula = async (
+export const scrapeNebula = async (
   channel_slug: string,
   videoScrapeLimit: number,
   onlyScrapeNew: boolean
@@ -165,7 +165,7 @@ const scrapeNebula = async (
   return convertedVideos;
 };
 
-const nebulaVideosToDb = async (
+export const nebulaVideosToDb = async (
   videos: Array<NebulaVideoInterface>
 ): Promise<void> => {
   // Save videos to database
@@ -201,7 +201,7 @@ const nebulaVideosToDb = async (
   return;
 };
 
-const removeNebulaDuplicates = async (
+export const removeNebulaDuplicates = async (
   nebula_videos: NebulaVideoInterface[]
 ): Promise<NebulaVideoInterface[]> => {
   // Check if videos are already in the database

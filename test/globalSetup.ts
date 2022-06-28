@@ -20,7 +20,6 @@ export const globalSetup = async () => {
     process.env.MONGO_URI = `mongodb://${config.IP}:${config.Port}`;
   }
 
-  console.log("Memory setup mongo uri: ", process.env.MONGO_URI);
   // The following is to make sure the database is clean before an test starts
   await mongoose.connect(`${process.env.MONGO_URI}/${config.Database}`);
   await mongoose.connection.db.dropDatabase();

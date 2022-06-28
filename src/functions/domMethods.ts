@@ -82,9 +82,18 @@ export const generateNebulaStyling = () => {
 
 // IDEA: #10 Add css for creator home channel to identify as nebula creator
 export const generateCreatorStyling = () => {
-  let creator_css = `#nebulate-creator-btn {
-    height: 2.25rem;
-    width: 2.25rem;
+  let creator_css = `
+  #avatar {
+    transition: outline 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    outline: 3px solid rgb(62, 187, 243);
+    outline-offset: 1px;
+  }
+
+  #owner {
+    transition: border 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+     border: 1px solid rgb(62, 187, 243) !important; 
+    /* background-color: rgb(62, 187, 243); */
+  }
 
 
 }`;

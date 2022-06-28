@@ -82,7 +82,9 @@ export const generateNebulaStyling = () => {
 
 // IDEA: #10 Add css for creator home channel to identify as nebula creator
 export const generateCreatorStyling = () => {
-  let creator_css = `#owner {
+  let creator_css = `#nebulate-creator-btn {
+    height: 2.25rem;
+    width: 2.25rem;
 
 
 }`;
@@ -91,38 +93,39 @@ export const generateCreatorStyling = () => {
 
 // let youtube_left_controls: Element | null = null;
 let youtube_right_controls: Element | null = null;
-let sponsor_button: Element | null = null;
+// let upload_info: Element | null = null;
 
-export const addCreatorButton = () => {
-  const creator_button_exists = document.getElementById(
-    CSS_CLASSES.NEBULA_VIDEO_BTN
-  );
-  if (!creator_button_exists) {
-    const creator_button = document.createElement("img");
-    creator_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
+// export const addCreatorButton = () => {
+//   console.debug("addCreatorButton: Adding creator button");
+//   const creator_button_exists = document.getElementById(
+//     CSS_CLASSES.CREATOR_BUTTON
+//   );
+//   if (!creator_button_exists) {
+//     const creator_button = document.createElement("img");
+//     creator_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
 
-    // Assign DOM element attributes
-    creator_button.className = "ytp-button " + CSS_CLASSES.CREATOR_BUTTON;
-    creator_button.id = CSS_CLASSES.CREATOR_BUTTON;
-    creator_button.title = "View this creator on Nebula";
+//     // Assign DOM element attributes
+//     creator_button.className = "ytp-button " + CSS_CLASSES.CREATOR_BUTTON;
+//     creator_button.id = CSS_CLASSES.CREATOR_BUTTON;
+//     creator_button.title = "View this creator on Nebula";
 
-    sponsor_button = document.getElementById("sponsor-button");
+//     upload_info = document.getElementById("upload-info");
 
-    sponsor_button?.prepend(creator_button);
-    creator_button.addEventListener("click", () => {
-      redirectHandler(Messages.CREATOR_REDIRECT);
-    });
-    return;
-  } else {
-    console.debug("addNebulaControls: Nebulate button already exists");
-    return;
-  }
-};
+//     upload_info?.append(creator_button);
+//     creator_button.addEventListener("click", () => {
+//       redirectHandler(Messages.CREATOR_REDIRECT);
+//     });
+//     return;
+//   } else {
+//     console.debug("addCreatorButton: Creator button already exists");
+//     return;
+//   }
+// };
 
-export const removeCreatorButton = () => {
-  const creator_button = document.getElementById(CSS_CLASSES.CREATOR_BUTTON);
-  if (creator_button) creator_button.remove();
-};
+// export const removeCreatorButton = () => {
+//   const creator_button = document.getElementById(CSS_CLASSES.CREATOR_BUTTON);
+//   if (creator_button) creator_button.remove();
+// };
 
 export const addNebulaControls = () => {
   // Add nebula controls

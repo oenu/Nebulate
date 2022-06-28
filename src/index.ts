@@ -32,8 +32,8 @@ app.use(auth);
 const generateDatabase = require("./routes/generateDatabase");
 app.use("/database", generateDatabase);
 
-const generateLookupTable = require("./routes/generateTable");
-app.use("/api/table", generateLookupTable);
+const serveLookupTable = require("./routes/serveTable");
+app.use("/api/table", serveLookupTable);
 
 const scrapeNebula = require("./routes/scrapeNebula");
 app.use("/scrape/nebula", scrapeNebula);

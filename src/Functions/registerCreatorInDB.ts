@@ -26,8 +26,6 @@ const registerCreatorInDB = async (channel_slug: string) => {
     throw error;
   }
 
-  // Main try/catch block
-
   // Get creator from Nebula
   const creator_nebula = await creatorFromNebula(channel_slug);
   const { id, slug, title, description, type, zype_id } =
@@ -40,16 +38,16 @@ const registerCreatorInDB = async (channel_slug: string) => {
       `Register: Creator ${channel_slug} does not exist in youtube mapping`
     );
   }
+
   // Get creator data from Youtube - channel upload playlist
   const creator_youtube = await creatorFromYoutube(creatorYtId);
-  // Create new creator document in DB
+
   if (!creator_youtube.upload_playlist_id)
     throw new Error(
       `Register: Creator ${channel_slug} no upload playlist id from youtube API`
     );
 
   logger.info(`Adding ${channel_slug} to the database`);
-
   // Map creator data to schema
   const creator = new Creator({
     nebula_id: id,
@@ -69,12 +67,6 @@ const registerCreatorInDB = async (channel_slug: string) => {
   await videosFromNebula(channel_slug, false, 500);
   // Scrape the creator's videos from Youtube and add them to the database
   await videosFromYoutube(channel_slug, false, 700);
-
-  // Catch for videosFromYoutube
-  logger.error(`Register: Could not scrape ${channel_slug}'s Youtube videos`);
-  throw new Error(
-    `Register: Could not scrape ${channel_slug}'s Youtube videos`
-  );
 };
 
 const creatorFromNebula = async (channel_slug: string) => {

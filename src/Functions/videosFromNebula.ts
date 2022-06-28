@@ -59,8 +59,8 @@ export const videosFromNebula = async (
   // Save videos to database
   logger.info(`Scrape: ${nebula_videos.length} un-scraped videos to be added`);
   await nebulaVideosToDb(nebula_videos);
-
-  return;
+  await creator.logScrape("nebula");
+  return nebula_videos;
 };
 
 const scrapeNebula = async (

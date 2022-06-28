@@ -49,7 +49,9 @@ const registerCreatorInDB = async (channel_slug: string) => {
     );
 
   logger.info(`Adding ${channel_slug} to the database`);
-  await Creator.create({
+
+  // Map creator data to schema
+  const creator = new Creator({
     nebula_id: id,
     slug,
     title,
@@ -60,31 +62,21 @@ const registerCreatorInDB = async (channel_slug: string) => {
     youtube_upload_id: creator_youtube.upload_playlist_id,
   });
 
-  // Scrape the creator's videos
-  logger.info(`Register: Scraping ${channel_slug}'s videos`);
+  // Register creator in DB
+  await Creator.create(creator);
 
   // Scrape the creator's videos from Nebula and add them to the database
-  try {
-    await videosFromNebula(channel_slug, false, 500);
-  } catch (error) {
-    // Catch for videosFromNebula
-    logger.error(`Register: Could not scrape ${channel_slug}'s Nebula videos`);
-    throw new Error(
-      `Register: Could not scrape ${channel_slug}'s Nebula videos`
-    );
-  }
-
+  await videosFromNebula(channel_slug, false, 500);
   // Scrape the creator's videos from Youtube and add them to the database
-  try {
-    await videosFromYoutube(channel_slug, false, 700); // HACK: Change to 500
-  } catch (error) {
-    // Catch for videosFromYoutube
-    logger.error(`Register: Could not scrape ${channel_slug}'s Youtube videos`);
-    throw new Error(
-      `Register: Could not scrape ${channel_slug}'s Youtube videos`
-    );
-  }
+  await videosFromYoutube(channel_slug, false, 700);
+
+  // Catch for videosFromYoutube
+  logger.error(`Register: Could not scrape ${channel_slug}'s Youtube videos`);
+  throw new Error(
+    `Register: Could not scrape ${channel_slug}'s Youtube videos`
+  );
 };
+
 const creatorFromNebula = async (channel_slug: string) => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;

@@ -3,6 +3,12 @@
 
 const youtubeIds = [
   {
+    slug: "test",
+    title: "test",
+    id: "test",
+    youtube_id: "test",
+  },
+  {
     slug: "12tone",
     title: "12tone",
     id: "video_channel:deb1097d-43db-4673-95e2-f2a9fb3f6433",

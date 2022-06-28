@@ -1,36 +1,16 @@
-import mongoose from "mongoose";
-// import axios from "axios";
-// jest.mock("axios");
 import { Creator } from "../models/creator";
 import { NebulaVideo } from "../models/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo";
-// import { creatorFromNebula } from "../Functions/registerCreatorInDB";
 require("dotenv").config("./.env");
 
 // Mocks
-// const creatorFromNebulaMock = require("../__mocks__/creatorFromNebula");
 
 //https://github.com/shelfio/jest-mongodb
 //https://vhudyma-blog.eu/3-ways-to-mock-axios-in-jest/
 
-describe("database tests", () => {
+describe("mongoose tests", () => {
   it("should be able to find env variables", () => {
     expect(process.env.DATABASE_URI).toBeDefined();
-    expect(process.env.DATABASE_TESTING_URI).toBeDefined();
-  });
-
-  beforeAll(async () => {
-    if (!process.env.DATABASE_TESTING_URI) {
-      throw new Error("DATABASE_TESTING_URI not set");
-    }
-    await mongoose.connect(process.env.DATABASE_TESTING_URI);
-  });
-
-  afterAll(async () => {
-    await mongoose.connection.dropCollection("creators");
-    await mongoose.connection.dropCollection("nebulaVideos");
-    await mongoose.connection.dropCollection("youtubeVideos");
-    await mongoose.connection.close();
   });
 
   describe("Creator", () => {

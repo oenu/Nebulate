@@ -26,8 +26,6 @@ import globalInit from "./store/store";
 app.use(auth);
 
 // Routes
-const generateDatabase = require("./routes/generateDatabase");
-app.use("/database", generateDatabase);
 
 const serveLookupTable = require("./routes/serveTable");
 app.use("/api/table", serveLookupTable);
@@ -56,3 +54,15 @@ mongoose.connection.once("open", async () => {
     logger.info(`Server is running on port ${port}`);
   });
 });
+
+import youtubeIds from "./config/youtubeIds";
+
+let youtubeIdsArray = ["hi"];
+
+youtubeIds.forEach((creator) => {
+  if (typeof creator.youtube_id === "string") {
+    youtubeIdsArray.push(creator.slug);
+  }
+});
+
+logger.verbose(youtubeIdsArray);

@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
+// Methods
+import videosFromNebula from "../Functions/videosFromNebula";
+import videosFromYoutube from "../Functions/videosFromYoutube";
+import matchVideos from "../Functions/matchVideos";
+
 // Models
 import { NebulaVideo } from "./nebulaVideo";
 import { YoutubeVideo } from "./youtubeVideo";
@@ -33,6 +38,9 @@ interface CreatorDocument extends CreatorInterface, mongoose.Document {
   getNebulaVideos: (nebula_slugs?: string[]) => Promise<NebulaVideoType[]>;
   getYoutubeVideos: (youtube_ids?: string[]) => Promise<YoutubeVideoType[]>;
   logScrape: (type: string, date?: Date) => Promise<void>;
+  scrapeNebula: (onlyScrapeNew?: boolean) => Promise<NebulaVideoType[]>;
+  scrapeYoutube: (onlyScrapeNew?: boolean) => Promise<YoutubeVideoType[]>;
+  matchVideos: () => Promise<void>;
 }
 
 const creatorSchema: Schema<CreatorDocument> = new Schema(
@@ -103,6 +111,20 @@ creatorSchema.methods.getNebulaVideos = async function (
       $and: [{ slug: { $in: nebula_slugs } }, { channel_slug: this.slug }],
     });
   }
+};
+
+creatorSchema.methods.scrapeNebula = async function (onlyScrapeNew?: boolean) {
+  if (onlyScrapeNew === undefined) onlyScrapeNew = true;
+  return await videosFromNebula(this.slug, onlyScrapeNew);
+};
+
+creatorSchema.methods.scrapeYoutube = async function (onlyScrapeNew?: boolean) {
+  if (onlyScrapeNew === undefined) onlyScrapeNew = true;
+  return await videosFromYoutube(this.slug, onlyScrapeNew);
+};
+
+creatorSchema.methods.matchVideos = async function () {
+  return await matchVideos(this.slug);
 };
 
 creatorSchema.methods.getYoutubeVideos = async function (

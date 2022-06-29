@@ -26,8 +26,6 @@ import globalInit from "./store/store";
 app.use(auth);
 
 // Routes
-const generateDatabase = require("./routes/generateDatabase");
-app.use("/database", generateDatabase);
 
 const serveLookupTable = require("./routes/serveTable");
 app.use("/api/table", serveLookupTable);
@@ -46,6 +44,9 @@ app.use("/match", matchVideos);
 
 const lookupRequest = require("./routes/lookupRequest");
 app.use("/api/lookup", lookupRequest);
+
+const registerAllCreators = require("./routes/registerAllCreators");
+app.use("/register_all_serious", registerAllCreators);
 
 // Start the server
 mongoose.connection.once("open", async () => {

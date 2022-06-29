@@ -85,11 +85,27 @@ export const scrapeNebula = async (
     const requestUrl = urlBuffer ? urlBuffer : url;
 
     // Get the next page of videos
-    const response = await axios.get(requestUrl, {
-      data: {
-        Authorization: `Bearer ${global.token}`,
-      },
-    });
+    let response: any;
+    try {
+      response = await axios.get(requestUrl, {
+        data: {
+          Authorization: `Bearer ${global.token}`,
+        },
+      });
+    } catch (error: any) {
+      if (error.status === 429) {
+        // If the request was rate limited, wait and try again
+        logger.info(
+          `Scrape: Rate limited, waiting and trying again in 1 minute`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 60000));
+        response = await axios.get(requestUrl, {
+          data: {
+            Authorization: `Bearer ${global.token}`,
+          },
+        });
+      }
+    }
 
     const newEpisodes = response.data.episodes.results;
     videoBuffer.push(...newEpisodes);

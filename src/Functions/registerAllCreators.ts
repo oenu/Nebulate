@@ -8,9 +8,12 @@ const registerAllCreators = async () => {
   // Check if creator is already in DB
 
   // Filter out creators that are already in DB
+  const existingCreators = await Creator.find({});
+
   let new_slugs = mappedSlugs.filter(
-    async (slug) => await !Creator.exists({ slug })
+    (slug) => !existingCreators.find((creator) => creator.slug === slug)
   );
+
   const existing_slugs = mappedSlugs.length - new_slugs.length;
 
   logger.info(
@@ -30,17 +33,18 @@ const registerAllCreators = async () => {
       console.info("registerAllCreators: Creator already in DB");
       continue;
     }
-
+    console.time("registerAllLoop");
     // Begin registration
     try {
       await registerCreatorInDB(slug);
       await (await Creator.findOne({ slug }))?.matchVideos();
     } catch (error) {
-      logger.info("registerAllCreators: Failed to register creator", { slug });
+      logger.error("registerAllCreators: Failed to register creator", { slug });
       logger.error(error);
     } finally {
       remaining_slugs--;
       logger.info(`registerAllCreators: ${remaining_slugs} creators remaining`);
+      console.timeEnd("registerAllLoop");
       console.timeLog("registerAllCreators", "Sleeping for 1 minute");
       await new Promise((resolve) => setTimeout(resolve, 60000));
     }

@@ -64,9 +64,9 @@ const registerCreatorInDB = async (channel_slug: string) => {
   await Creator.create(creator);
 
   // Scrape the creator's videos from Nebula and add them to the database
-  await videosFromNebula(channel_slug, false, 500);
+  await videosFromNebula(channel_slug, false, 5000);
   // Scrape the creator's videos from Youtube and add them to the database
-  await videosFromYoutube(channel_slug, false, 2000);
+  await videosFromYoutube(channel_slug, false, 5000);
   return;
 };
 

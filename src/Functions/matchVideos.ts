@@ -81,7 +81,7 @@ const matchVideos = async (
     logger.error(`Match: No videos matched for ${channel_slug}`);
     return;
   } else {
-    logger.verbose(
+    logger.info(
       `Match: Found ${matched_videos.length} possible matched videos for ${channel_slug}`
     );
   }

@@ -2,7 +2,12 @@ import { Creator } from "../models/creator";
 
 const hourScrapeInterval = 6;
 
-const updateCreatorsCron = async () => {
+/**
+ * @function updateCreators
+ *
+ */
+
+const updateAllCreators = async () => {
   // Get all creators
   const creators = await Creator.find({}).select(
     "last_scraped_nebula last_scraped_youtube last_matched slug"
@@ -37,4 +42,4 @@ const updateCreatorsCron = async () => {
   }
 };
 
-export default updateCreatorsCron;
+export default updateAllCreators;

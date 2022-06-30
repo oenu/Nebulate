@@ -11,7 +11,7 @@ import logger from "../utils/logger";
  * @returns {Promise<void>} A promise that resolves if the creators are registered.
  * @throws {Error} If the creators cannot be registered.
  * @async
- * @see {@link registerCreatorInDB}
+ * @see {@link registerCreatorInDB} {@link mappedSlugs}
  */
 const registerAllCreators = async () => {
   console.time("registerAllCreators");

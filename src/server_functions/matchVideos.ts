@@ -41,26 +41,6 @@ const matchVideos = async (
     throw new Error(`Match: Creator ${channel_slug} not found in DB`);
   }
 
-  // Check the last time the creator's nebula videos were scraped
-  // If the creator's videos were scraped more than 4 hours ago, scrape them again
-  const { last_scraped_nebula, last_scraped_youtube } = creator;
-  if (
-    last_scraped_nebula &&
-    last_scraped_youtube &&
-    new Date().getTime() -
-      Math.min(last_scraped_nebula.getTime(), last_scraped_youtube.getTime()) >
-      14400000
-  ) {
-    logger.info("Match: Creator scraped more than 4 hours ago, scraping again");
-    try {
-      await videosFromNebula(channel_slug, true);
-      await videosFromYoutube(channel_slug, true);
-    } catch (error) {
-      logger.error("Match: Error scraping videos");
-      throw error;
-    }
-  }
-
   // Get creator's youtube videos
   const youtube_videos: YoutubeVideoType[] = await creator.getYoutubeVideos(
     rematch_yt_id

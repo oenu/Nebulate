@@ -5,6 +5,14 @@ import path from "path";
 import logger from "../utils/logger";
 import keyFromNebula from "./keyFromNebula";
 
+/**
+ * @function jwtFromNebula
+ * @description This function fetches a JWT from Nebula using a secret provided by {@link keyFromNebula}.
+ * @description This function reads the secret from a file in the /store directory and will call {@link keyFromNebula} to get the secret if it does not exist.
+ * @returns {Promise<string>} A promise that resolves to a JWT string
+ * @async
+ */
+
 export const jwtFromNebula = async (): Promise<string> => {
   try {
     if (global.key === undefined) {

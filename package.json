@@ -58,6 +58,6 @@
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "test": "jest --watch --detectOpenHandles --runInBand",
     "test:ci": "jest --ci",
-    "doc": "jsdoc -c ./jsdoc.json -d ./docs ./dist/"
+    "doc": "./node_modules/.bin/jsdoc -c ./jsdoc.json -d ./docs ./dist/"
   }
 }

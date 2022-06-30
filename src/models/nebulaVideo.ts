@@ -1,18 +1,10 @@
 // Video type and model
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 
 // Types
 import type { YoutubeVideoType } from "./youtubeVideo";
-
-// Mongo Models
-// import { YoutubeVideo } from "./youtubeVideo";
-
-/**
- * nebulaVideoSchema schema
- * @constructor NebulaVideo
- */
 
 export interface NebulaVideoInterface {
   nebula_video_id: string;
@@ -127,16 +119,19 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
 // Methods
 
 /**
- * Set a the nebula videos match parameters to a youtube video
- * @param youtubeVideo YoutubeVideoType The youtube video to match to
- * @param matchStrength number The strength of the match
- * @returns {Promise<void>}
+ * @function setMatch
+ * @description Set the match parameters for a video
+ * @param {YoutubeVideoType} - The youtube video to match to
+ * @param {number} - The match strength
+ * @returns {Promise<void>} Promise that resolves when the match is set
  * @memberof NebulaVideo
+ * @async
  */
 nebulaVideoSchema.methods.setMatch = async function (
   youtubeVideo: YoutubeVideoType,
   strength: number
 ) {
+  // Update the video with the matched youtube video
   await NebulaVideo.findOneAndUpdate(
     { _id: this._id },
     {
@@ -151,13 +146,15 @@ nebulaVideoSchema.methods.setMatch = async function (
 };
 
 /**
- * Update the match parameters of a nebula video
+ * @function updateMatch
+ * @description Update the match parameters for a video
  * Note: This will remove the match from the old youtube video if it exists
  * Note: If provided with a strength below zero it will always override the match
  * @param youtubeVideo  YoutubeVideoType The youtube video to match to
  * @param strength  number of strength of the match (lower is better)
  * @returns {Promise<void>}
  * @memberof NebulaVideo
+ * @async
  */
 nebulaVideoSchema.methods.updateMatch = async function (
   youtubeVideo: YoutubeVideoType,
@@ -170,6 +167,7 @@ nebulaVideoSchema.methods.updateMatch = async function (
       logger.info(
         `Match update: ${this.slug}: ${this.match_strength} ==> ${matchStrength}`
       );
+      // Update just the match strength
       await NebulaVideo.findOneAndUpdate(
         { _id: this._id },
         {
@@ -210,6 +208,14 @@ nebulaVideoSchema.methods.updateMatch = async function (
   return;
 };
 
+/**
+ * @function removeMatch
+ * @description Remove the match parameters for a video
+ * @param {NebulaVideoType} [nebulaVideo] - The nebula video to remove the match from
+ * @returns {Promise<void>} Promise that resolves when the match is removed
+ * @memberof NebulaVideo
+ * @async
+ */
 nebulaVideoSchema.methods.removeMatch = async function (
   replacementVideo?: NebulaVideoType
 ) {
@@ -229,6 +235,14 @@ nebulaVideoSchema.methods.removeMatch = async function (
   );
 };
 
+/**
+ * @function findByNebulaVideoId
+ * @description Find a video by its nebula video id
+ * @param {string} nebulaVideoId - The nebula video id
+ * @returns {Promise<NebulaVideoType>} Promise that resolves with the video
+ * @memberof NebulaVideo
+ * @async
+ */
 nebulaVideoSchema.statics.findByNebulaVideoId = async function (
   nebulaVideoId: string
 ): Promise<NebulaVideoType | null> {

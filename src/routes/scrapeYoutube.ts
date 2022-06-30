@@ -1,9 +1,9 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import videosFromYoutube from "../Functions/videosFromYoutube";
+import videosFromYoutube from "../scrapers/videosFromYoutube";
 
 app.get(
   "/:channel_slug/:onlySearchNew?/:videoScrapeLimit?",

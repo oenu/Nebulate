@@ -1,6 +1,6 @@
 // Register creator in DB
 import axios from "axios";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
 
@@ -8,12 +8,20 @@ const yt = youtube("v3");
 import { youtubeIds } from "../store/youtubeIds";
 
 // Functions
-import videosFromNebula from "./videosFromNebula";
-import videosFromYoutube from "./videosFromYoutube";
+import videosFromNebula from "../scrapers/videosFromNebula";
+import videosFromYoutube from "../scrapers/videosFromYoutube";
 
 // Mongo Models
 import { Creator } from "../models/creator";
 
+/**
+ * @function registerCreatorInDB
+ * @description Register a creator in the DB
+ * @param {string} channel_slug - The creator's channel slug
+ * @returns {Promise<void>} - Resolves when creator is registered in DB
+ * @throws {Error} - If the creator already exists in the DB or if the creator does not have a youtube upload id
+ * @async
+ */
 const registerCreatorInDB = async (channel_slug: string) => {
   // Check if creator exists in DB
   try {
@@ -70,6 +78,14 @@ const registerCreatorInDB = async (channel_slug: string) => {
   return;
 };
 
+/**
+ * @function creatorFromNebula
+ * @description Get creator data from Nebula
+ * @param {string} channel_slug - The creator's channel slug
+ * @returns {Promise<AxiosResponse<NebulaCreatorType>>} - Resolves with creator data
+ * @throws {Error} - If the creator does not exist in Nebula
+ * @async
+ */
 export const creatorFromNebula = async (channel_slug: string) => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
@@ -89,6 +105,14 @@ export const creatorFromNebula = async (channel_slug: string) => {
   }
 };
 
+/**
+ * @function idFromYoutube
+ * @description Get creator youtube id from manual youtube mapping
+ * @param {string} channel_slug - The creator's channel slug
+ * @returns {Promise<string>} - Resolves with creator youtube id
+ * @throws {Error} - If the creator does not have a youtube id
+ * @async
+ */
 export const idFromYoutube = async (channel_slug: string) => {
   try {
     const creatorYtId = youtubeIds.find(
@@ -102,6 +126,14 @@ export const idFromYoutube = async (channel_slug: string) => {
   }
 };
 
+/**
+ * @function creatorFromYoutube
+ * @description Get creator data from Youtube
+ * @param {string} creatorYtId - The creator's youtube id
+ * @returns {Promise<{upload_playlist_id, channel_title, custom_url}>} - Resolves with spcific creator data
+ * @throws {Error} - If the creator does not exist in Youtube or the lookup fails
+ * @async
+ */
 export const creatorFromYoutube = async (creatorYtId: string) => {
   const response = await yt.channels.list({
     id: [creatorYtId],

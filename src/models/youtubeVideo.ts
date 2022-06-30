@@ -6,9 +6,6 @@ import { Schema, InferSchemaType } from "mongoose";
 // Types
 import type { NebulaVideoType } from "./nebulaVideo";
 
-// Mongo Models
-// import { NebulaVideo } from "./nebulaVideo";
-
 export interface YoutubeVideoInterface {
   youtube_video_id: string;
   published_at: Date;
@@ -19,10 +16,6 @@ export interface YoutubeVideoInterface {
   etag: string;
   status: string;
   channel_slug: string;
-  // nebula_video_object_id?: mongoose.Schema.Types.ObjectId;
-  // nebula_video_slug?: string;
-  // match_strength?: number;
-  // matched?: boolean;
   creator_object_id?: mongoose.Schema.Types.ObjectId;
 }
 
@@ -97,49 +90,14 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
   }
 );
 
-// Methods
-// youtubeVideoSchema.methods.setMatch = async function (
-//   nebulaVideo: NebulaVideoType,
-//   matchStrength: number
-// ): Promise<void> {
-//   this.matched = true;
-//   this.nebula_video_object_id = nebulaVideo._id;
-//   this.nebula_video_slug = nebulaVideo.slug;
-//   this.match_strength = matchStrength;
-//   await this.save();
-// };
-
-// youtubeVideoSchema.methods.updateMatch = async function (
-//   nebulaVideo: NebulaVideoType,
-//   matchStrength: number
-// ): Promise<void> {
-//   if (this.nebula_video_object_id !== nebulaVideo._id) {
-//     const oldNebulaVideo = await NebulaVideo.findById(
-//       this.nebula.video_object_id
-//     );
-//     if (oldNebulaVideo) {
-//       if (oldNebulaVideo.match_strength) {
-//         if (matchStrength > oldNebulaVideo.match_strength) return;
-//         await oldNebulaVideo.removeMatch(nebulaVideo);
-//       }
-//     }
-//     await this.setMatch(nebulaVideo, matchStrength);
-//   }
-// };
-
-// youtubeVideoSchema.methods.removeMatch = async function (
-//   replacementVideo?: YoutubeVideoType
-// ): Promise<void> {
-//   logger.warn(
-//     `Removing match for ${this.title}, replacing with ${replacementVideo?.title}`
-//   );
-//   this.matched = false;
-//   this.nebula_video_object_id = null;
-//   this.nebula_video_slug = null;
-//   this.match_strength = null;
-//   await this.save();
-// };
-
+/**
+ * @function findByYoutubeVideoId
+ * @description Finds a video by its youtube_video_id
+ * @param {string} youtubeVideoId - The youtube video id
+ * @returns {Promise<YoutubeVideoType>}
+ * @memberof YoutubeVideo
+ * @async
+ */
 youtubeVideoSchema.statics.findByYoutubeVideoId = async function (
   youtubeVideoId: string
 ): Promise<YoutubeVideoType | null> {

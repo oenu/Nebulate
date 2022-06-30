@@ -1,6 +1,10 @@
 //#
 /* cSpell:disable */
 
+/**
+ * YouTube IDs
+ * @description Manually mapped YouTube IDs for creators
+ */
 export const youtubeIds = [
   {
     slug: "12tone",
@@ -1344,6 +1348,10 @@ export const youtubeIds = [
   },
 ];
 
+/**
+ * mappedSlugs
+ * @description - a list of creator slugs that have mappings for youtube
+ */
 let mappedSlugs: string[] = [];
 youtubeIds.forEach((creator) => {
   if (typeof creator.youtube_id === "string") {
@@ -1352,5 +1360,3 @@ youtubeIds.forEach((creator) => {
 });
 
 export default mappedSlugs;
-
-//https://www.youtube.com/results?search_query=

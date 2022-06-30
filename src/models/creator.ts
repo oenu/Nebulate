@@ -90,11 +90,13 @@ const creatorSchema: Schema<CreatorDocument> = new Schema(
   }
 );
 
-creatorSchema.methods.test = async function () {
-  console.log(`${this.title}: Testing function`);
-  return "test";
-};
-
+/**
+ * @function getNebulaVideos
+ * @description Get the videos from Nebula for this creator
+ * @param {string[]} [nebula_slugs] - The slugs of the videos to get
+ * @returns {NebulaVideoType[]} - Nebula videos associated with this creator
+ * @memberof Creator
+ */
 creatorSchema.methods.getNebulaVideos = async function (
   nebula_slugs?: string[]
 ) {
@@ -113,20 +115,55 @@ creatorSchema.methods.getNebulaVideos = async function (
   }
 };
 
+/**
+ * @function scrapeNebula
+ * @description Scrape the videos from Nebula for this creator
+ * @param {boolean} [onlyScrapeNew=true] - Only scrape new videos
+ * @returns {NebulaVideoType[]} - Nebula videos associated with this creator
+ * @memberof Creator
+ * @throws {Error} - If the creator has no slug
+ * @async
+ */
 creatorSchema.methods.scrapeNebula = async function (onlyScrapeNew?: boolean) {
   if (onlyScrapeNew === undefined) onlyScrapeNew = true;
   return await videosFromNebula(this.slug, onlyScrapeNew);
 };
 
+/**
+ * @function scrapeYoutube
+ * @description Scrape the videos from Youtube for this creator
+ * @param {boolean} [onlyScrapeNew=true] - Only scrape new videos
+ * @returns {YoutubeVideoType[]} - Youtube videos associated with this creator
+ * @memberof Creator
+ * @throws {Error} - If the creator has no slug or mapped youtube_id
+ * @async
+ */
 creatorSchema.methods.scrapeYoutube = async function (onlyScrapeNew?: boolean) {
   if (onlyScrapeNew === undefined) onlyScrapeNew = true;
   return await videosFromYoutube(this.slug, onlyScrapeNew);
 };
 
+/**
+ * @function matchVideos
+ * @description Match videos from Nebula and Youtube for this creator
+ * @returns {void}
+ * @memberof Creator
+ * @throws {Error} - If the creator has no slug or videos
+ * @async
+ */
 creatorSchema.methods.matchVideos = async function () {
   return await matchVideos(this.slug);
 };
 
+/**
+ * @fumction getYoutubeVideos
+ * @description Get the videos from Youtube for this creator
+ * @param {string[]} [youtube_ids] - The ids of the videos to get
+ * @returns {YoutubeVideoType[]} - Youtube videos associated with this creator
+ * @memberof Creator
+ * @throws {Error} - If the creator has no mapped youtube_id or youtube_videos
+ * @async
+ */
 creatorSchema.methods.getYoutubeVideos = async function (
   youtube_ids?: string[]
 ) {
@@ -145,6 +182,16 @@ creatorSchema.methods.getYoutubeVideos = async function (
   }
 };
 
+/**
+ * @function logScrape
+ * @description Log the scrape of this creator
+ * @param {string} type - The type of scrape
+ * @param {Date} [date] - The date of the scrape
+ * @returns {void}
+ * @memberof Creator
+ * @throws {Error} - If the creator cannot be updated
+ * @async
+ */
 creatorSchema.methods.logScrape = async function (
   type: string,
   date?: Date
@@ -163,4 +210,5 @@ export type CreatorPreType = InferSchemaType<typeof creatorSchema>;
 export interface CreatorType extends CreatorPreType {
   _id: mongoose.Types.ObjectId;
 }
+
 export const Creator = mongoose.model("Creator", creatorSchema);

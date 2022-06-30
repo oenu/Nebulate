@@ -1,15 +1,10 @@
 {
   "display": "Node 16 + ESM + Strictest",
-  "ts-node": {
-    // these options are overrides used only by ts-node
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  },
+  "ts-node": {},
   "compilerOptions": {
     "lib": ["es6"],
     "module": "commonjs",
-    "target": "es6",
+    "target": "es2017",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -32,5 +27,5 @@
     "rootDir": "./src"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "__tests__"]
+  "exclude": ["node_modules", "__tests__", "logs"]
 }

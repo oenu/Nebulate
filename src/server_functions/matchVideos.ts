@@ -1,10 +1,6 @@
 import logger from "../utils/logger";
 import Fuse from "fuse.js";
 
-// Functions
-import videosFromNebula from "../scrapers/videosFromNebula";
-import videosFromYoutube from "../scrapers/videosFromYoutube";
-
 // Types
 import type { NebulaVideoType } from "../models/nebulaVideo";
 import type { YoutubeVideoType } from "../models/youtubeVideo";
@@ -24,6 +20,16 @@ interface MatchResult {
 // Mongo Models
 import { Creator } from "../models/creator";
 
+/**
+ * @function matchVideos
+ * @description Match videos from Nebula to Youtube for given creator
+ * @param {string} [channel_slug] - The slug of the creator to match videos for
+ * @param {string[]} [rematch_yt_ids] - The youtube_ids to rematch
+ * @param {string[]} [rematch_nebula_slug] - The slugs of the videos to get
+ * @returns {void}
+ * @async
+ *
+ */
 const matchVideos = async (
   channel_slug: string,
   rematch_nebula_slug?: Array<string>,
@@ -39,26 +45,6 @@ const matchVideos = async (
   const creator = await Creator.findOne({ slug: channel_slug });
   if (!creator) {
     throw new Error(`Match: Creator ${channel_slug} not found in DB`);
-  }
-
-  // Check the last time the creator's nebula videos were scraped
-  // If the creator's videos were scraped more than 4 hours ago, scrape them again
-  const { last_scraped_nebula, last_scraped_youtube } = creator;
-  if (
-    last_scraped_nebula &&
-    last_scraped_youtube &&
-    new Date().getTime() -
-      Math.min(last_scraped_nebula.getTime(), last_scraped_youtube.getTime()) >
-      14400000
-  ) {
-    logger.info("Match: Creator scraped more than 4 hours ago, scraping again");
-    try {
-      await videosFromNebula(channel_slug, true);
-      await videosFromYoutube(channel_slug, true);
-    } catch (error) {
-      logger.error("Match: Error scraping videos");
-      throw error;
-    }
   }
 
   // Get creator's youtube videos
@@ -86,7 +72,7 @@ const matchVideos = async (
     );
   }
 
-  let modified_videos: {
+  const modified_videos: {
     nebula_title: string;
     youtube_title: string;
     score: number;
@@ -96,7 +82,7 @@ const matchVideos = async (
     const { nebula_video, youtube_matches } = match_set;
     // Try to prevent matching one youtube video to multiple nebula videos
     for (let index = 0; index < youtube_matches.length; index++) {
-      let match = youtube_matches[index];
+      const match = youtube_matches[index];
       if (match === undefined) return;
 
       const { youtube_video, score } = match;
@@ -118,22 +104,18 @@ const matchVideos = async (
 
   logger.info(`Match: Matched ${modified_videos.length} videos`);
 
-  // Sanity Check
-  // const sorted_array = modified_videos.sort((a: any, b: any) => {
-  //   return b.score - a.score;
-  // });
-  // logger.verbose(sorted_array);
-  // logger.info("Match: Worst matches for " + channel_slug);
-  // logger.info(modified_videos.slice(0, 10));
-  // logger.verbose("Match: Worst matches for " + channel_slug);
-  // logger.verbose(modified_videos.slice(0, 10));
-
   return;
 };
 export default matchVideos;
 
-//#region  --- Matcher Function ---
-// Match videos to each other
+/**
+ * @function matcher
+ * @description Match videos from Nebula to Youtube for given creator
+ * @param {NebulaVideoType[]} [nebula_videos] - The videos to match
+ * @param {YoutubeVideoType[]} [youtube_videos] - The videos to match
+ * @returns {MatchResult[]} - The matched videos
+ * @async
+ */
 const matcher = async (
   nebula_videos: Array<NebulaVideoType>,
   youtube_videos: Array<YoutubeVideoType>
@@ -178,5 +160,3 @@ const matcher = async (
 
   return match_sets;
 };
-
-//#endregion --- Matcher Function ---

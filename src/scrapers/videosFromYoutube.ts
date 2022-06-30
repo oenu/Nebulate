@@ -1,5 +1,5 @@
 // Scrape youtube API to get videos for a creator
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import { youtube } from "@googleapis/youtube";
 import mongoose from "mongoose";
 const yt = youtube("v3");
@@ -14,6 +14,16 @@ import type {
 import { Creator } from "../models/creator";
 import { YoutubeVideo as VideoModel } from "../models/youtubeVideo";
 
+/**
+ * @function videosFromYoutube
+ * @description Scrape youtube API to get videos for a creator
+ * @param {string} channel_slug - The creator's channel slug
+ * @param {boolean} onlyScrapeNew - Only scrape new videos, will stop when a known video is found
+ * @param {number} videoScrapeLimit - The number of videos to scrape
+ * @returns {Promise<YoutubeVideo[]>}  - The videos scraped from youtube
+ * @throws {Error} - If the creator does not exist in the DB or if the creator does not have a youtube upload id
+ * @async
+ */
 const videosFromYoutube = async (
   channel_slug: string,
   onlyScrapeNew: boolean,
@@ -24,7 +34,9 @@ const videosFromYoutube = async (
 
   // Check if creator exists
   if (await !Creator.exists({ slug: channel_slug })) {
-    throw new Error(`YtScrape: Creator ${channel_slug} does not exist in DB`);
+    throw new Error(
+      `videosFromYoutube: Creator ${channel_slug} does not exist in DB`
+    );
   }
 
   // Get Creator
@@ -32,14 +44,16 @@ const videosFromYoutube = async (
 
   if (!creator)
     throw new Error(
-      `YtScrape: Creator ${channel_slug} does not have a youtube_id`
+      `videosFromYoutube: Creator ${channel_slug} does not have a youtube_id`
     );
 
+  // Check if creator has a youtube upload id
   if (creator.youtube_upload_id === "" || creator.youtube_upload_id === null)
     throw new Error(
-      `YtScrape: Creator ${channel_slug} does not have a youtube_upload_id`
+      `videosFromYoutube: Creator ${channel_slug} does not have a youtube_upload_id`
     );
 
+  // Scrape youtube API to get videos for a creator
   let youtube_videos = await scrapeYoutube(
     channel_slug,
     videoScrapeLimit,
@@ -50,8 +64,8 @@ const videosFromYoutube = async (
   youtube_videos = await removeYoutubeDuplicates(youtube_videos);
 
   if (youtube_videos.length === 0) {
-    logger.info(
-      `YtScrape: No new videos found for ${channel_slug}, logging scrape and exiting`
+    logger.debug(
+      `videosFromYoutube: No new videos found for ${channel_slug}, logging scrape and exiting`
     );
     await creator.logScrape("youtube");
     return;
@@ -60,13 +74,23 @@ const videosFromYoutube = async (
   // Insert videos into DB
   await youtubeVideosToDb(youtube_videos);
   await creator.logScrape("youtube");
-  logger.info(`YtScrape: ${youtube_videos.length} videos found`);
+  logger.debug(`videosFromYoutube: ${youtube_videos.length} videos found`);
   return youtube_videos;
 };
 
 export default videosFromYoutube;
 
-const scrapeYoutube = async (
+/**
+ * @function scrapeYoutube
+ * @description Scrape youtube API to get videos for a creator
+ * @param {string} channel_slug - The creator's channel slug
+ * @param {number} videoScrapeLimit - The number of videos to scrape
+ * @param {boolean} onlyScrapeNew - Only scrape new videos, will stop when a known video is found
+ * @returns {Promise<YoutubeVideo[]>} - The videos scraped from youtube
+ * @throws {Error} - If the creator does not exist in the DB or if the creator does not have a youtube upload id
+ * @async
+ */
+export const scrapeYoutube = async (
   channel_slug: string,
   videoScrapeLimit: number,
   onlyScrapeNew: boolean
@@ -104,16 +128,11 @@ const scrapeYoutube = async (
         scrapedVideos++;
       });
 
-      // console.log(pagetokenBuffer);
       // Set the pagetokenBuffer to the next page token
       if (response.data.nextPageToken) {
-        // logger.info(`scrapeYoutube: Next page token found for ${channel_slug}`);
         pagetokenBuffer = response?.data?.nextPageToken;
       } else {
-        // logger.info(
-        //   `scrapeYoutube: No next page token found for ${channel_slug}`
-        // );
-        logger.info("scrapeYoutube: Reached end of page tokens");
+        logger.debug("scrapeYoutube: Reached end of page tokens");
         scrapedVideos = videoScrapeLimit * 2;
       }
 
@@ -133,13 +152,15 @@ const scrapeYoutube = async (
         });
         // If no new videos were found, break the loop
         if (newVideos.length === 0) {
-          logger.info(`scrapeYoutube: No new videos found for ${channel_slug}`);
+          logger.debug(
+            `scrapeYoutube: No new videos found for ${channel_slug}`
+          );
           break;
         }
 
         // If end new videos was reached, break the loop
         if (newVideos.length && newVideos.length < newEpisodes.length) {
-          logger.info(
+          logger.debug(
             `scrapeYoutube: End of new videos reached for ${channel_slug}`
           );
           break;
@@ -149,14 +170,14 @@ const scrapeYoutube = async (
 
         // If all videos are new, continue to the next page
         if (newVideos.length === newEpisodes.length) {
-          logger.info(
+          logger.debug(
             `scrapeYoutube: All new videos found: ${channel_slug}, scraping again`
           );
         }
 
         // If no next page token, break the loop
         if (!response.data.nextPageToken) {
-          logger.info(`scrapeYoutube: No next page token for ${channel_slug}`);
+          logger.debug(`scrapeYoutube: No next page token for ${channel_slug}`);
           break;
         }
       }
@@ -185,6 +206,14 @@ const scrapeYoutube = async (
   return convertedVideos;
 };
 
+/**
+ * @function removeYoutubeDuplicates
+ * @description Remove videos from array that are already in the DB
+ * @param {YoutubeVideo[]} youtube_videos - Array of videos to remove duplicates from
+ * @returns {Promise<YoutubeVideo[]>} - Array of videos with duplicates removed
+ * @throws {Error} - If the creator does not exist in the DB or if the creator does not have a youtube upload id
+ * @async
+ */
 export const removeYoutubeDuplicates = async (
   youtube_videos: YoutubeVideoInterface[]
 ): Promise<YoutubeVideoInterface[]> => {
@@ -204,6 +233,14 @@ export const removeYoutubeDuplicates = async (
   return nonConflictingVideos;
 };
 
+/**
+ * @function youtubeVideosToDb
+ * @description Send youtube videos to the database
+ * @param {YoutubeVideo[]} youtube_videos - Array of videos to add to the database
+ * @returns {Promise<void>} - Promise that resolves when the videos are added to the database
+ * @throws {Error} - If the creator does not exist in the DB or if the update fails
+ * @async
+ */
 export const youtubeVideosToDb = async (
   youtube_videos: YoutubeVideoInterface[]
 ) => {

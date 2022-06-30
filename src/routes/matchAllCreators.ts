@@ -1,13 +1,13 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import matchVideosCron from "../cron/matchAllCreators";
+import matchAllCreators from "../bulk_methods/matchAllCreators";
 
 app.post("/", async (_req: Request, res: Response) => {
   logger.warn("matchAllCreators: Matching all creators");
-  matchVideosCron();
+  matchAllCreators();
   res.send("Matching all creators");
 });
 

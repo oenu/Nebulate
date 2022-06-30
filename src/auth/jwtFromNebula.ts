@@ -20,7 +20,7 @@ export const jwtFromNebula = async (): Promise<string> => {
       try {
         logger.debug("jwtFromNebula: Global key undefined, fetching from file");
         const simple_key = await fs.promises.readFile(
-          path.join(__dirname, "..", "store", "simple_key.txt"),
+          path.join(__dirname, "..", "/store", "simple_key.txt"),
           "utf-8"
         );
         global.key = simple_key;
@@ -45,7 +45,7 @@ export const jwtFromNebula = async (): Promise<string> => {
 
     // Write JWT to file
     await fs.promises.writeFile(
-      path.join(__dirname, "..", "store", "json_token.txt"),
+      path.join(__dirname, "..", "/store", "json_token.txt"),
       response.data.token
     );
 

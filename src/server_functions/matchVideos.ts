@@ -20,6 +20,16 @@ interface MatchResult {
 // Mongo Models
 import { Creator } from "../models/creator";
 
+/**
+ * @function matchVideos
+ * @description Match videos from Nebula to Youtube for given creator
+ * @param {string} [channel_slug] - The slug of the creator to match videos for
+ * @param {string[]} [rematch_yt_ids] - The youtube_ids to rematch
+ * @param {string[]} [rematch_nebula_slug] - The slugs of the videos to get
+ * @returns {void}
+ * @async
+ *
+ */
 const matchVideos = async (
   channel_slug: string,
   rematch_nebula_slug?: Array<string>,
@@ -98,8 +108,14 @@ const matchVideos = async (
 };
 export default matchVideos;
 
-//#region  --- Matcher Function ---
-// Match videos to each other
+/**
+ * @function matcher
+ * @description Match videos from Nebula to Youtube for given creator
+ * @param {NebulaVideoType[]} [nebula_videos] - The videos to match
+ * @param {YoutubeVideoType[]} [youtube_videos] - The videos to match
+ * @returns {MatchResult[]} - The matched videos
+ * @async
+ */
 const matcher = async (
   nebula_videos: Array<NebulaVideoType>,
   youtube_videos: Array<YoutubeVideoType>
@@ -144,5 +160,3 @@ const matcher = async (
 
   return match_sets;
 };
-
-//#endregion --- Matcher Function ---

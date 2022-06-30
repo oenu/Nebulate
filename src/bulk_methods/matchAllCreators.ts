@@ -29,7 +29,7 @@ const matchAllCreators = async () => {
     "matchAllCreators: Found " + creators.length + " creators, matching"
   );
 
-  // Iterate through each creator and match their videos, this will also trigger scraping if needed
+  // Iterate through each creator and match their videos
   for await (const creator of creators) {
     await creator.matchVideos();
     await creator.save();

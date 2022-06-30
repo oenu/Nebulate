@@ -10,7 +10,6 @@ app.get(
   async (req: Request, res: Response) => {
     const channel_slug = req.params.channel_slug;
 
-    // HACK: #40
     const rematch_nebula_slug = req.params?.rematch_nebula_slug
       ? [req.params.rematch_nebula_slug]
       : undefined;
@@ -18,7 +17,6 @@ app.get(
       ? [req.params.rematch_yt_id]
       : undefined;
 
-    // TODO: #39 Change to post and change to body parser
     if (!channel_slug) {
       res.send("No channel_slug provided");
       logger.error("No channel_slug provided");

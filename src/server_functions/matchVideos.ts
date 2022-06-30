@@ -1,10 +1,6 @@
 import logger from "../utils/logger";
 import Fuse from "fuse.js";
 
-// Functions
-import videosFromNebula from "../scrapers/videosFromNebula";
-import videosFromYoutube from "../scrapers/videosFromYoutube";
-
 // Types
 import type { NebulaVideoType } from "../models/nebulaVideo";
 import type { YoutubeVideoType } from "../models/youtubeVideo";
@@ -66,7 +62,7 @@ const matchVideos = async (
     );
   }
 
-  let modified_videos: {
+  const modified_videos: {
     nebula_title: string;
     youtube_title: string;
     score: number;
@@ -76,7 +72,7 @@ const matchVideos = async (
     const { nebula_video, youtube_matches } = match_set;
     // Try to prevent matching one youtube video to multiple nebula videos
     for (let index = 0; index < youtube_matches.length; index++) {
-      let match = youtube_matches[index];
+      const match = youtube_matches[index];
       if (match === undefined) return;
 
       const { youtube_video, score } = match;
@@ -97,16 +93,6 @@ const matchVideos = async (
   });
 
   logger.info(`Match: Matched ${modified_videos.length} videos`);
-
-  // Sanity Check
-  // const sorted_array = modified_videos.sort((a: any, b: any) => {
-  //   return b.score - a.score;
-  // });
-  // logger.verbose(sorted_array);
-  // logger.info("Match: Worst matches for " + channel_slug);
-  // logger.info(modified_videos.slice(0, 10));
-  // logger.verbose("Match: Worst matches for " + channel_slug);
-  // logger.verbose(modified_videos.slice(0, 10));
 
   return;
 };

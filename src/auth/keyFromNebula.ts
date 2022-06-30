@@ -10,6 +10,7 @@ import logger from "../utils/logger";
  * @description This stores the secret in a file in the /store directory and sets the global.key to the secret.
  * @returns {Promise<string>} A promise that resolves to a secret from Nebula.
  * @throws {Error} If the secret cannot be requested from Nebula or if environment variables are not set.
+ * @memberof module:Auth
  * @async
  */
 

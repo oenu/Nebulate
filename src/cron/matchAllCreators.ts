@@ -18,9 +18,14 @@ const matchVideosCron = async () => {
     "matchVideosCron: Found " + creators.length + " creators, matching"
   );
 
-  for (const creator of creators) {
+  for await (const creator of creators) {
     await creator.matchVideos();
+    await creator.save();
+    // wait for 10 seconds between matches
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   }
-  console.info("matchVideosCron: Done matching videos");
+  logger.info("matchVideosCron: Done matching videos");
   console.timeEnd("matchVideosCron");
 };
+
+export default matchVideosCron;

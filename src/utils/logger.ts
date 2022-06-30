@@ -1,6 +1,7 @@
-const winston = require("winston");
+// const winston = require("winston");
 import path from "path";
-import { format } from "winston";
+// import { format } from "winston";
+import winston from "winston";
 
 // const verboseFormat = format.printf(() => {
 //   return `Verbose message`;
@@ -26,7 +27,11 @@ const logger = winston.createLogger({
     }),
     new winston.transports.File({
       format: winston.format.json(),
-      timestamp: true,
+      filename: path.join(__dirname, "..", "/logs", "debug.log"),
+      level: "debug",
+    }),
+    new winston.transports.File({
+      format: winston.format.json(),
       filename: path.join(__dirname, "..", "/logs", "combined.log"),
     }),
   ],
@@ -47,11 +52,11 @@ if (process.env.NODE_ENV !== "production") {
     new winston.transports.File({
       format: winston.format.combine(
         winston.format.json(),
-        format((info: any) => {
+        winston.format((info: any) => {
           return info.level === "verbose" ? info : false;
         })()
       ),
-      timestamp: true,
+      // timestamp: true,
       filename: path.join(__dirname, "..", "/logs", "verbose.log"),
       level: "verbose",
     })
@@ -59,7 +64,7 @@ if (process.env.NODE_ENV !== "production") {
   logger.add(
     new winston.transports.Console({
       format: winston.format.combine(
-        format((info: any) => {
+        winston.format((info: any) => {
           return info.level === "verbose" ? info : false;
         })(),
         // verboseFormat,
@@ -69,8 +74,8 @@ if (process.env.NODE_ENV !== "production") {
         winston.format.colorize(),
         winston.format.printf((log: any) => `${log.level}: Wrote to file`)
       ),
-      timestamp: true,
-      filename: path.join(__dirname, "..", "/logs", "verbose.log"),
+      // timestamp: true,
+      // filename: path.join(__dirname, "..", "/logs", "verbose.log"),
       level: "verbose",
     })
   );

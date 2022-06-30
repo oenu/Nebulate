@@ -51,6 +51,9 @@ app.use("/register_all_serious", registerAllCreators);
 const matchAllCreators = require("./routes/matchAllCreators");
 app.use("/match_all_serious", matchAllCreators);
 
+const updateAllCreators = require("./routes/updateAllCreators");
+app.use("/update_all_creators", updateAllCreators);
+
 // Start the server
 mongoose.connection.once("open", async () => {
   // Initialize global variables

@@ -51,7 +51,7 @@ const matchVideos = async (
       Math.min(last_scraped_nebula.getTime(), last_scraped_youtube.getTime()) >
       14400000
   ) {
-    logger.log("Match: Creator scraped more than 4 hours ago, scraping again");
+    logger.info("Match: Creator scraped more than 4 hours ago, scraping again");
     try {
       await videosFromNebula(channel_slug, true);
       await videosFromYoutube(channel_slug, true);
@@ -115,6 +115,8 @@ const matchVideos = async (
         });
     }
   });
+
+  logger.info(`Match: Matched ${modified_videos.length} videos`);
 
   // Sanity Check
   // const sorted_array = modified_videos.sort((a: any, b: any) => {

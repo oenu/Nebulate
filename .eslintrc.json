@@ -1,12 +1,17 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "eslint-plugin-jest"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-jest", "jsdoc"],
   "extends": [
-    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "plugin:jest/recommended"
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "prettier"
   ],
-  "@typescript-eslint/no-explicit-any": "off"
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
+  },
+  "env": {
+    "node": true
+  }
 }

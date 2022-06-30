@@ -59,6 +59,7 @@ const serveLookupTable = async (
   // If the lookup table doesn't exist, create it
   if (!lookupTableExists) {
     logger.warn("serveLookupTable: lookup table does not exist");
+
     return await generateLookupTable(maximumMatchDistance);
   }
 

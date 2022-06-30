@@ -35,9 +35,6 @@ const videosFromYoutube = async (
       `YtScrape: Creator ${channel_slug} does not have a youtube_id`
     );
 
-  // TODO: #30 Get creators earliest video date on nebula and stop scraping before that date
-  // TODO: #31 If returned array of videos is massive (> 500) check nebula to see if this number is reasonable
-
   if (creator.youtube_upload_id === "" || creator.youtube_upload_id === null)
     throw new Error(
       `YtScrape: Creator ${channel_slug} does not have a youtube_upload_id`

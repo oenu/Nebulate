@@ -9,8 +9,8 @@ import keyFromNebula from "./keyFromNebula";
  * @function jwtFromNebula
  * @description This function fetches a JWT from Nebula using a secret provided by {@link keyFromNebula}, stores it in /store and sets global.token to it.
  * @description This function reads the secret from a file in the /store directory and will call {@link keyFromNebula} to get the secret if it does not exist.
- * @returns {Promise<string>} A promise that resolves to a JWT string
- * @throws {Error} If the JWT cannot be resolved from Nebula or if the secret cannot be fetched from Nebula
+ * @returns {Promise<string>} A promise that resolves to a JWT string.
+ * @throws {Error} If the JWT cannot be resolved from Nebula or if the secret cannot be fetched from Nebula.
  * @async
  */
 

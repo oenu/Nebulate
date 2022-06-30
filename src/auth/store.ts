@@ -8,9 +8,8 @@ import keyFromNebula from "./keyFromNebula";
 /**
  * @function globalInit
  * @description This function initializes the global variables.
- * @
- * @returns {Promise<void>} A promise that resolves if the global variables are set
- * @throws {Error} If the global variables cannot be set
+ * @returns {Promise<void>} A promise that resolves if the global variables are set.
+ * @throws {Error} If the global variables cannot be set.
  * @async
  */
 

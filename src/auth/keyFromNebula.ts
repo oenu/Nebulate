@@ -8,8 +8,8 @@ import logger from "../utils/logger";
  * @function keyFromNebula
  * @description This function fetches a secret from Nebula using a username and password stored in the environment at SCRAPE_USER and SCRAPE_PASS.
  * @description This stores the secret in a file in the /store directory and sets the global.key to the secret.
- * @returns {Promise<string>} A promise that resolves to a secret from Nebula
- * @throws {Error} If the secret cannot be requested from Nebula or if environment variables are not set
+ * @returns {Promise<string>} A promise that resolves to a secret from Nebula.
+ * @throws {Error} If the secret cannot be requested from Nebula or if environment variables are not set.
  * @async
  */
 

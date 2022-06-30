@@ -18,7 +18,7 @@ const registerAllCreators = async () => {
 
   // Filter out creators that are already in DB
   const existingCreators = await Creator.find({});
-  let new_slugs = mappedSlugs.filter(
+  const new_slugs = mappedSlugs.filter(
     (slug) => !existingCreators.find((creator) => creator.slug === slug)
   );
 

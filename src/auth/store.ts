@@ -23,7 +23,7 @@ const globalInit = async () => {
       );
 
       // Check if returned key is empty
-      if (typeof simple_key === undefined || simple_key.length === 0) {
+      if (simple_key === undefined || simple_key.length === 0) {
         throw new Error("globalInit: Key is empty");
       } else {
         global.key = simple_key;
@@ -49,7 +49,7 @@ const globalInit = async () => {
       );
 
       // Check if returned token is empty
-      if (typeof json_token === undefined || json_token.length === 0) {
+      if (json_token === undefined || json_token.length === 0) {
         logger.info("globalInit: Token is empty");
       } else {
         global.token = json_token;

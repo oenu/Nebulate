@@ -5,7 +5,7 @@ import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
 
 // Files
-import youtubeIds from "../config/youtubeIds";
+import { youtubeIds } from "../store/youtubeIds";
 
 // Functions
 import videosFromNebula from "./videosFromNebula";
@@ -26,17 +26,59 @@ const registerCreatorInDB = async (channel_slug: string) => {
     throw error;
   }
 
-  // Main try/catch block
-  // Collect creator data from Nebula and Youtube and save to DB
-  let response;
+  // Get creator from Nebula
+  const creator_nebula = await creatorFromNebula(channel_slug);
+  const { id, slug, title, description, type, zype_id } =
+    creator_nebula.data.details;
+
+  // Get creator youtube id from youtube mapping
+  const creatorYtId = await idFromYoutube(channel_slug);
+  if (!creatorYtId) {
+    throw new Error(
+      `Register: Creator ${channel_slug} does not exist in youtube mapping`
+    );
+  }
+
+  // Get creator data from Youtube - channel upload playlist
+  const creator_youtube = await creatorFromYoutube(creatorYtId);
+
+  if (!creator_youtube.upload_playlist_id)
+    throw new Error(
+      `Register: Creator ${channel_slug} no upload playlist id from youtube API`
+    );
+
+  logger.info(`Adding ${channel_slug} to the database`);
+  // Map creator data to schema
+  const creator = new Creator({
+    nebula_id: id,
+    slug,
+    title,
+    description,
+    type,
+    zype_id,
+    youtube_id: creatorYtId,
+    youtube_upload_id: creator_youtube.upload_playlist_id,
+  });
+
+  // Register creator in DB
+  await Creator.create(creator);
+
+  // Scrape the creator's videos from Nebula and add them to the database
+  await videosFromNebula(channel_slug, false, 5000);
+  // Scrape the creator's videos from Youtube and add them to the database
+  await videosFromYoutube(channel_slug, false, 5000);
+  return;
+};
+
+export const creatorFromNebula = async (channel_slug: string) => {
   try {
-    // Get creator data from Nebula
     const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
-    response = await axios.get(url, {
+    const response = await axios.get(url, {
       data: {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response;
   } catch (error: any) {
     if (error?.code === "ERR_BAD_REQUEST") {
       logger.error(`Register: ${channel_slug} not valid slug`);
@@ -45,92 +87,37 @@ const registerCreatorInDB = async (channel_slug: string) => {
     logger.info(`Register: Creator ${channel_slug} does not exist in Nebula`);
     throw error;
   }
+};
 
+export const idFromYoutube = async (channel_slug: string) => {
   try {
-    // Get Creator Youtube_id from lookup table
     const creatorYtId = youtubeIds.find(
       (creator) => creator.slug === channel_slug
     )?.youtube_id;
-
-    if (!creatorYtId) {
-      throw new Error(
-        `Register: Creator ${channel_slug} does not exist in youtube mapping`
-      );
-    }
-
-    // Get creator data from Youtube - channel upload playlist
-    if (creatorYtId && process.env.YOUTUBE_API_KEY) {
-      let res;
-      try {
-        res = await yt.channels.list({
-          id: [creatorYtId],
-          auth: process.env.YOUTUBE_API_KEY,
-          part: ["contentDetails"],
-        });
-      } catch (error) {
-        logger.error(error);
-        logger.error(
-          "Register: Could not get upload playlist id from youtube API"
-        );
-        throw new Error(
-          "Register: Could not get upload playlist id from youtube API"
-        );
-      }
-
-      try {
-        // Create new creator document in DB
-        if (res.data?.items) {
-          logger.info(`Adding ${channel_slug} to the database`);
-          await Creator.create({
-            nebula_id: response.data.details.id,
-            slug: response.data.details.slug,
-            title: response.data.details.title,
-            description: response.data.details.description,
-            type: response.data.details.type,
-            "zype-id": response.data.details.zype_id,
-            youtube_id: creatorYtId,
-            youtube_upload_id:
-              res.data?.items[0]?.contentDetails?.relatedPlaylists?.uploads,
-          });
-        }
-      } catch (error) {
-        // Catch for creating creator document in DB
-        logger.error(error);
-        logger.error(`Register: Could not add ${channel_slug} to the database`);
-        throw new Error(
-          `Register: Could not add ${channel_slug} to the database`
-        );
-      }
-    }
+    if (creatorYtId) return creatorYtId;
+    else return null;
   } catch (error) {
-    // Catch for Creator lookup and creation
+    logger.error(error);
     throw error;
   }
+};
 
-  // Scrape the creator's videos
-  logger.info(`Register: Scraping ${channel_slug}'s videos`);
-
-  // Scrape the creator's videos from Nebula and add them to the database
-  try {
-    await videosFromNebula(channel_slug, false, 500);
-  } catch (error) {
-    // Catch for videosFromNebula
-    logger.error(`Register: Could not scrape ${channel_slug}'s Nebula videos`);
+export const creatorFromYoutube = async (creatorYtId: string) => {
+  const response = await yt.channels.list({
+    id: [creatorYtId],
+    auth: process.env.YOUTUBE_API_KEY as string,
+    part: ["contentDetails"],
+  });
+  if (!response?.data?.items || !response?.data?.items[0])
     throw new Error(
-      `Register: Could not scrape ${channel_slug}'s Nebula videos`
+      "Register: Could not get upload playlist id from youtube API"
     );
-  }
+  const creator = response?.data?.items[0];
+  const upload_playlist_id = creator.contentDetails?.relatedPlaylists?.uploads;
+  const channel_title = creator.snippet?.title;
+  const custom_url = creator.snippet?.customUrl;
 
-  // Scrape the creator's videos from Youtube and add them to the database
-  try {
-    await videosFromYoutube(channel_slug, false, 700); // HACK: Change to 500
-  } catch (error) {
-    // Catch for videosFromYoutube
-    logger.error(`Register: Could not scrape ${channel_slug}'s Youtube videos`);
-    throw new Error(
-      `Register: Could not scrape ${channel_slug}'s Youtube videos`
-    );
-  }
+  return { upload_playlist_id, channel_title, custom_url };
 };
 
 export default registerCreatorInDB;

@@ -24,95 +24,138 @@ export const videosFromNebula = async (
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
 ) => {
+  // Default scrape limit if none is provided
+  if (!videoScrapeLimit) videoScrapeLimit = 20;
+
+  // Check if creator exists
   if (await !Creator.exists({ slug: channel_slug })) {
     throw new Error(`Scrape: Creator ${channel_slug} does not exist in DB`);
   }
 
+  // Find creator in DB
   const creator = await Creator.findOne({ slug: channel_slug });
   if (!creator) {
-    logger.error(`Scrape: Creator ${channel_slug} does not have a nebula_id`);
     throw new Error(
       `Scrape: Creator ${channel_slug} does not have a nebula_id`
     );
   }
 
-  let urlBuffer = "";
-  let videoBuffer = [];
-  logger.info(`OnlyScrapeNew: ${onlyScrapeNew}`);
+  // Scrape videos from Nebula
+  let nebula_videos = await scrapeNebula(
+    channel_slug,
+    videoScrapeLimit,
+    onlyScrapeNew
+  );
 
-  // Default scrape limit if none is provided
-  if (!videoScrapeLimit) {
-    videoScrapeLimit = 20;
+  // Remove videos that are already in the DB
+  nebula_videos = await removeNebulaDuplicates(nebula_videos);
+
+  if (nebula_videos.length === 0) {
+    logger.info(`Scrape: No new videos found for ${channel_slug}`);
+    await creator.logScrape("nebula");
+    return;
   }
 
-  for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
-    try {
-      const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
-      const requestUrl = urlBuffer ? urlBuffer : url;
+  // Save videos to database
+  logger.info(`Scrape: ${nebula_videos.length} un-scraped videos to be added`);
+  await nebulaVideosToDb(nebula_videos);
+  await creator.logScrape("nebula");
+  return nebula_videos;
+};
 
-      // Get the next page of videos
-      const response = await axios.get(requestUrl, {
+export const scrapeNebula = async (
+  channel_slug: string,
+  videoScrapeLimit: number,
+  onlyScrapeNew: boolean
+): Promise<NebulaVideoInterface[]> => {
+  let urlBuffer = "";
+  let videoBuffer = [];
+
+  // Get the creators object id
+  const creator = await Creator.findOne({ slug: channel_slug });
+  if (!creator) {
+    throw new Error(
+      `scrapeNebula: Creator ${channel_slug} does not have a nebula_id`
+    );
+  }
+
+  // Start scrape
+  for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
+    const url = `https://content.watchnebula.com/video/channels/${channel_slug}/`;
+    const requestUrl = urlBuffer ? urlBuffer : url;
+
+    // Get the next page of videos
+    let response: any;
+    try {
+      response = await axios.get(requestUrl, {
         data: {
           Authorization: `Bearer ${global.token}`,
         },
       });
-
-      const newEpisodes = response.data.episodes.results;
-      videoBuffer.push(...newEpisodes);
-      scrapedVideos += newEpisodes.length;
-      urlBuffer = response.data.episodes.next;
-
-      // If onlyScrapeNew is true, check if the video is in the cache
-      if (onlyScrapeNew === true) {
-        const videoCache = await VideoModel.find({
-          slug: { $in: newEpisodes.map((video: any) => video.slug) },
-        }).select("slug");
-
-        // Filter out videos that are in the cache
-        const newVideos = newEpisodes.filter((video: any) => {
-          return !videoCache.some((cacheVideo) => {
-            return cacheVideo.slug === video.slug;
-          });
+    } catch (error: any) {
+      if (error.status === 429) {
+        // If the request was rate limited, wait and try again
+        logger.info(
+          `Scrape: Rate limited, waiting and trying again in 1 minute`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 60000));
+        response = await axios.get(requestUrl, {
+          data: {
+            Authorization: `Bearer ${global.token}`,
+          },
         });
-
-        // If no new videos were found, break the loop
-        if (newVideos.length === 0) {
-          logger.info(`Scrape: No new videos found for ${channel_slug}`);
-          break;
-        }
-
-        // If end of new videos was reached, break the loop
-        if (newVideos.length > 0 && newVideos.length < newEpisodes.length) {
-          logger.info(
-            `Scrape: ${newVideos.length} new videos found for: ${channel_slug}`
-          );
-          break;
-        }
-        // If all videos are new, continue to the next page
-        if (newVideos.length === newEpisodes.length) {
-          logger.info(
-            `Scrape: All new videos found: ${channel_slug}, scraping again`
-          );
-        }
       }
+    }
 
-      // If no next page was found, break the loop
-      if (response.data.episodes.next === null) {
-        logger.info("Scrape: Reached end of Next-Redirects");
+    const newEpisodes = response.data.episodes.results;
+    videoBuffer.push(...newEpisodes);
+    scrapedVideos += newEpisodes.length;
+    urlBuffer = response.data.episodes.next;
+
+    // If onlyScrapeNew is true, check if the video is in the cache
+    if (onlyScrapeNew === true) {
+      const videoCache = await VideoModel.find({
+        slug: { $in: newEpisodes.map((video: any) => video.slug) },
+      }).select("slug");
+
+      // Filter out videos that are in the cache
+      const newVideos = newEpisodes.filter((video: any) => {
+        return !videoCache.some((cacheVideo) => {
+          return cacheVideo.slug === video.slug;
+        });
+      });
+
+      // If no new videos were found, break the loop
+      if (newVideos.length === 0) {
+        logger.info(`scrapeNebula: No new videos found for ${channel_slug}`);
         break;
       }
-    } catch (error) {
-      logger.error(error);
-      logger.error("Scrape: Could not scrape videos");
-      throw new Error("Scrape: Could not scrape videos");
+
+      // If end of new videos was reached, break the loop
+      if (newVideos.length > 0 && newVideos.length < newEpisodes.length) {
+        logger.info(
+          `scrapeNebula: ${newVideos.length} new videos found for: ${channel_slug}`
+        );
+        break;
+      }
+      // If all videos are new, continue to the next page
+      if (newVideos.length === newEpisodes.length) {
+        logger.info(
+          `scrapeNebula: All new videos found: ${channel_slug}, scraping again`
+        );
+      }
+    }
+
+    // If no next page was found, break the loop
+    if (response.data.episodes.next === null) {
+      logger.info("scrapeNebula: Reached end of Next-Redirects");
+      break;
     }
   }
+  if (videoBuffer.length === 0) {
+    throw new Error(`scrapeNebula: No videos found for ${channel_slug}`);
+  }
 
-  logger.info(
-    `Scrape: Scrape found ${videoBuffer.length} Nebula videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
-  );
-
-  // Convert to video objects
   const convertedVideos = videoBuffer.map(
     (video: any): NebulaVideoInterface => {
       return {
@@ -132,84 +175,64 @@ export const videosFromNebula = async (
       };
     }
   );
+  logger.info(
+    `scrapeNebula: Found ${convertedVideos.length} Nebula videos for ${channel_slug} with a limit of ${videoScrapeLimit}`
+  );
+  return convertedVideos;
+};
 
+export const nebulaVideosToDb = async (
+  videos: Array<NebulaVideoInterface>
+): Promise<void> => {
+  // Save videos to database
+  const videoResponse = await VideoModel.insertMany(videos);
+  logger.info(`Scrape: ${videoResponse.length} videos added to database`);
+
+  // Add video ids to creator
+  if (!videoResponse[0]?.channel_slug)
+    throw new Error("Scrape: Could not find creator to add nebula videos to");
+  const creatorResponse = await Creator.findOneAndUpdate(
+    {
+      slug: videoResponse[0].channel_slug,
+    },
+    {
+      $addToSet: {
+        nebula_videos: {
+          $each: [
+            ...videoResponse.map(
+              (video: any) => new mongoose.Types.ObjectId(video._id.toString())
+            ),
+          ],
+        },
+      },
+      $set: {
+        last_scraped_nebula: new Date(),
+      },
+    }
+  );
+
+  if (creatorResponse === null)
+    throw new Error("Scrape: Could not find creator to add nebula videos to");
+  else logger.info(`Scrape: ${videoResponse.length} videos added to creator`);
+  return;
+};
+
+export const removeNebulaDuplicates = async (
+  nebula_videos: NebulaVideoInterface[]
+): Promise<NebulaVideoInterface[]> => {
   // Check if videos are already in the database
   const existingVideos = await VideoModel.find({
-    slug: { $in: convertedVideos.map((video: any) => video.slug) },
+    slug: { $in: nebula_videos.map((video: any) => video.slug) },
   }).select("slug"); // Select() reduces the amount of data to be sent back from the database
 
   // If videos are already in the database, remove them from the array
-  const nonConflictingVideos = convertedVideos.filter((video: any) => {
+  const nonConflictingVideos = nebula_videos.filter((video: any) => {
     return !existingVideos.some((existingVideo: any) => {
       return existingVideo.slug === video.slug;
     });
   });
 
-  if (nonConflictingVideos.length === 0) {
-    logger.info(`Scrape: No new videos found for ${channel_slug}`);
-
-    try {
-      // If no new videos were found, update the creator's last_scraped_nebula field
-      await Creator.findOneAndUpdate(
-        { slug: channel_slug },
-        { $set: { last_scraped_nebula: new Date() } }
-      );
-      logger.info(`Scrape: Updated last_scraped_nebula for ${channel_slug}`);
-    } catch {
-      logger.info(
-        `Scrape: Couldn't update last_scraped_nebula for ${channel_slug}`
-      );
-    }
-    return;
-  }
-
-  logger.info(
-    `Scrape: ${nonConflictingVideos.length} un-scraped videos to be added`
-  );
-  try {
-    // Save videos to database
-    const mongoResponse = await VideoModel.insertMany(nonConflictingVideos);
-    logger.info(`Scrape: ${mongoResponse.length} videos added to database`);
-
-    // Add video ids to creator
-    if (mongoResponse[0]?.channel_slug) {
-      try {
-        await Creator.findOneAndUpdate(
-          {
-            slug: mongoResponse[0].channel_slug,
-          },
-          {
-            $addToSet: {
-              nebula_videos: {
-                $each: [
-                  ...mongoResponse.map(
-                    (video: any) =>
-                      new mongoose.Types.ObjectId(video._id.toString())
-                  ),
-                ],
-              },
-            },
-            $set: {
-              last_scraped_nebula: new Date(),
-            },
-          }
-        );
-
-        // logger.info(updateResponse);
-        logger.info(`Scrape: ${mongoResponse.length} videos added to creator`);
-      } catch (error) {
-        logger.error(error);
-        logger.error("Scrape: Could not add video ids to creator");
-        throw new Error("Scrape: Could not add video ids to creator");
-      }
-    }
-  } catch (error) {
-    logger.error(error);
-    logger.error("Scrape: Could not save videos");
-    throw new Error("Scrape: Could not save videos");
-  }
-
-  return;
+  return nonConflictingVideos;
 };
 
 export default videosFromNebula;

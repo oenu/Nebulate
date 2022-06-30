@@ -1,9 +1,8 @@
+import "dotenv/config";
 import express from "express";
 const app = express();
 const cors = require("cors");
 app.use(cors());
-
-import "dotenv/config";
 
 // Constants
 const port = process.env.PORT || 3000;
@@ -13,8 +12,6 @@ declare global {
   var token: string;
   var key: string;
 }
-
-// Token store initialization
 
 // Mongoose
 import mongoose from "mongoose";
@@ -29,11 +26,9 @@ import globalInit from "./store/store";
 app.use(auth);
 
 // Routes
-const generateDatabase = require("./routes/generateDatabase");
-app.use("/database", generateDatabase);
 
-const generateLookupTable = require("./routes/generateTable");
-app.use("/api/table", generateLookupTable);
+const serveLookupTable = require("./routes/serveTable");
+app.use("/api/table", serveLookupTable);
 
 const scrapeNebula = require("./routes/scrapeNebula");
 app.use("/scrape/nebula", scrapeNebula);
@@ -49,6 +44,12 @@ app.use("/match", matchVideos);
 
 const lookupRequest = require("./routes/lookupRequest");
 app.use("/api/lookup", lookupRequest);
+
+const registerAllCreators = require("./routes/registerAllCreators");
+app.use("/register_all_serious", registerAllCreators);
+
+const matchAllCreators = require("./routes/matchAllCreators");
+app.use("/match_all_serious", matchAllCreators);
 
 // Start the server
 mongoose.connection.once("open", async () => {

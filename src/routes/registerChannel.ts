@@ -18,7 +18,7 @@ app.get("/:channel_slug", async (req: Request, res: Response) => {
 
   try {
     await registerCreatorInDB(channel_slug);
-    res.send(`Registered ${channel_slug}`);
+    res.status(201).send(`Registered ${channel_slug}`);
 
     await matchVideos(channel_slug);
   } catch (error: any) {

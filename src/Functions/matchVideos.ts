@@ -51,7 +51,7 @@ const matchVideos = async (
       Math.min(last_scraped_nebula.getTime(), last_scraped_youtube.getTime()) >
       14400000
   ) {
-    logger.log("Match: Creator scraped more than 4 hours ago, scraping again");
+    logger.info("Match: Creator scraped more than 4 hours ago, scraping again");
     try {
       await videosFromNebula(channel_slug, true);
       await videosFromYoutube(channel_slug, true);
@@ -81,7 +81,7 @@ const matchVideos = async (
     logger.error(`Match: No videos matched for ${channel_slug}`);
     return;
   } else {
-    logger.verbose(
+    logger.info(
       `Match: Found ${matched_videos.length} possible matched videos for ${channel_slug}`
     );
   }
@@ -116,15 +116,17 @@ const matchVideos = async (
     }
   });
 
+  logger.info(`Match: Matched ${modified_videos.length} videos`);
+
   // Sanity Check
-  const sorted_array = modified_videos.sort((a: any, b: any) => {
-    return b.score - a.score;
-  });
-  logger.verbose(sorted_array);
-  logger.info("Match: Worst matches for " + channel_slug);
-  logger.info(modified_videos.slice(0, 10));
-  logger.verbose("Match: Worst matches for " + channel_slug);
-  logger.verbose(modified_videos.slice(0, 10));
+  // const sorted_array = modified_videos.sort((a: any, b: any) => {
+  //   return b.score - a.score;
+  // });
+  // logger.verbose(sorted_array);
+  // logger.info("Match: Worst matches for " + channel_slug);
+  // logger.info(modified_videos.slice(0, 10));
+  // logger.verbose("Match: Worst matches for " + channel_slug);
+  // logger.verbose(modified_videos.slice(0, 10));
 
   return;
 };

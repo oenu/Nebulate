@@ -137,11 +137,17 @@ nebulaVideoSchema.methods.setMatch = async function (
   youtubeVideo: YoutubeVideoType,
   strength: number
 ) {
-  this.matched = true;
-  this.youtube_video_object_id = youtubeVideo._id;
-  this.youtube_video_id = youtubeVideo.youtube_video_id;
-  this.match_strength = strength;
-  this.save();
+  await NebulaVideo.findOneAndUpdate(
+    { _id: this._id },
+    {
+      $set: {
+        youtube_video_object_id: youtubeVideo._id,
+        youtube_video_id: youtubeVideo.youtube_video_id,
+        match_strength: strength,
+        matched: true,
+      },
+    }
+  );
 };
 
 /**
@@ -156,16 +162,23 @@ nebulaVideoSchema.methods.setMatch = async function (
 nebulaVideoSchema.methods.updateMatch = async function (
   youtubeVideo: YoutubeVideoType,
   matchStrength: number
-): Promise<void> {
-  return new Promise(async (resolve, reject) => {
+) {
+  await new Promise<void>(async (resolve, reject) => {
     // Check to see if the new video is the same as the old one
     if (this.youtube_video_object_id === youtubeVideo._id) {
       // The new video is the same as the old one -- Update the match strength
       logger.info(
         `Match update: ${this.slug}: ${this.match_strength} ==> ${matchStrength}`
       );
-      this.match_strength = matchStrength;
-      await this.save();
+      await NebulaVideo.findOneAndUpdate(
+        { _id: this._id },
+        {
+          $set: {
+            match_strength: matchStrength,
+          },
+        }
+      );
+
       resolve();
     }
 
@@ -193,6 +206,8 @@ nebulaVideoSchema.methods.updateMatch = async function (
     await this.setMatch(youtubeVideo, matchStrength);
     resolve();
   });
+
+  return;
 };
 
 nebulaVideoSchema.methods.removeMatch = async function (
@@ -201,11 +216,17 @@ nebulaVideoSchema.methods.removeMatch = async function (
   logger.warn(
     `Removing match for ${this.slug}, replacing with ${replacementVideo?.slug}`
   );
-  this.matched = false;
-  this.youtube_video_object_id = null;
-  this.youtube_video_id = null;
-  this.match_strength = null;
-  await this.save();
+  await NebulaVideo.findOneAndUpdate(
+    { _id: this._id },
+    {
+      $set: {
+        matched: false,
+        youtube_video_object_id: null,
+        youtube_video_id: null,
+        match_strength: null,
+      },
+    }
+  );
 };
 
 nebulaVideoSchema.statics.findByNebulaVideoId = async function (

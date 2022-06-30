@@ -1,7 +1,7 @@
 //#
 /* cSpell:disable */
 
-const youtubeIds = [
+export const youtubeIds = [
   {
     slug: "12tone",
     title: "12tone",
@@ -222,7 +222,7 @@ const youtubeIds = [
     slug: "curiouselephant",
     title: "Curious Elephant",
     id: "video_channel:bff81668-2684-4bb4-9637-a6fe4ff80b58",
-    youtube_id: "",
+    youtube_id: null,
   },
   {
     slug: "thedailybriefing",
@@ -354,7 +354,7 @@ const youtubeIds = [
     slug: "grandtestauto",
     title: "Grand Test Auto",
     id: "video_channel:221d128f-1374-4e8e-bbac-2b4d68a3517d",
-    youtube_id: "",
+    youtube_id: null,
   },
   {
     slug: "the-great-war",
@@ -679,7 +679,7 @@ const youtubeIds = [
     slug: "miamulder",
     title: "Mia Mulder",
     id: "video_channel:558de3dc-7986-4609-b269-406acc3b42a3",
-    youtube_id: "",
+    youtube_id: null,
   },
   {
     slug: "michaelwuerth",
@@ -1344,6 +1344,13 @@ const youtubeIds = [
   },
 ];
 
-export default youtubeIds;
+let mappedSlugs: string[] = [];
+youtubeIds.forEach((creator) => {
+  if (typeof creator.youtube_id === "string") {
+    mappedSlugs.push(creator.slug);
+  }
+});
+
+export default mappedSlugs;
 
 //https://www.youtube.com/results?search_query=

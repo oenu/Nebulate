@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
+// Methods
+import videosFromNebula from "../Functions/videosFromNebula";
+import videosFromYoutube from "../Functions/videosFromYoutube";
+import matchVideos from "../Functions/matchVideos";
+
 // Models
 import { NebulaVideo } from "./nebulaVideo";
 import { YoutubeVideo } from "./youtubeVideo";
@@ -17,7 +22,7 @@ interface CreatorInterface {
   slug: string;
   title: string;
   description: string;
-  "zype-id": string;
+  zype_id: string;
   youtube_id: string;
   youtube_channel_name: string;
   youtube_upload_id: string;
@@ -32,6 +37,10 @@ interface CreatorDocument extends CreatorInterface, mongoose.Document {
   test: () => Promise<void>;
   getNebulaVideos: (nebula_slugs?: string[]) => Promise<NebulaVideoType[]>;
   getYoutubeVideos: (youtube_ids?: string[]) => Promise<YoutubeVideoType[]>;
+  logScrape: (type: string, date?: Date) => Promise<void>;
+  scrapeNebula: (onlyScrapeNew?: boolean) => Promise<NebulaVideoType[]>;
+  scrapeYoutube: (onlyScrapeNew?: boolean) => Promise<YoutubeVideoType[]>;
+  matchVideos: () => Promise<void>;
 }
 
 const creatorSchema: Schema<CreatorDocument> = new Schema(
@@ -49,7 +58,7 @@ const creatorSchema: Schema<CreatorDocument> = new Schema(
     description: {
       type: "String",
     },
-    "zype-id": {
+    zype_id: {
       type: "String",
     },
     nebula_videos: [
@@ -104,6 +113,20 @@ creatorSchema.methods.getNebulaVideos = async function (
   }
 };
 
+creatorSchema.methods.scrapeNebula = async function (onlyScrapeNew?: boolean) {
+  if (onlyScrapeNew === undefined) onlyScrapeNew = true;
+  return await videosFromNebula(this.slug, onlyScrapeNew);
+};
+
+creatorSchema.methods.scrapeYoutube = async function (onlyScrapeNew?: boolean) {
+  if (onlyScrapeNew === undefined) onlyScrapeNew = true;
+  return await videosFromYoutube(this.slug, onlyScrapeNew);
+};
+
+creatorSchema.methods.matchVideos = async function () {
+  return await matchVideos(this.slug);
+};
+
 creatorSchema.methods.getYoutubeVideos = async function (
   youtube_ids?: string[]
 ) {
@@ -120,6 +143,19 @@ creatorSchema.methods.getYoutubeVideos = async function (
       $and: [{ youtube_id: { $in: youtube_ids } }, { channel_slug: this.slug }],
     });
   }
+};
+
+creatorSchema.methods.logScrape = async function (
+  type: string,
+  date?: Date
+): Promise<void> {
+  if (!date) date = new Date();
+  if (type === "nebula") {
+    this.last_scraped_nebula = date;
+  } else if (type === "youtube") {
+    this.last_scraped_youtube = date;
+  }
+  await this.save();
 };
 
 export type CreatorPreType = InferSchemaType<typeof creatorSchema>;

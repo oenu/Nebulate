@@ -13,7 +13,7 @@ export interface YoutubeVideoInterface {
   youtube_video_id: string;
   published_at: Date;
   playlist_id: string;
-  channelTitle: string;
+  channel_title: string;
   title: string;
   channel_id: string;
   etag: string;
@@ -57,7 +57,7 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
       // "VVVwYS1aYjBaY1FqVENQUDFEeF8xTThRLlNmWnJub28xR1BN"
       type: "String",
     },
-    channelTitle: {
+    channel_title: {
       // "LegalEagle"
       type: "String",
     },

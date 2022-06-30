@@ -1,9 +1,9 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import videosFromNebula from "../Functions/videosFromNebula";
+import videosFromNebula from "../scrapers/videosFromNebula";
 
 app.get(
   "/:channel_slug/:onlySearchNew?/:searchLimit?",

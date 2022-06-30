@@ -1,5 +1,5 @@
 import { Creator } from "../models/creator";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 const hourMatchInterval = 6;
 
 const matchVideosCron = async () => {

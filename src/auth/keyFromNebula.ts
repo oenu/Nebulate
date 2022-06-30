@@ -2,7 +2,7 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 
 export const keyFromNebula = async (): Promise<string> => {
   try {

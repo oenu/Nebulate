@@ -15,13 +15,13 @@ declare global {
 
 // Mongoose
 import mongoose from "mongoose";
-import { connectDB } from "./config/dbConfig";
+import { connectDB } from "./utils/dbConfig";
 connectDB();
 
 // Middleware
-import logger from "./config/logger";
+import logger from "./utils/logger";
 import auth from "./middleware/auth";
-import globalInit from "./store/store";
+import globalInit from "./auth/store";
 
 app.use(auth);
 

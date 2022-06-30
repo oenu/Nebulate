@@ -1,6 +1,6 @@
 // Register creator in DB
 import axios from "axios";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
 
@@ -8,8 +8,8 @@ const yt = youtube("v3");
 import { youtubeIds } from "../store/youtubeIds";
 
 // Functions
-import videosFromNebula from "./videosFromNebula";
-import videosFromYoutube from "./videosFromYoutube";
+import videosFromNebula from "../scrapers/videosFromNebula";
+import videosFromYoutube from "../scrapers/videosFromYoutube";
 
 // Mongo Models
 import { Creator } from "../models/creator";

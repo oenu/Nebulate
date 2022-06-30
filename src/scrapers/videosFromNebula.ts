@@ -1,7 +1,7 @@
 // Scrapes api for a creator and returns an array of video objects
 import mongoose from "mongoose";
 import axios from "axios";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 
 // Types
 import type {

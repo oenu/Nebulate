@@ -2,8 +2,8 @@
 
 import type { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import logger from "../config/logger";
-import jwtFromNebula from "../Functions/jwtFromNebula";
+import logger from "../utils/logger";
+import jwtFromNebula from "../auth/jwtFromNebula";
 
 const auth = async (_req: Request, res: Response, next: NextFunction) => {
   try {

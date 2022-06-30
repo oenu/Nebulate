@@ -1,9 +1,9 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import matchVideos from "../Functions/matchVideos";
+import matchVideos from "../server_functions/matchVideos";
 
 app.get(
   "/:channel_slug/:rematch_nebula_slug?/:rematch_yt_id?",

@@ -1,9 +1,9 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import Fuse from "fuse.js";
 
 // Functions
-import videosFromNebula from "./videosFromNebula";
-import videosFromYoutube from "./videosFromYoutube";
+import videosFromNebula from "../scrapers/videosFromNebula";
+import videosFromYoutube from "../scrapers/videosFromYoutube";
 
 // Types
 import type { NebulaVideoType } from "../models/nebulaVideo";

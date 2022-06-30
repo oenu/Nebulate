@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 // const crypto = require("crypto");
 import { v4 as uuidv4 } from "uuid";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 
 import { NebulaVideo } from "../models/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo";

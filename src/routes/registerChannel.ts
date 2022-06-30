@@ -1,10 +1,10 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import registerCreatorInDB from "../Functions/registerCreatorInDB";
-import matchVideos from "../Functions/matchVideos";
+import registerCreatorInDB from "../server_functions/registerCreatorInDB";
+import matchVideos from "../server_functions/matchVideos";
 
 app.get("/:channel_slug", async (req: Request, res: Response) => {
   // TODO: Change to post

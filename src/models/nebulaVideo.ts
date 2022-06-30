@@ -1,7 +1,7 @@
 // Video type and model
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
-import logger from "../config/logger";
+import logger from "../utils/logger";
 
 // Types
 import type { YoutubeVideoType } from "./youtubeVideo";

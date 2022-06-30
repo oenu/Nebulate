@@ -1,9 +1,9 @@
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import path from "path";
 import fs from "fs";
 
-import jwtFromNebula from "../Functions/jwtFromNebula";
-import keyFromNebula from "../Functions/keyFromNebula";
+import jwtFromNebula from "./jwtFromNebula";
+import keyFromNebula from "./keyFromNebula";
 const globalInit = async () => {
   try {
     // Key Handler

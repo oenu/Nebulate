@@ -1,5 +1,5 @@
 // Scrape youtube API to get videos for a creator
-import logger from "../config/logger";
+import logger from "../utils/logger";
 import { youtube } from "@googleapis/youtube";
 import mongoose from "mongoose";
 const yt = youtube("v3");

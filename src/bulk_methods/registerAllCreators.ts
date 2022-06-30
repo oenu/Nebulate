@@ -1,7 +1,7 @@
 import mappedSlugs from "../store/youtubeIds";
 import { Creator } from "../models/creator";
-import registerCreatorInDB from "./registerCreatorInDB";
-import logger from "../config/logger";
+import registerCreatorInDB from "../server_functions/registerCreatorInDB";
+import logger from "../utils/logger";
 
 const registerAllCreators = async () => {
   console.time("registerAllCreators");

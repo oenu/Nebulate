@@ -48,6 +48,9 @@ app.use("/api/lookup", lookupRequest);
 const registerAllCreators = require("./routes/registerAllCreators");
 app.use("/register_all_serious", registerAllCreators);
 
+const matchAllCreators = require("./routes/matchAllCreators");
+app.use("/match_all_serious", matchAllCreators);
+
 // Start the server
 mongoose.connection.once("open", async () => {
   // Initialize global variables

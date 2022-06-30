@@ -21,6 +21,7 @@ export const keyFromNebula = async (): Promise<string> => {
     throw new Error("keyFromNebula: Environment variables not set");
   }
   try {
+    // Request secret from Nebula
     const response = await axios.post(
       "https://api.watchnebula.com/api/v1/auth/login/",
       {
@@ -29,12 +30,15 @@ export const keyFromNebula = async (): Promise<string> => {
       }
     );
     logger.debug("keyFromNebula: Key fetched from Nebula");
+
+    // Write secret to file
     await fs.promises.writeFile(
       path.join(__dirname, "..", "/store", "simple_key.txt"),
       response.data.key,
       "utf-8"
     );
 
+    // Set global.key to secret
     global.key = response.data.key;
     return response.data.key;
   } catch (error) {

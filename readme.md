@@ -64,7 +64,7 @@ YOUTUBE_API_KEY=<api key> // Your YouTube API key
 DATABASE_URI=<database uri> // mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
 ```
 
-Once you have created the .env file, you can run the following command to start the server: `yarn start`
+Once you have created the .env file, you can run the following command to start the server: `yarn build && yarn start`
 
 This will start the server and will automatically connect to the database, it will also create the models in the database from the Mongoose schema included in the package.
 

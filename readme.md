@@ -30,7 +30,7 @@ Nebulate-Node is a backend web scraper and caching server designed to integrate 
 
 <!-- Why did I make this -->
 
-When on YouTube I forget to check Nebula for new releases. This means I end up watching videos that have longer and ad-free versions only to be reminded during a sponsor read for a service I already pay for. I wanted a way to easily see if a video is available in Nebula and to easily watch it. I built this project to solve this problem and hopefully help others who want to support creators on Nebula, but who's default platform is YouTube.
+When using YouTube I often forget to check Nebula for an enhanced version of a video I am watching. This means I end up watching videos that have longer and ad-free versions only to be reminded during a sponsor read for a service I already pay for. I wanted a way to easily see if a video is available in Nebula and to easily watch it. I built this project to solve this problem and hopefully help others who want to support creators on Nebula and use the fantastic service that they pay for. 
 
 > This is a personal project built in a week. If you are looking for driven Junior Dev please [get in touch](https://www.linkedin.com/in/adamnb)
 

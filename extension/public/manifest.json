@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Nebulate",
+  "description": "Nebulate links YouTube and Nebula videos",
+  "version": "0.1",
+  "options_ui": {
+    "page": "options.html"
+  },
+
+  "action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["js/vendor.js", "js/content_script.js"]
+    }
+  ],
+
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/bookmark.png",
+        "assets/play.png",
+        "assets/delete.png",
+        "assets/save.png",
+        "assets/nebula_temp_dark.png",
+        "assets/nebula_temp_light.png"
+      ],
+      "matches": ["https://*.youtube.com/*"]
+    }
+  ],
+
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "alarms"
+  ],
+
+  "host_permissions": ["https://*.youtube.com/*", "*localhost:*"]
+}

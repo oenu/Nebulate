@@ -5,7 +5,7 @@ const app = express();
 
 import matchVideos from "../server_functions/matchVideos";
 
-app.get(
+app.put(
   "/:channel_slug/:rematch_nebula_slug?/:rematch_yt_id?",
   async (req: Request, res: Response) => {
     const channel_slug = req.params.channel_slug;

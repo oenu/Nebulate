@@ -5,7 +5,7 @@ const app = express();
 
 import videosFromYoutube from "../scrapers/videosFromYoutube";
 
-app.get(
+app.put(
   "/:channel_slug/:onlySearchNew?/:videoScrapeLimit?",
   async (req: Request, res: Response) => {
     const channel_slug = req.params.channel_slug;

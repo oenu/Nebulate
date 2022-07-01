@@ -5,7 +5,7 @@ const app = express();
 
 import updateAllCreators from "../bulk_methods/updateAllCreators";
 
-app.post("/", async (_req: Request, res: Response) => {
+app.put("/", async (_req: Request, res: Response) => {
   logger.warn("updateAllCreators: Updating all creators");
   updateAllCreators();
   res.send("Updating all creators");

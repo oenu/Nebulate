@@ -63,11 +63,11 @@ app.use("/api/lookup", lookupRequest);
 
 // Trigger the registration of all creators that have manual youtube id mappings
 const registerAllCreators = require("./routes/registerAllCreators");
-app.use("/register_all_serious", onlyLocal, registerAllCreators);
+app.use("/register_all", onlyLocal, registerAllCreators);
 
 // Match all videos from Nebula and Youtube for all creators without scraping new videos
 const matchAllCreators = require("./routes/matchAllCreators");
-app.use("/match_all_serious", onlyLocal, matchAllCreators);
+app.use("/match_all", onlyLocal, matchAllCreators);
 
 // Trigger a scrape of all creators and rematching of all videos
 const updateAllCreators = require("./routes/updateAllCreators");

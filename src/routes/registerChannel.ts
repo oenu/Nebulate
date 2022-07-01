@@ -6,7 +6,7 @@ const app = express();
 import registerCreatorInDB from "../server_functions/registerCreatorInDB";
 import matchVideos from "../server_functions/matchVideos";
 
-app.get("/:channel_slug", async (req: Request, res: Response) => {
+app.put("/:channel_slug", async (req: Request, res: Response) => {
   const { channel_slug } = req.params;
 
   if (!channel_slug) {

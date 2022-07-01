@@ -5,7 +5,7 @@ const app = express();
 
 import videosFromNebula from "../scrapers/videosFromNebula";
 
-app.get(
+app.put(
   "/:channel_slug/:onlySearchNew?/:searchLimit?",
   async (req: Request, res: Response) => {
     const { channel_slug } = req.params;

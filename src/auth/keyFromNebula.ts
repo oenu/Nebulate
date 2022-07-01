@@ -6,7 +6,7 @@ import logger from "../utils/logger";
 
 /**
  * @function keyFromNebula
- * @description This function fetches a secret from Nebula using a username and password stored in the environment at SCRAPE_USER and SCRAPE_PASS.
+ * @description This function fetches a secret from Nebula using a username and password stored in the environment at NEBULA_USERNAME and NEBULA_PASSWORD.
  * @description This stores the secret in a file in the /store directory and sets the global.key to the secret.
  * @returns {Promise<string>} A promise that resolves to a secret from Nebula.
  * @throws {Error} If the secret cannot be requested from Nebula or if environment variables are not set.
@@ -15,8 +15,8 @@ import logger from "../utils/logger";
 
 export const keyFromNebula = async (): Promise<string> => {
   if (
-    process.env.SCRAPE_USER === undefined ||
-    process.env.SCRAPE_PASS === undefined
+    process.env.NEBULA_USERNAME === undefined ||
+    process.env.NEBULA_PASSWORD === undefined
   ) {
     throw new Error("keyFromNebula: Environment variables not set");
   }
@@ -25,8 +25,8 @@ export const keyFromNebula = async (): Promise<string> => {
     const response = await axios.post(
       "https://api.watchnebula.com/api/v1/auth/login/",
       {
-        email: process.env.SCRAPE_USER,
-        password: process.env.SCRAPE_PASS,
+        email: process.env.NEBULA_USERNAME,
+        password: process.env.NEBULA_PASSWORD,
       }
     );
     logger.debug("keyFromNebula: Key fetched from Nebula");

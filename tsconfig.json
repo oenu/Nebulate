@@ -27,5 +27,5 @@
     "rootDir": "./src"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "__tests__", "logs"]
+  "exclude": ["node_modules", "__tests__", "logs", "extension"]
 }

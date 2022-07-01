@@ -11,8 +11,8 @@ jobs:
       - run: |
           touch .env
           echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
-          echo SCRAPE_PASS=${{ secrets.SCRAPE_PASS }} >> .env
-          echo SCRAPE_USER=${{ secrets.SCRAPE_USER }} >> .env
+          echo NEBULA_PASSWORD=${{ secrets.NEBULA_PASSWORD }} >> .env
+          echo NEBULA_USERNAME=${{ secrets.NEBULA_USERNAME }} >> .env
           echo YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }} >> .env
       - run: yarn test:ci # run tests (configured to use jest-junit reporter)
       - name: Test Reporter

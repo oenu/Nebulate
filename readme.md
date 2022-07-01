@@ -1,11 +1,13 @@
-# Nebulate Node
+# Nebulate
+
+> This is a personal project built in a week. If you are looking for driven Junior Dev please [get in touch](https://www.linkedin.com/in/adamnb)
 
 ## Introduction
 
-Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of a [chrome extension]().
+Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of the [Nebulate](https://github.com/oenu/Nebulate/tree/main/extension) chrome extension included in this repo.
 
 ![](screenshots/matched_nebula_video.png)
-
+*Highlighted video and creator have been found on Nebula, a button has been presented to the user to redirect them to the nebula version*
 ## Table of contents
 
 1. [Motivation](#motivation)
@@ -38,6 +40,8 @@ The mongoDB database holds approximately 44,000 videos at this time and take up 
 
  <!-- How to install -->
 
+### Node Package
+
 To install this package, run the following command: `yarn install`
 
 You must then create an .env file in the root directory of the project. This file should contain the following variables:
@@ -53,15 +57,46 @@ Once you have created the .env file, you can run the following command to start 
 
 This will start the server and will automatically connect to the database, it will also create the models in the database from the Mongoose schema included in the package.
 
+### Chrome extension
+
+To install the chrome extension you can run the following command: `yarn install:extension`
+
 ## Usage
 
  <!-- How to use this package -->
+### Node Package
+To run this package run `yarn build && yarn start` this will build the package and start the server on port 3000.
 
 This package has a number of methods that can be called to interact with the database. As a proof of concept project I have not implemented authentication beyond restricting access to database functions to requests coming from localhost. Requests from Extension users will be accepted and may trigger database functions, but will not be able to trigger database functions directly.
+
+The database functions are listed in the `/src/index.js` file and are:
+```
+// Database Functions
+PUT: /register_all -- This will register all creators in the database. This is a one time function and should not be run again.
+PUT: /update_all_creators -- This will scrape all new videos from all creators, match them and update the database.
+PUT: /match_all -- This will match all videos from all creators in the database.
+
+// Individual Functions
+PUT: /register/<creator nebula slug> -- This will register a creator in the database.
+PUT: /match/<creator nebula slug> -- This will match all videos from a creator to their releases in Nebula.
+PUT: /scrape/nebula/<creator> -- This will scrape all new videos from Nebula and store them in the database.
+PUT: /scrape/youtube/<creator> -- This will scrape all new videos from YouTube and store them in the database.
+
+// Public Functions
+GET: /api/table -- This will return the lookup table for the database and generate one if it does not exist.
+GET: /api/lookup/<youtube video id> -- This will return the Nebula release information for a matched YouTube video. This is the primary method of interacting with the database from the extension.
+```
+
 
 When users click on a video in the extension, the extension will send a request to the server with the video ID. The server will then look up the video in the database and return the Nebula video information if it is available, which is then used to open the video in the browser. This is done to minimize the size of extension and allow for redirects to be updated without updating the extension database.
 
 > Note: This is a proof of concept project and is not intended to be used in production in its current state.
+
+### Chrome Extension
+To use the extension in Chrome run `yarn build:extension`, open the chrome://extensions page and click the "Add" button. Then click the `Load unpacked extension` button and select the folder that contains the unpacked extension (`dist`).
+
+This will install the extension with the assumption that you are running the server locally, this can be changed in the `/extension/src/background.ts` file.
+
 
 ## Limitations
 

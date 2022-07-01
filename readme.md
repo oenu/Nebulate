@@ -32,7 +32,7 @@ Nebulate-Node is a backend web scraper and caching server designed to integrate 
 
 When using YouTube I often forget to check Nebula for an enhanced version of a video I am watching. This means I end up watching videos that have longer and ad-free versions only to be reminded during a sponsor read for a service I already pay for. I wanted a way to easily see if a video is available in Nebula and to easily watch it. I built this project to solve this problem and hopefully help others who want to support creators on Nebula and use the fantastic service that they pay for. 
 
-> This is a personal project built in a week. If you are looking for driven Junior Dev please [get in touch](https://www.linkedin.com/in/adamnb)
+> This is a personal project built in a week. If you are looking for driven Junior Dev please [get in touch](https://twitter.com/_a_nb)
 
 # Composition
 
@@ -50,6 +50,8 @@ This is a Chrome extension that interfaces with the node package to offer video 
 # Installation
 
  <!-- How to install -->
+
+> Note: This package ships with no video data for copyright reasons. Using this package requires you to use your own Nebula login and Youtube API key. If you would like to see a demo please [get in touch](https://twitter.com/_a_nb)
 
 ### Node Package
 

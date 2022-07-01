@@ -88,7 +88,7 @@ PUT: /update_all_creators -- This will scrape all new videos from all creators, 
 PUT: /match_all -- This will match all videos from all creators in the database.
 
 // Individual Functions
-PUT: /register/<creator nebula slug> -- This will register a creator in the database.
+PUT: /register/<creator nebula slug> -- This will register a creator in the database and trigger a scrape and match cycle.
 PUT: /match/<creator nebula slug> -- This will match all videos from a creator to their releases in Nebula.
 PUT: /scrape/nebula/<creator> -- This will scrape all new videos from Nebula and store them in the database.
 PUT: /scrape/youtube/<creator> -- This will scrape all new videos from YouTube and store them in the database.

@@ -75,6 +75,7 @@ This will start the server and will automatically connect to the database, it wi
 ### Chrome extension
 
 To install the chrome extension dependencies you can run the following command: `yarn install:extension`
+
 To use the extension in Chrome run `yarn build:extension`, open the chrome://extensions page and click the "Add" button. Then click the `Load unpacked extension` button and select the folder that contains the unpacked extension (`dist`).
 
 This will install the extension with the assumption that you are running the server locally, this can be changed in the `/extension/src/background.ts` file.

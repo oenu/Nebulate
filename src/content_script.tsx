@@ -1,18 +1,51 @@
 console.log("CS: init");
 // Runs in the context of the youtube tab
 
-chrome.runtime.onMessage.addListener((obj, sender) => {
-  console.log(obj);
-  const { type } = obj;
-  if (type === "NEW_VIDEO") {
-    const { videoId, slug, matched, known } = obj;
-    if (videoId === current_video_id) {
-    } else if (videoId !== undefined) {
-      console.log("CS: New video loaded: " + videoId);
-      newVideoLoaded(videoId, known, matched, slug);
-    }
+// const videoCss = require("./css/video.css");
+import { CSS, Messages } from "./enums";
+
+import {
+  // addCreatorButton,
+  addNebulaControls,
+  loadCSS,
+  removeNebulaControls,
+  unloadCSS,
+  // removeCreatorButton,
+} from "./functions/domMethods";
+
+let creator_slug: string;
+
+chrome.runtime.onMessage.addListener((message) => {
+  const { type } = message;
+  console.log(message.videoId);
+  switch (type) {
+    case Messages.NEW_VIDEO:
+      console.log(
+        "CS: New video loaded, known: %s, matched: %s",
+        message.known,
+        message.matched
+      );
+      const { videoId, matched, known } = message;
+      creator_slug = message.creator_slug;
+      newVideoLoaded(videoId, known, matched, creator_slug);
+      break;
+
+    case Messages.NO_SLUG_REDIRECT:
+      console.log("CS: No slug from redirect request");
+      handleNoSlugRedirect();
+      break;
+
+    case Messages.CLEAR:
+      console.log("CS: Clearing all styling");
+      unloadCSS(CSS.NEBULA_VIDEO);
+      unloadCSS(CSS.CREATOR);
+      removeNebulaControls();
+      // removeCreatorButton();
+      break;
+    default:
+      console.log("CS: Unknown message type");
+      break;
   }
-  return;
 });
 
 // Types
@@ -23,20 +56,32 @@ interface Video {
 }
 
 // (() => {
-let youtube_left_controls: Element | null = null;
-let youtube_right_controls: Element | null = null;
-let youtube_volume_controls: Element | null = null;
-let youtube_player: Element | null = null;
+
 let current_video_id: string | null = null;
 
-const redirectHandler = async () => {
+const handleNoSlugRedirect = async () => {
+  console.log("CS: No slug redirect");
+};
+
+export const redirectHandler = async (message: Messages) => {
   // Request redirect address for current video
   console.log("Requesting redirect address for current video");
 
-  chrome.runtime.sendMessage({
-    type: "NEBULA_REDIRECT",
-    url: current_video_id,
-  });
+  switch (message) {
+    case Messages.NEBULA_REDIRECT:
+      chrome.runtime.sendMessage({
+        type: Messages.NEBULA_REDIRECT,
+        url: current_video_id,
+      });
+      break;
+
+    case Messages.CREATOR_REDIRECT:
+      chrome.runtime.sendMessage({
+        type: Messages.CREATOR_REDIRECT,
+        url: current_video_id,
+      });
+      break;
+  }
 };
 
 // Send message to background script to open new tab
@@ -51,24 +96,29 @@ const newVideoLoaded = async (
   slug?: string
 ) => {
   current_video_id = videoId;
-  const nebulate_button_exists = document.getElementById("nebulate-btn");
 
-  if (!nebulate_button_exists) {
-    const nebulate_button_right = document.createElement("img");
-    nebulate_button_right.src = chrome.runtime.getURL(
-      "assets/nebula_temp_light.png"
-    );
-    nebulate_button_right.className = "ytp-button " + "nebulate-btn";
-    nebulate_button_right.id = "nebulate-btn";
-    nebulate_button_right.title = "RIGHT View this video on Nebula";
+  // Remove nebula styling to enable animation
+  unloadCSS(CSS.NEBULA_VIDEO);
+  unloadCSS(CSS.CREATOR);
 
-    youtube_right_controls =
-      document.getElementsByClassName("ytp-right-controls")[0];
-    // // document.getElementsByClassName("ytp-left-controls")[0];
-    // youtube_player = document.getElementsByClassName("video-stream")[0];
+  const video_styling_exists =
+    document.getElementsByClassName("nebulate-extension")[0];
 
-    youtube_right_controls.prepend(nebulate_button_right);
-    nebulate_button_right.addEventListener("click", redirectHandler);
+  if (known) {
+    // addCreatorButton();
+    // Highlight creator
+    loadCSS(CSS.CREATOR);
+    if (matched) {
+      // Highlight video
+      addNebulaControls();
+      if (!video_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
+    } else removeNebulaControls();
+  } else {
+    // Unknown video, remove nebula controls and styling
+    unloadCSS(CSS.NEBULA_VIDEO);
+    unloadCSS(CSS.CREATOR);
+    removeNebulaControls();
+    // removeCreatorButton();
   }
 };
 

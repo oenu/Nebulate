@@ -7,5 +7,5 @@ export interface CreatorEntry {
 export interface LookupTable {
   creators: CreatorEntry[];
   generatedAt: Date;
-  hash: string;
+  id: string;
 }

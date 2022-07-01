@@ -120,7 +120,7 @@ If you would like to contribute to this project, please open an issue or pull re
 
 ## Credits
 
-This project was built by Adam Newton-Blows and utilizes data from the fantastic [Nebula](https://nebula.app/) platform along with data from the [YouTube API](https://developers.google.com/youtube/v3/).
+This project was built by [@oenu](https://github.com/oenu) and utilizes data from the fantastic [Nebula](https://nebula.app/) platform along with data from the [YouTube API](https://developers.google.com/youtube/v3/).
 
 ## Support
 

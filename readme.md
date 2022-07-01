@@ -6,19 +6,20 @@
 
 Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of the [Nebulate](https://github.com/oenu/Nebulate/tree/main/extension) chrome extension included in this repo.
 
-![](screenshots/matched_nebula_video.png)
-*Highlighted video and creator have been found on Nebula, a button has been presented to the user to redirect them to the nebula version*
+[](screenshots/extension_demo.mp4)
+*Demonstration of the Chrome extension recognizing a Nebula video and the server providing a redirect*
 ## Table of contents
 
 1. [Motivation](#motivation)
 2. [Composition](#composition})
 3. [Installation](#installation)
 4. [Usage](#usage)
-5. [Limitations](#limitations)
-6. [Contributing](#contributing)
-7. [Credits](#credits)
-8. [Support](#support)
-9. [License](#license)
+5. [Screenshots](#screenshots)
+6. [Limitations](#limitations)
+7. [Contributing](#contributing)
+8. [Credits](#credits)
+9. [Support](#support)
+10. [License](#license)
 
 ---
 
@@ -98,6 +99,14 @@ To use the extension in Chrome run `yarn build:extension`, open the chrome://ext
 This will install the extension with the assumption that you are running the server locally, this can be changed in the `/extension/src/background.ts` file.
 
 
+## Screenshots
+
+![](screenshots/matched_nebula_video.png)
+*Highlighted video and creator have been found on Nebula, a button has been presented to the user to redirect them to the nebula version*
+
+
+![](screenshots/matched_nebula_video_cinema.png)
+*Video also highlighted in cinema mode*
 ## Limitations
 
  <!-- How this package is limited -->

@@ -10,7 +10,6 @@ const redirect_preference = false;
 let currentVideo_url = "";
 
 // When the page url is equal to a youtube video url, send a message to the content script.
-
 // Message Router
 chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   try {

@@ -1,16 +1,12 @@
 import { redirectHandler } from "../content_script";
 import { CSS, CSS_CLASSES, Messages } from "../enums";
 
-// const cssFile = require("../css/video.css");
-
 export const loadCSS = (css: CSS) => {
   if (css === CSS.NEBULA_VIDEO) {
     const head = document.head || document.getElementsByTagName("head")[0];
     const style = document.createElement("style");
     style.className = CSS_CLASSES.NEBULA;
     style.textContent = generateNebulaStyling();
-    // style.textContent = cssFile.toString();
-    // console.log(cssFile.toString());
     console.debug("loadCSS: loading styling" + css);
     setTimeout(() => {
       head.appendChild(style);
@@ -54,7 +50,6 @@ export const unloadCSS = (css: CSS) => {
   }
 };
 
-// IDEA: #11 Animated background slow transition through nebula colors, options menu
 export const generateNebulaStyling = () => {
   let default_css = `#player {
   transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -80,7 +75,6 @@ export const generateNebulaStyling = () => {
   return player_height > player_width ? default_css : default_css;
 };
 
-// IDEA: #10 Add css for creator home channel to identify as nebula creator
 export const generateCreatorStyling = () => {
   let creator_css = `
   #avatar {
@@ -100,41 +94,7 @@ export const generateCreatorStyling = () => {
   return creator_css;
 };
 
-// let youtube_left_controls: Element | null = null;
 let youtube_right_controls: Element | null = null;
-// let upload_info: Element | null = null;
-
-// export const addCreatorButton = () => {
-//   console.debug("addCreatorButton: Adding creator button");
-//   const creator_button_exists = document.getElementById(
-//     CSS_CLASSES.CREATOR_BUTTON
-//   );
-//   if (!creator_button_exists) {
-//     const creator_button = document.createElement("img");
-//     creator_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
-
-//     // Assign DOM element attributes
-//     creator_button.className = "ytp-button " + CSS_CLASSES.CREATOR_BUTTON;
-//     creator_button.id = CSS_CLASSES.CREATOR_BUTTON;
-//     creator_button.title = "View this creator on Nebula";
-
-//     upload_info = document.getElementById("upload-info");
-
-//     upload_info?.append(creator_button);
-//     creator_button.addEventListener("click", () => {
-//       redirectHandler(Messages.CREATOR_REDIRECT);
-//     });
-//     return;
-//   } else {
-//     console.debug("addCreatorButton: Creator button already exists");
-//     return;
-//   }
-// };
-
-// export const removeCreatorButton = () => {
-//   const creator_button = document.getElementById(CSS_CLASSES.CREATOR_BUTTON);
-//   if (creator_button) creator_button.remove();
-// };
 
 export const addNebulaControls = () => {
   // Add nebula controls

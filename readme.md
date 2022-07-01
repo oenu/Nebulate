@@ -1,7 +1,5 @@
 # Nebulate Node
 
-## Project Status
-
 ## Introduction
 
 Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of a [chrome extension]().
@@ -44,7 +42,7 @@ To install this package, run the following command: `yarn install`
 
 You must then create an .env file in the root directory of the project. This file should contain the following variables:
 
-```json
+```
 NEBULA_USERNAME=<username> // Your Nebula account username
 NEBULA_PASSWORD=<password> // Your Nebula account password
 YOUTUBE_API_KEY=<api key> // Your YouTube API key

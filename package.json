@@ -50,6 +50,9 @@
     "lint": "eslint .",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "test": "jest --watch --detectOpenHandles --runInBand",
-    "test:ci": "jest --ci"
+    "test:ci": "jest --ci",
+    "install:extension": "cd extensions && yarn install",
+    "test:extension": "cd extensions && yarn test",
+    "build:extension": "cd extensions && yarn build"
   }
 }

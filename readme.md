@@ -1,4 +1,6 @@
 # Nebulate
+> Note: This is not production ready, though id love to work on it to get it there!
+
 ## Introduction
 
 Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of the [Nebulate](https://github.com/oenu/Nebulate/tree/main/extension) chrome extension included in this repo.

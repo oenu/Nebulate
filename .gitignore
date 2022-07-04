@@ -33,11 +33,12 @@ docs/
 .env
 
 yarn-error.log
-src/store/json_token.txt
-src/store/simple_key.txt
-src/database/key.pem
-src/database/simple_key.json
-src/lookup_table/key.pem
-src/lookup_table/lookup_table.json
+json_token.txt
+simple_key.txt
+key.pem
+simple_key.json
+key.pem
+lookup_table.json
 globalConfig.json
 junit.xml
+src/lookup/key.pem

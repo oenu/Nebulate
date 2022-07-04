@@ -7,12 +7,10 @@ const downloadTable = async (): Promise<any> => {
 
     // Check for existing table
     const table = await chrome.storage.local.get("lookupTable");
-    if (!table) {
-      response = await fetch(`${server_url}/api/table`);
-    } else {
-      response = await fetch(`${server_url}/api/table/${table.lookupTable.id}`);
-    }
 
+    response = await fetch(
+      `https://raw.githubusercontent.com/nebulate-worker/store/main/table.json`
+    );
     // Check response
     if (response.status === 204) {
       console.log("background.js: table is up to date");

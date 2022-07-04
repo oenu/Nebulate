@@ -29,11 +29,11 @@ services:
       - mongo
 
   node:
-    platform: linux/arm64
+    platform: linux/amd64
     build:
       context: .
-      dockerfile: "Dockerfile"
-    container_name: "Nebulate-node-arm64"
+      dockerfile: "Dockerfile.prod"
+    container_name: "Nebulate-node-amd64"
     ports:
       - "3000:3000"
     networks:

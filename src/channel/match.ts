@@ -77,6 +77,9 @@ const match = async (channelSlug: string) => {
     }
   }
 
+  // Set Last Match Date
+  await channel.logMatch();
+
   logger.info(
     `Match: Match complete for ${channelSlug}, ${matchCount} matches`
   );

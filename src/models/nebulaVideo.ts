@@ -7,22 +7,22 @@ import logger from "../utils/logger";
 import type { YoutubeVideoType } from "./youtubeVideo";
 
 export interface NebulaVideoInterface {
-  nebula_video_id: string;
+  nebulaVideoId: string;
   slug: string;
   title: string;
-  short_description: string;
+  shortDescription: string;
   duration: number;
-  published_at: Date;
-  channel_id: string;
-  channel_slug: string;
-  channel_slugs: string[];
-  channel_title: string;
-  share_url: string;
+  publishedAt: Date;
+  channelId: string;
+  channelSlug: string;
+  channelSlugs: string[];
+  channelTitle: string;
+  shareUrl: string;
   matched: boolean;
-  youtube_video_id?: string;
-  youtube_video_object_id?: mongoose.Schema.Types.ObjectId;
-  match_strength?: number;
-  creator_object_id?: mongoose.Schema.Types.ObjectId;
+  youtubeVideoId?: string;
+  youtubeVideoObjectId?: mongoose.Schema.Types.ObjectId;
+  matchStrength?: number;
+  channelObjectId?: mongoose.Schema.Types.ObjectId;
 }
 
 interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
@@ -40,7 +40,7 @@ interface NebulaVideoDocument extends NebulaVideoInterface, mongoose.Document {
 
 const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
   {
-    nebula_video_id: {
+    nebulaVideoId: {
       // "video_episode:d49e13df-f1ed-4562-8209-6098de1e187f"
       type: "String",
       index: true,
@@ -54,7 +54,7 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
       // "Real Lawyer Reacts to Will Smith Slapping Chris Rock"
       type: "String",
     },
-    short_description: {
+    shortDescription: {
       // "Welcome to earth, Chris Rock."
       type: "String",
     },
@@ -62,28 +62,28 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
       // 568
       type: "Number",
     },
-    published_at: {
+    publishedAt: {
       // "2022-03-29T16:58:40Z"
       type: "Date",
     },
-    channel_id: {
+    channelId: {
       // video_channel:85bf1f47-7cb1-409f-ae8f-4ea1a9b4414b
       type: "String",
     },
-    channel_slug: {
+    channelSlug: {
       // "legaleagle"
       type: "String",
       index: true,
     },
-    channel_slugs: {
+    channelSlugs: {
       // ["legaleagle"]
       type: ["String"],
     },
-    channel_title: {
+    channelTitle: {
       // "LegalEagle"
       type: "String",
     },
-    share_url: {
+    shareUrl: {
       // "https://nebula.app/videos/legaleagle-real-lawyer-reacts-to-will-smith-slapping-chris-rock/"
       type: "String",
     },
@@ -92,22 +92,22 @@ const nebulaVideoSchema = new Schema<NebulaVideoDocument>(
       type: "Boolean",
       default: false,
     },
-    youtube_video_object_id: {
+    youtubeVideoObjectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "YoutubeVideo",
     },
-    youtube_video_id: {
+    youtubeVideoId: {
       // "PtxNsc85KMw"
       type: "String",
       index: true,
     },
-    match_strength: {
+    matchStrength: {
       // 0.5
       type: "Number",
     },
-    creator_object_id: {
+    channelObjectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Creator",
+      ref: "Channel",
     },
   },
   {
@@ -136,9 +136,9 @@ nebulaVideoSchema.methods.setMatch = async function (
     { _id: this._id },
     {
       $set: {
-        youtube_video_object_id: youtubeVideo._id,
-        youtube_video_id: youtubeVideo.youtube_video_id,
-        match_strength: strength,
+        youtubeVideoObjectId: youtubeVideo._id,
+        youtubeVideoId: youtubeVideo.youtubeVideoId,
+        matchStrength: strength,
         matched: true,
       },
     }
@@ -162,17 +162,17 @@ nebulaVideoSchema.methods.updateMatch = async function (
   matchStrength: number
 ) {
   // Check to see if the new video is the same as the old one
-  if (this.youtube_video_object_id === youtubeVideo._id) {
+  if (this.youtubeVideoObjectId === youtubeVideo._id) {
     // The new video is the same as the old one -- Update the match strength
     logger.info(
-      `Match update: ${this.slug}: ${this.match_strength} ==> ${matchStrength}`
+      `Match update: ${this.slug}: ${this.matchStrength} ==> ${matchStrength}`
     );
     // Update just the match strength
     await NebulaVideo.findOneAndUpdate(
       { _id: this._id },
       {
         $set: {
-          match_strength: matchStrength,
+          matchStrength: matchStrength,
         },
       }
     );
@@ -183,14 +183,14 @@ nebulaVideoSchema.methods.updateMatch = async function (
   // Check to see if the youtube video is matched to another nebula video
   if (youtubeVideo._id) {
     const existingNebulaMatch = await NebulaVideo.findOne({
-      youtube_video_object_id: youtubeVideo._id,
+      youtubeVideoObjectId: youtubeVideo._id,
     });
 
     if (existingNebulaMatch) {
       // Compare the match strengths
       if (
-        existingNebulaMatch.match_strength &&
-        matchStrength < existingNebulaMatch.match_strength
+        existingNebulaMatch.matchStrength &&
+        matchStrength < existingNebulaMatch.matchStrength
       ) {
         // This match is closer, remove the old match
         await existingNebulaMatch.removeMatch(this.toObject());
@@ -224,9 +224,9 @@ nebulaVideoSchema.methods.removeMatch = async function (
     {
       $set: {
         matched: false,
-        youtube_video_object_id: null,
-        youtube_video_id: null,
-        match_strength: null,
+        youtubeVideoObjectId: null,
+        youtubeVideoId: null,
+        matchStrength: null,
       },
     }
   );
@@ -243,7 +243,7 @@ nebulaVideoSchema.methods.removeMatch = async function (
 nebulaVideoSchema.statics.findByNebulaVideoId = async function (
   nebulaVideoId: string
 ): Promise<NebulaVideoType | null> {
-  const response = await this.findOne({ nebula_video_id: nebulaVideoId });
+  const response = await this.findOne({ nebulaVideoId: nebulaVideoId });
   return response || null;
 };
 

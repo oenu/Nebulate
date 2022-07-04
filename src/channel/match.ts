@@ -18,43 +18,33 @@ interface MatchResult {
 }
 
 // Mongo Models
-import { Creator } from "../models/creator";
+import { Channel } from "../models/channel";
 
 /**
- * @function matchVideos
- * @description Match videos from Nebula to Youtube for given creator
- * @param {string} [channel_slug] - The slug of the creator to match videos for
- * @param {string[]} [rematch_yt_ids] - The youtube_ids to rematch
- * @param {string[]} [rematch_nebula_slug] - The slugs of the videos to get
+ * @function match
+ * @description Match videos from Nebula to Youtube for given channel
+ * @param {string} [channelSlug] - The slug of the channel to match videos for
  * @returns {void}
  * @async
  *
  */
-const matchVideos = async (
-  channel_slug: string,
-  rematch_nebula_slug?: Array<string>,
-  rematch_yt_id?: Array<string>
-) => {
-  logger.info(`Match: Matching videos for ${channel_slug}`);
-  // Check for creator slug
-  if (await !Creator.exists({ slug: channel_slug })) {
-    throw new Error(`Match: Creator ${channel_slug} doesn't exist in database`);
+const match = async (channelSlug: string) => {
+  logger.info(`Match: Matching videos for ${channelSlug}`);
+  // Check for channel slug
+  if (await !Channel.exists({ slug: channelSlug })) {
+    throw new Error(`Match: Channel ${channelSlug} doesn't exist in database`);
   }
 
-  // Get creator
-  const creator = await Creator.findOne({ slug: channel_slug });
-  if (!creator) {
-    throw new Error(`Match: Creator ${channel_slug} not found in DB`);
+  // Get channel
+  const channel = await Channel.findOne({ slug: channelSlug });
+  if (!channel) {
+    throw new Error(`Match: Channel ${channelSlug} not found in DB`);
   }
 
-  // Get creator's youtube videos
-  const youtube_videos: YoutubeVideoType[] = await creator.getYoutubeVideos(
-    rematch_yt_id
-  );
-  // Get creator's nebula videos
-  const nebula_videos: NebulaVideoType[] = await creator.getNebulaVideos(
-    rematch_nebula_slug
-  );
+  // Get channel's youtube videos
+  const youtube_videos: YoutubeVideoType[] = await channel.getYoutubeVideos();
+  // Get channel's nebula videos
+  const nebula_videos: NebulaVideoType[] = await channel.getNebulaVideos();
 
   logger.info(
     `Match: Matching ${youtube_videos.length} youtube videos against ${nebula_videos.length} nebula videos`
@@ -64,11 +54,11 @@ const matchVideos = async (
   const matched_videos = await matcher(nebula_videos, youtube_videos);
 
   if (matched_videos.length === 0) {
-    logger.error(`Match: No videos matched for ${channel_slug}`);
+    logger.error(`Match: No videos matched for ${channelSlug}`);
     return;
   } else {
     logger.info(
-      `Match: Found ${matched_videos.length} possible matched videos for ${channel_slug}`
+      `Match: Found ${matched_videos.length} possible matched videos for ${channelSlug}`
     );
   }
 
@@ -87,17 +77,20 @@ const matchVideos = async (
     }
   }
 
+  // Set Last Match Date
+  await channel.logMatch();
+
   logger.info(
-    `Match: Match complete for ${channel_slug}, ${matchCount} matches`
+    `Match: Match complete for ${channelSlug}, ${matchCount} matches`
   );
 
   return;
 };
-export default matchVideos;
+export default match;
 
 /**
  * @function matcher
- * @description Match videos from Nebula to Youtube for given creator
+ * @description Match videos from Nebula to Youtube for given channel
  * @param {NebulaVideoType[]} [nebula_videos] - The videos to match
  * @param {YoutubeVideoType[]} [youtube_videos] - The videos to match
  * @returns {MatchResult[]} - The matched videos

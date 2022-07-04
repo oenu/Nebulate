@@ -5,7 +5,7 @@ import path from "path";
 import logger from "../utils/logger";
 
 /**
- * @function keyFromNebula
+ * @function getKey
  * @description This function fetches a secret from Nebula using a username and password stored in the environment at NEBULA_USERNAME and NEBULA_PASSWORD.
  * @description This stores the secret in a file in the /store directory and sets the global.key to the secret.
  * @returns {Promise<string>} A promise that resolves to a secret from Nebula.
@@ -13,12 +13,12 @@ import logger from "../utils/logger";
  * @async
  */
 
-export const keyFromNebula = async (): Promise<string> => {
+export const getKey = async (): Promise<string> => {
   if (
     process.env.NEBULA_USERNAME === undefined ||
     process.env.NEBULA_PASSWORD === undefined
   ) {
-    throw new Error("keyFromNebula: Environment variables not set");
+    throw new Error("getKey: Environment variables not set");
   }
   try {
     // Request secret from Nebula
@@ -29,11 +29,11 @@ export const keyFromNebula = async (): Promise<string> => {
         password: process.env.NEBULA_PASSWORD,
       }
     );
-    logger.debug("keyFromNebula: Key fetched from Nebula");
+    logger.debug("getKey: Key fetched from Nebula");
 
     // Write secret to file
     await fs.promises.writeFile(
-      path.join(__dirname, "..", "/store", "simple_key.txt"),
+      path.join(__dirname, "/store", "simple_key.txt"),
       response.data.key,
       "utf-8"
     );
@@ -43,8 +43,8 @@ export const keyFromNebula = async (): Promise<string> => {
     return response.data.key;
   } catch (error) {
     logger.error(error);
-    throw new Error("keyFromNebula: Unable to get key from Nebula");
+    throw new Error("getKey: Unable to get key from Nebula");
   }
 };
 
-export default keyFromNebula;
+export default getKey;

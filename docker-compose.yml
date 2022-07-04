@@ -21,6 +21,8 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
     networks: 
       - "stack"
+    depends_on:
+      - mongo
 
   node:
     platform: linux/arm64

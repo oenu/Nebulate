@@ -58,8 +58,9 @@
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "test": "jest --watch --detectOpenHandles --runInBand",
     "test:ci": "jest --ci",
-    "install:extension": "cd extensions && yarn install",
-    "test:extension": "cd extensions && yarn test",
-    "build:extension": "cd extensions && yarn build"
+    "install:extension": "cd extension && yarn install",
+    "test:extension": "cd extension && yarn test",
+    "build:extension": "cd extension && yarn build",
+    "dev:extension": "cd extension && yarn watch"
   }
 }

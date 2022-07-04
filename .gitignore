@@ -31,6 +31,8 @@ docs/
 # Misc
 .DS_Store
 .env
+
+yarn-error.log
 src/store/json_token.txt
 src/store/simple_key.txt
 src/database/key.pem

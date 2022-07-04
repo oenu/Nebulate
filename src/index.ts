@@ -43,6 +43,10 @@ app.use(auth);
 const lookup = require("./routes/lookup");
 app.use("/api/lookup", lookup);
 
+// Register a new channel
+const register = require("./routes/register");
+app.use("/register", reqAuth, register);
+
 // Trigger a scrape of nebula videos for specific channel
 const scrapeNebula = require("./routes/scrapeNebula");
 app.use("/scrape/nebula", reqAuth, scrapeNebula);
@@ -50,10 +54,6 @@ app.use("/scrape/nebula", reqAuth, scrapeNebula);
 // Trigger a scrape of youtube videos for specific channel
 const scrapeYoutube = require("./routes/scrapeYoutube");
 app.use("/scrape/youtube", reqAuth, scrapeYoutube);
-
-// Register a new channel
-const register = require("./routes/register");
-app.use("/register", reqAuth, register);
 
 // Match videos from Nebula and Youtube for specific channel
 const match = require("./routes/match");
@@ -70,6 +70,10 @@ app.use("/matchAll", reqAuth, matchAll);
 // Trigger a scrape of all channels and rematching of all videos
 const updateAll = require("./routes/updateAll");
 app.use("/updateAll", reqAuth, updateAll);
+
+// Generate Table
+const generateTable = require("./routes/generateTable");
+app.use("/generateTable", reqAuth, generateTable);
 
 // Upload table to storage
 const uploadTable = require("./routes/uploadTable");

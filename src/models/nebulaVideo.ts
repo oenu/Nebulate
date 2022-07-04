@@ -164,7 +164,7 @@ nebulaVideoSchema.methods.updateMatch = async function (
   // Check to see if the new video is the same as the old one
   if (this.youtubeVideoObjectId === youtubeVideo._id) {
     // The new video is the same as the old one -- Update the match strength
-    logger.info(
+    logger.debug(
       `Match update: ${this.slug}: ${this.matchStrength} ==> ${matchStrength}`
     );
     // Update just the match strength

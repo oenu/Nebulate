@@ -45,7 +45,7 @@ export const videosFromNebula = async (
     );
   }
 
-  logger.info(`videosFromNebula: Getting videos for ${channelSlug}`);
+  logger.debug(`videosFromNebula: Getting videos for ${channelSlug}`);
   // Scrape videos from Nebula
   let nebula_videos = await scrapeNebula(
     channelSlug,

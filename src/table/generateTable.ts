@@ -109,6 +109,7 @@ export const generateTable = async (maximumMatchDistance?: number) => {
     "utf-8"
   );
 
+  logger.info("generateTable: Lookup table generated");
   // Return the lookup table
   return table;
 };

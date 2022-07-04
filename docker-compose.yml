@@ -5,10 +5,12 @@ services:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    networks: 
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+    networks:
       - "stack"
+    volumes:
+      - mongo:/data/db
 
   mongo-express:
     image: mongo-express
@@ -16,10 +18,12 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-    networks: 
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DATABASE_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DATABASE_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
+    networks:
       - "stack"
     depends_on:
       - mongo
@@ -30,14 +34,16 @@ services:
     container_name: "Nebulate-node"
     ports:
       - "3000:3000"
-    networks: 
+    networks:
       - "stack"
     volumes:
       - .:/app
     environment:
       PORT: 3000
 
-
 networks:
-  stack: 
+  stack:
     driver: bridge
+
+volumes:
+  mongo:

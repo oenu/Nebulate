@@ -11,8 +11,12 @@ declare let process: { env: { [key: string]: string } };
  */
 export const connectDB = async () => {
   try {
+    console.log(process.env.NODE_ENV);
     // Connect to the database
-    if (process.env.DATABASE_URI) {
+    if (process.env.NODE_ENV === "dev") {
+      console.log("Connecting to mongoDB in dev mode");
+      await mongoose.connect("mongodb://localhost:27017/nebulate");
+    } else if (process.env.DATABASE_URI) {
       await mongoose.connect(process.env.DATABASE_URI);
     } else {
       // This cannot be missing, HCF

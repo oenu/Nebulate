@@ -30,49 +30,49 @@ connectDB();
 
 // Middleware
 import logger from "./utils/logger";
-import auth from "./middleware/auth";
-import globalInit from "./auth/store";
+import auth from "./middleware/refreshAuth";
+import globalInit from "./auth/init";
 
-import { checkAuth } from "./middleware/checkAuth";
+import { reqAuth } from "./middleware/reqAuth";
 
 app.use(auth);
 
 // Routes
 // Respond to request for latest version of the lookup table
-const serveLookupTable = require("./routes/serveTable");
-app.use("/api/table", serveLookupTable);
+// const serveLookupTable = require("./routes/serveTable");
+// app.use("/api/table", serveLookupTable);
 
-// Trigger a scrape of nebula videos for specific creator
+// Trigger a scrape of nebula videos for specific channel
 const scrapeNebula = require("./routes/scrapeNebula");
-app.use("/scrape/nebula", checkAuth, scrapeNebula);
+app.use("/scrape/nebula", reqAuth, scrapeNebula);
 
-// Trigger a scrape of youtube videos for specific creator
+// Trigger a scrape of youtube videos for specific channel
 const scrapeYoutube = require("./routes/scrapeYoutube");
-app.use("/scrape/youtube", checkAuth, scrapeYoutube);
+app.use("/scrape/youtube", reqAuth, scrapeYoutube);
 
-// Register a new creator
-const registerChannel = require("./routes/registerChannel");
-app.use("/register", checkAuth, registerChannel);
+// Register a new channel
+const register = require("./routes/register");
+app.use("/register", reqAuth, register);
 
-// Match videos from Nebula and Youtube for specific creator
-const matchVideos = require("./routes/matchVideos");
-app.use("/match", checkAuth, matchVideos);
+// Match videos from Nebula and Youtube for specific channel
+const match = require("./routes/match");
+app.use("/match", reqAuth, match);
 
 // Search internal mappings for a specific nebula video based on a provided youtube video id
-const lookupRequest = require("./routes/lookupRequest");
-app.use("/api/lookup", lookupRequest);
+const lookup = require("./routes/lookup");
+app.use("/api/lookup", lookup);
 
-// Trigger the registration of all creators that have manual youtube id mappings
-const registerAllCreators = require("./routes/registerAllCreators");
-app.use("/register_all", checkAuth, registerAllCreators);
+// Trigger the registration of all channels that have manual youtube id mappings
+const registerAll = require("./routes/registerAll");
+app.use("/register_all", reqAuth, registerAll);
 
-// Match all videos from Nebula and Youtube for all creators without scraping new videos
-const matchAllCreators = require("./routes/matchAllCreators");
-app.use("/match_all", checkAuth, matchAllCreators);
+// Match all videos from Nebula and Youtube for all channels without scraping new videos
+const matchAll = require("./routes/matchAll");
+app.use("/match_all", reqAuth, matchAll);
 
-// Trigger a scrape of all creators and rematching of all videos
-const updateAllCreators = require("./routes/updateAllCreators");
-app.use("/update_all_creators", checkAuth, updateAllCreators);
+// Trigger a scrape of all channels and rematching of all videos
+const updateAll = require("./routes/updateAll");
+app.use("/update_all_channels", reqAuth, updateAll);
 
 // Start the server
 mongoose.connection.once("open", async () => {

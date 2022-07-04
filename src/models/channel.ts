@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
 // Methods
-import videosFromNebula from "../scrapers/videosFromNebula";
-import videosFromYoutube from "../scrapers/videosFromYoutube";
-import matchVideos from "../server_functions/matchVideos";
+import videosFromNebula from "../scrape/videosFromNebula";
+import videosFromYoutube from "../scrape/videosFromYoutube";
+import matchVideos from "../channel/match";
 
 // Models
 import { NebulaVideo } from "./nebulaVideo";
@@ -16,24 +16,24 @@ import type { YoutubeVideoType } from "./youtubeVideo";
 
 // Fantastic Doc on mongoose schemas:
 // https://millo-l.github.io/Typescript-mongoose-methods-statics/
-interface CreatorInterface {
-  nebula_id: string;
+interface ChannelInterface {
+  nebulaId: string;
   type: string;
   slug: string;
   title: string;
   description: string;
-  zype_id: string;
-  youtube_id: string;
-  youtube_channel_name: string;
-  youtube_upload_id: string;
-  last_scraped_nebula: Date;
-  last_scraped_youtube: Date;
-  last_matched: Date;
-  nebula_videos: NebulaVideoType[];
-  youtube_videos: YoutubeVideoType[];
+  zypeId: string;
+  youtubeId: string;
+  youtubeTitle: string;
+  youtubeUploadId: string;
+  lastScrapedNebula: Date;
+  lastScrapedYoutube: Date;
+  lastMatched: Date;
+  nebulaVideos: NebulaVideoType[];
+  youtubeVideos: YoutubeVideoType[];
 }
 
-interface CreatorDocument extends CreatorInterface, mongoose.Document {
+interface ChannelDocument extends ChannelInterface, mongoose.Document {
   test: () => Promise<void>;
   getNebulaVideos: (nebula_slugs?: string[]) => Promise<NebulaVideoType[]>;
   getYoutubeVideos: (youtube_ids?: string[]) => Promise<YoutubeVideoType[]>;
@@ -43,9 +43,9 @@ interface CreatorDocument extends CreatorInterface, mongoose.Document {
   matchVideos: () => Promise<void>;
 }
 
-const creatorSchema: Schema<CreatorDocument> = new Schema(
+const channelSchema: Schema<ChannelDocument> = new Schema(
   {
-    nebula_id: {
+    nebulaId: {
       type: "String",
     },
     type: {
@@ -58,157 +58,157 @@ const creatorSchema: Schema<CreatorDocument> = new Schema(
     description: {
       type: "String",
     },
-    zype_id: {
+    zypeId: {
       type: "String",
     },
-    nebula_videos: [
+    nebulaVideos: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "NebulaVideo",
       },
     ],
-    youtube_videos: [
+    youtubeVideos: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "YoutubeVideo",
       },
     ],
-    youtube_id: {
+    youtubeId: {
       type: "String",
     },
-    youtube_channel_name: {
+    youtubeTitle: {
       type: "String",
     },
-    youtube_upload_id: { type: "String" },
-    last_scraped_nebula: { type: "Date" },
-    last_scraped_youtube: { type: "Date" },
-    last_matched: { type: "Date" },
+    youtubeUploadId: { type: "String" },
+    lastScrapedNebula: { type: "Date" },
+    lastScrapedYoutube: { type: "Date" },
+    lastMatched: { type: "Date" },
   },
   {
-    collection: "creators",
+    collection: "channels",
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );
 
 /**
  * @function getNebulaVideos
- * @description Get the videos from Nebula for this creator
+ * @description Get the videos from Nebula for this channel
  * @param {string[]} [nebula_slugs] - The slugs of the videos to get
- * @returns {NebulaVideoType[]} - Nebula videos associated with this creator
- * @memberof Creator
+ * @returns {NebulaVideoType[]} - Nebula videos associated with this channel
+ * @memberof Channel
  */
-creatorSchema.methods.getNebulaVideos = async function (
+channelSchema.methods.getNebulaVideos = async function (
   nebula_slugs?: string[]
 ) {
   if (!nebula_slugs) {
     return await NebulaVideo.find({
       _id: {
-        $in: this.nebula_videos?.map(function (video: any) {
+        $in: this.nebulaVideos?.map(function (video: any) {
           return video._id;
         }),
       },
     });
   } else {
     return await NebulaVideo.find({
-      $and: [{ slug: { $in: nebula_slugs } }, { channel_slug: this.slug }],
+      $and: [{ slug: { $in: nebula_slugs } }, { channelSlug: this.slug }],
     });
   }
 };
 
 /**
  * @function scrapeNebula
- * @description Scrape the videos from Nebula for this creator
+ * @description Scrape the videos from Nebula for this channel
  * @param {boolean} [onlyScrapeNew=true] - Only scrape new videos
- * @returns {NebulaVideoType[]} - Nebula videos associated with this creator
- * @memberof Creator
- * @throws {Error} - If the creator has no slug
+ * @returns {NebulaVideoType[]} - Nebula videos associated with this channel
+ * @memberof Channel
+ * @throws {Error} - If the channel has no slug
  * @async
  */
-creatorSchema.methods.scrapeNebula = async function (onlyScrapeNew?: boolean) {
+channelSchema.methods.scrapeNebula = async function (onlyScrapeNew?: boolean) {
   if (onlyScrapeNew === undefined) onlyScrapeNew = true;
   return await videosFromNebula(this.slug, onlyScrapeNew);
 };
 
 /**
  * @function scrapeYoutube
- * @description Scrape the videos from Youtube for this creator
+ * @description Scrape the videos from Youtube for this channel
  * @param {boolean} [onlyScrapeNew=true] - Only scrape new videos
- * @returns {YoutubeVideoType[]} - Youtube videos associated with this creator
- * @memberof Creator
- * @throws {Error} - If the creator has no slug or mapped youtube_id
+ * @returns {YoutubeVideoType[]} - Youtube videos associated with this channel
+ * @memberof Channel
+ * @throws {Error} - If the channel has no slug or mapped youtubeId
  * @async
  */
-creatorSchema.methods.scrapeYoutube = async function (onlyScrapeNew?: boolean) {
+channelSchema.methods.scrapeYoutube = async function (onlyScrapeNew?: boolean) {
   if (onlyScrapeNew === undefined) onlyScrapeNew = true;
   return await videosFromYoutube(this.slug, onlyScrapeNew);
 };
 
 /**
  * @function matchVideos
- * @description Match videos from Nebula and Youtube for this creator
+ * @description Match videos from Nebula and Youtube for this channel
  * @returns {void}
- * @memberof Creator
- * @throws {Error} - If the creator has no slug or videos
+ * @memberof Channel
+ * @throws {Error} - If the channel has no slug or videos
  * @async
  */
-creatorSchema.methods.matchVideos = async function () {
+channelSchema.methods.matchVideos = async function () {
   return await matchVideos(this.slug);
 };
 
 /**
  * @fumction getYoutubeVideos
- * @description Get the videos from Youtube for this creator
+ * @description Get the videos from Youtube for this channel
  * @param {string[]} [youtube_ids] - The ids of the videos to get
- * @returns {YoutubeVideoType[]} - Youtube videos associated with this creator
- * @memberof Creator
- * @throws {Error} - If the creator has no mapped youtube_id or youtube_videos
+ * @returns {YoutubeVideoType[]} - Youtube videos associated with this channel
+ * @memberof Channel
+ * @throws {Error} - If the channel has no mapped youtubeId or youtubeVideo
  * @async
  */
-creatorSchema.methods.getYoutubeVideos = async function (
+channelSchema.methods.getYoutubeVideos = async function (
   youtube_ids?: string[]
 ) {
   if (!youtube_ids) {
     return await YoutubeVideo.find({
       _id: {
-        $in: this.youtube_videos?.map(function (video: any) {
+        $in: this.youtubeVideos?.map(function (video: any) {
           return video._id;
         }),
       },
     });
   } else {
     return await YoutubeVideo.find({
-      $and: [{ youtube_id: { $in: youtube_ids } }, { channel_slug: this.slug }],
+      $and: [{ youtubeId: { $in: youtube_ids } }, { channelSlug: this.slug }],
     });
   }
 };
 
 /**
  * @function logScrape
- * @description Log the scrape of this creator
+ * @description Log the scrape of this channel
  * @param {string} type - The type of scrape
  * @param {Date} [date] - The date of the scrape
  * @returns {void}
- * @memberof Creator
- * @throws {Error} - If the creator cannot be updated
+ * @memberof Channel
+ * @throws {Error} - If the channel cannot be updated
  * @async
  */
-creatorSchema.methods.logScrape = async function (
+channelSchema.methods.logScrape = async function (
   type: string,
   date?: Date
 ): Promise<void> {
   if (!date) date = new Date();
   if (type === "nebula") {
-    this.last_scraped_nebula = date;
+    this.lastScrapedNebula = date;
   } else if (type === "youtube") {
-    this.last_scraped_youtube = date;
+    this.lastScrapedYoutube = date;
   }
   await this.save();
 };
 
-export type CreatorPreType = InferSchemaType<typeof creatorSchema>;
+export type ChannelPreType = InferSchemaType<typeof channelSchema>;
 
-export interface CreatorType extends CreatorPreType {
+export interface ChannelType extends ChannelPreType {
   _id: mongoose.Types.ObjectId;
 }
 
-export const Creator = mongoose.model("Creator", creatorSchema);
+export const Channel = mongoose.model("Channel", channelSchema);

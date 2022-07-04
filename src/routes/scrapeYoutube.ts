@@ -3,12 +3,12 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import videosFromYoutube from "../scrapers/videosFromYoutube";
+import videosFromYoutube from "../scrape/videosFromYoutube";
 
 app.put(
-  "/:channel_slug/:onlySearchNew?/:videoScrapeLimit?",
+  "/:channelSlug/:onlySearchNew?/:videoScrapeLimit?",
   async (req: Request, res: Response) => {
-    const channel_slug = req.params.channel_slug;
+    const channelSlug = req.params.channelSlug;
     const onlySearchNew = req.params.onlySearchNew
       ? req.params.onlySearchNew === "true"
       : true;
@@ -16,15 +16,15 @@ app.put(
       ? parseInt(req.params.videoScrapeLimit)
       : 10;
 
-    if (!channel_slug) {
-      res.send("No channel_slug provided");
-      logger.error("No channel_slug provided");
+    if (!channelSlug) {
+      res.send("No channelSlug provided");
+      logger.error("No channelSlug provided");
       return;
     }
 
     try {
-      await videosFromYoutube(channel_slug, onlySearchNew, videoScrapeLimit);
-      res.send(`Scraped ${channel_slug}`);
+      await videosFromYoutube(channelSlug, onlySearchNew, videoScrapeLimit);
+      res.send(`Scraped ${channelSlug}`);
     } catch (error: any) {
       logger.error(error.message);
 

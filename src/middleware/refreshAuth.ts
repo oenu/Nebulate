@@ -3,10 +3,10 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../utils/logger";
-import jwtFromNebula from "../auth/jwtFromNebula";
+import jwtFromNebula from "../auth/jwt";
 
 /**
- * @function auth
+ * @function refreshAuth
  * @description Middleware to refresh the JWT token, will refresh the token if it is about to expire and will get a new secret if the secret is invalid
  * @param {Request} req - The request object
  * @param {Response} res - The response object
@@ -16,7 +16,11 @@ import jwtFromNebula from "../auth/jwtFromNebula";
  * @async
  */
 
-const auth = async (_req: Request, res: Response, next: NextFunction) => {
+const refreshAuth = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // Check if the token is undefined, if so, get a new token
   if (global.token === undefined) {
     logger.error("Auth: Global token undefined, fetching from Nebula");
@@ -61,4 +65,4 @@ const auth = async (_req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default auth;
+export default refreshAuth;

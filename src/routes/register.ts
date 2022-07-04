@@ -6,20 +6,20 @@ const app = express();
 import register from "../channel/register";
 import matchVideos from "../channel/match";
 
-app.put("/:channel_slug", async (req: Request, res: Response) => {
-  const { channel_slug } = req.params;
+app.put("/:channelSlug", async (req: Request, res: Response) => {
+  const { channelSlug } = req.params;
 
-  if (!channel_slug) {
-    res.send("No channel_slug provided");
-    logger.error("No channel_slug provided");
+  if (!channelSlug) {
+    res.send("No channelSlug provided");
+    logger.error("No channelSlug provided");
     return;
   }
 
   try {
-    await register(channel_slug);
-    res.status(201).send(`Registered ${channel_slug}`);
+    await register(channelSlug);
+    res.status(201).send(`Registered ${channelSlug}`);
 
-    await matchVideos(channel_slug);
+    await matchVideos(channelSlug);
   } catch (error: any) {
     logger.error(error.message);
 

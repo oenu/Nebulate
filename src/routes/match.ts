@@ -5,32 +5,22 @@ const app = express();
 
 import match from "../channel/match";
 
-app.put(
-  "/:channel_slug/:rematch_nebula_slug?/:rematch_yt_id?",
-  async (req: Request, res: Response) => {
-    const channel_slug = req.params.channel_slug;
+app.put("/:channelSlug", async (req: Request, res: Response) => {
+  const channelSlug = req.params.channelSlug;
 
-    const rematch_nebula_slug = req.params?.rematch_nebula_slug
-      ? [req.params.rematch_nebula_slug]
-      : undefined;
-    const rematch_yt_id = req.params?.rematch_yt_id
-      ? [req.params.rematch_yt_id]
-      : undefined;
-
-    if (!channel_slug) {
-      res.send("No channel_slug provided");
-      logger.error("No channel_slug provided");
-      return;
-    }
-    try {
-      await match(channel_slug, rematch_nebula_slug, rematch_yt_id);
-
-      res.send(`Matched ${channel_slug}`);
-    } catch (error: any) {
-      logger.error(error.message);
-      throw error;
-    }
+  if (!channelSlug) {
+    res.send("No channelSlug provided");
+    logger.error("No channelSlug provided");
+    return;
   }
-);
+  try {
+    await match(channelSlug);
+
+    res.send(`Matched ${channelSlug}`);
+  } catch (error: any) {
+    logger.error(error.message);
+    throw error;
+  }
+});
 
 module.exports = app;

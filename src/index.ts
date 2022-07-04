@@ -42,19 +42,19 @@ app.use(auth);
 // const serveLookupTable = require("./routes/serveTable");
 // app.use("/api/table", serveLookupTable);
 
-// Trigger a scrape of nebula videos for specific creator
+// Trigger a scrape of nebula videos for specific channel
 const scrapeNebula = require("./routes/scrapeNebula");
 app.use("/scrape/nebula", reqAuth, scrapeNebula);
 
-// Trigger a scrape of youtube videos for specific creator
+// Trigger a scrape of youtube videos for specific channel
 const scrapeYoutube = require("./routes/scrapeYoutube");
 app.use("/scrape/youtube", reqAuth, scrapeYoutube);
 
-// Register a new creator
+// Register a new channel
 const register = require("./routes/register");
 app.use("/register", reqAuth, register);
 
-// Match videos from Nebula and Youtube for specific creator
+// Match videos from Nebula and Youtube for specific channel
 const match = require("./routes/match");
 app.use("/match", reqAuth, match);
 
@@ -62,17 +62,17 @@ app.use("/match", reqAuth, match);
 const lookup = require("./routes/lookup");
 app.use("/api/lookup", lookup);
 
-// Trigger the registration of all creators that have manual youtube id mappings
+// Trigger the registration of all channels that have manual youtube id mappings
 const registerAll = require("./routes/registerAll");
 app.use("/register_all", reqAuth, registerAll);
 
-// Match all videos from Nebula and Youtube for all creators without scraping new videos
+// Match all videos from Nebula and Youtube for all channels without scraping new videos
 const matchAll = require("./routes/matchAll");
 app.use("/match_all", reqAuth, matchAll);
 
-// Trigger a scrape of all creators and rematching of all videos
+// Trigger a scrape of all channels and rematching of all videos
 const updateAll = require("./routes/updateAll");
-app.use("/update_all_creators", reqAuth, updateAll);
+app.use("/update_all_channels", reqAuth, updateAll);
 
 // Start the server
 mongoose.connection.once("open", async () => {

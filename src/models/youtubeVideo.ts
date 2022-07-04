@@ -7,16 +7,16 @@ import { Schema, InferSchemaType } from "mongoose";
 import type { NebulaVideoType } from "./nebulaVideo";
 
 export interface YoutubeVideoInterface {
-  youtube_video_id: string;
-  published_at: Date;
-  playlist_id: string;
-  channel_title: string;
+  youtubeVideoId: string;
+  publishedAt: Date;
+  playlistId: string;
+  channelTitle: string;
   title: string;
-  channel_id: string;
+  channelId: string;
   etag: string;
   status: string;
-  channel_slug: string;
-  creator_object_id?: mongoose.Schema.Types.ObjectId;
+  channelSlug: string;
+  channelObjectId?: mongoose.Schema.Types.ObjectId;
 }
 
 interface YoutubeVideoDocument
@@ -35,22 +35,22 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
   {
     // Youtube Response Fields ==================================================
     // Content Details Fields -------------------------------------------------------
-    youtube_video_id: {
+    youtubeVideoId: {
       // "SfZrnoo1GPM"
       // Can be used to identify the video from a url eg (https://www.youtube.com/watch?v=SfZrnoo1GPM)
       type: "String",
       index: true,
     },
-    published_at: {
+    publishedAt: {
       // 2020-01-01T00:00:00.000Z
       type: "Date",
     },
     // Snippet Fields -------------------------------------------------------
-    playlist_id: {
+    playlistId: {
       // "VVVwYS1aYjBaY1FqVENQUDFEeF8xTThRLlNmWnJub28xR1BN"
       type: "String",
     },
-    channel_title: {
+    channelTitle: {
       // "LegalEagle"
       type: "String",
     },
@@ -59,7 +59,7 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
       type: "String",
     },
 
-    channel_id: {
+    channelId: {
       // "UCpa-Zb0ZcQjTCPP1Dx_1M8Q"
       type: "String",
     },
@@ -74,14 +74,14 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
       type: "String",
     },
     // Custom Fields ==================================================
-    channel_slug: {
+    channelSlug: {
       // "legaleagle"
       type: "String",
       index: true,
     },
-    creator_object_id: {
+    channelObjectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Creator",
+      ref: "Channel",
     },
   },
   {
@@ -92,7 +92,7 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
 
 /**
  * @function findByYoutubeVideoId
- * @description Finds a video by its youtube_video_id
+ * @description Finds a video by its youtubeVideoId
  * @param {string} youtubeVideoId - The youtube video id
  * @returns {Promise<YoutubeVideoType>}
  * @memberof YoutubeVideo
@@ -102,7 +102,7 @@ youtubeVideoSchema.statics.findByYoutubeVideoId = async function (
   youtubeVideoId: string
 ): Promise<YoutubeVideoType | null> {
   const response = await YoutubeVideo.findOne({
-    youtube_video_id: youtubeVideoId,
+    youtubeVideoId: youtubeVideoId,
   });
   return response || null;
 };

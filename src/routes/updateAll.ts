@@ -6,9 +6,9 @@ const app = express();
 import updateAll from "../batch/updateAll";
 
 app.put("/", async (_req: Request, res: Response) => {
-  logger.warn("updateAll: Updating all creators");
+  logger.warn("updateAll: Updating all channels");
   updateAll();
-  res.send("Updating all creators");
+  res.send("Updating all channels");
 });
 
 module.exports = app;

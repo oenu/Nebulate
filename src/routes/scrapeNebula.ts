@@ -6,9 +6,9 @@ const app = express();
 import videosFromNebula from "../scrape/videosFromNebula";
 
 app.put(
-  "/:channel_slug/:onlySearchNew?/:searchLimit?",
+  "/:channelSlug/:onlySearchNew?/:searchLimit?",
   async (req: Request, res: Response) => {
-    const { channel_slug } = req.params;
+    const { channelSlug } = req.params;
     const onlySearchNew = req.params.onlySearchNew
       ? req.params.onlySearchNew === "true"
       : true;
@@ -16,18 +16,18 @@ app.put(
       ? parseInt(req.params.searchLimit)
       : 10;
 
-    if (!channel_slug) {
-      res.send("No channel_slug provided");
-      logger.error("No channel_slug provided");
+    if (!channelSlug) {
+      res.send("No channelSlug provided");
+      logger.error("No channelSlug provided");
       return;
     }
 
     try {
-      await videosFromNebula(channel_slug, onlySearchNew, searchLimit);
+      await videosFromNebula(channelSlug, onlySearchNew, searchLimit);
     } catch (error) {
       logger.error(error);
     }
-    res.send(`Updated ${channel_slug}`);
+    res.send(`Updated ${channelSlug}`);
   }
 );
 

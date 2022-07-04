@@ -5,15 +5,15 @@ console.log("CS: init");
 import { CSS, Messages } from "./enums";
 
 import {
-  // addCreatorButton,
+  // addChannelButton,
   addNebulaControls,
   loadCSS,
   removeNebulaControls,
   unloadCSS,
-  // removeCreatorButton,
+  // removeChannelButton,
 } from "./functions/domMethods";
 
-let creator_slug: string;
+let channelSlug: string;
 
 chrome.runtime.onMessage.addListener((message) => {
   const { type } = message;
@@ -26,8 +26,8 @@ chrome.runtime.onMessage.addListener((message) => {
         message.matched
       );
       const { videoId, matched, known } = message;
-      creator_slug = message.creator_slug;
-      newVideoLoaded(videoId, known, matched, creator_slug);
+      channelSlug = message.channelSlug;
+      newVideoLoaded(videoId, known, matched, channelSlug);
       break;
 
     case Messages.NO_SLUG_REDIRECT:
@@ -40,7 +40,7 @@ chrome.runtime.onMessage.addListener((message) => {
       unloadCSS(CSS.NEBULA_VIDEO);
       unloadCSS(CSS.CREATOR);
       removeNebulaControls();
-      // removeCreatorButton();
+      // removeChannelButton();
       break;
     default:
       console.log("CS: Unknown message type");
@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((message) => {
 // Types
 interface Video {
   url: string;
-  channel_slug: string;
+  channelSlug: string;
   matched: boolean;
 }
 
@@ -105,8 +105,8 @@ const newVideoLoaded = async (
     document.getElementsByClassName("nebulate-extension")[0];
 
   if (known) {
-    // addCreatorButton();
-    // Highlight creator
+    // addChannelButton();
+    // Highlight channel
     loadCSS(CSS.CREATOR);
     if (matched) {
       // Highlight video
@@ -118,9 +118,9 @@ const newVideoLoaded = async (
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
     removeNebulaControls();
-    // removeCreatorButton();
+    // removeChannelButton();
   }
 };
 
 // IDEA: #1 Highlight the video with a blue border if it has a match
-// IDEA: #4 Whenever on a nebula creators video, highlight the creator / indicate that they are a nebula creator
+// IDEA: #4 Whenever on a nebula channels video, highlight the channel / indicate that they are a nebula channel

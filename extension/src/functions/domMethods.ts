@@ -17,7 +17,7 @@ export const loadCSS = (css: CSS) => {
     const style = document.createElement("style");
 
     style.className = CSS_CLASSES.CREATOR;
-    style.textContent = generateCreatorStyling();
+    style.textContent = generateChannelStyling();
     console.debug("loadCSS: loading styling" + css);
     setTimeout(() => {
       head.appendChild(style);
@@ -38,7 +38,7 @@ export const unloadCSS = (css: CSS) => {
         break;
       case CSS.CREATOR:
         for (let element of document.getElementsByClassName(
-          "nebulate-creator-css"
+          "nebulate-channel-css"
         )) {
           element.remove();
         }
@@ -75,8 +75,8 @@ export const generateNebulaStyling = () => {
   return player_height > player_width ? default_css : default_css;
 };
 
-export const generateCreatorStyling = () => {
-  let creator_css = `
+export const generateChannelStyling = () => {
+  let channel_css = `
   #avatar {
     transition: outline 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
     outline: 3px solid rgb(62, 187, 243);
@@ -91,7 +91,7 @@ export const generateCreatorStyling = () => {
 
 
 }`;
-  return creator_css;
+  return channel_css;
 };
 
 let youtube_right_controls: Element | null = null;

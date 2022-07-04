@@ -7,9 +7,9 @@ import registerAll from "../batch/registerAll";
 
 app.put("/", async (_req: Request, res: Response) => {
   try {
-    logger.warn("registerAll: Registering all creators");
+    logger.warn("registerAll: Registering all channels");
     registerAll();
-    res.send("Registering all creators");
+    res.send("Registering all channels");
   } catch (error) {
     logger.error(error);
     res.status(500).send(error);

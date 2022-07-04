@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Creator } from "../../src/models/creator";
+import { Channel } from "../../src/models/channel";
 import { NebulaVideo } from "../../src/models/nebulaVideo";
 import { YoutubeVideo } from "../../src/models/youtubeVideo";
 
@@ -14,42 +14,42 @@ describe("mongoose tests", () => {
     expect(databaseURI).toBeDefined();
   });
 
-  describe("Creator", () => {
-    it("should be able to add a creator to the database", async () => {
-      const creator = new Creator({
-        nebula_id: "test_creator_nebula_id",
-        slug: "test_creator_slug",
-        title: "test_creator_title",
-        description: "test_creator_description",
-        type: "test_creator_type",
-        zype_id: "test_creator_zype_id",
-        youtube_id: "test_creator_youtube_id",
-        youtube_upload_id: "test_creator_youtube_upload_id",
+  describe("Channel", () => {
+    it("should be able to add a channel to the database", async () => {
+      const channel = new Channel({
+        nebula_id: "test_channel_nebula_id",
+        slug: "test_channelSlug",
+        title: "test_channel_title",
+        description: "test_channel_description",
+        type: "test_channel_type",
+        zypeId: "test_channel_zypeId",
+        youtube_id: "test_channel_youtube_id",
+        youtube_upload_id: "test_channel_youtube_upload_id",
       });
 
-      const response = await Creator.create(creator);
+      const response = await Channel.create(channel);
       expect(response?._id).toBeDefined();
     });
 
-    it("should be able to find a creator in the database", async () => {
-      const testCreator = await Creator.findOne({ slug: "test_creator_slug" });
-      expect(testCreator?.slug).toBe("test_creator_slug");
+    it("should be able to find a channel in the database", async () => {
+      const testChannel = await Channel.findOne({ slug: "test_channelSlug" });
+      expect(testChannel?.slug).toBe("test_channelSlug");
     });
   });
 
   describe("NebulaVideo", () => {
     it("should be able to add a video to the database", async () => {
       const video = new NebulaVideo({
-        nebula_video_id: "test_nebula_video_id",
+        nebulaVideoId: "test_nebulaVideoId",
         slug: "test_nebula_video_slug",
         title: "test_nebula_video_title",
         short_description: "test_nebula_video_short_description",
         duration: 1000,
         published_at: new Date(),
-        channel_id: "test_creator_nebula_id",
-        channel_slug: "test_creator_nebula_slug",
-        channel_slugs: ["test_creator_nebula_slug"],
-        channel_title: "test_creator_nebula_title",
+        channel_id: "test_channel_nebula_id",
+        channelSlug: "test_channel_nebula_slug",
+        channelSlugs: ["test_channel_nebula_slug"],
+        channel_title: "test_channel_nebula_title",
         share_url: "test_nebula_video_share_url",
         matched: false,
       });
@@ -73,10 +73,10 @@ describe("mongoose tests", () => {
         published_at: new Date(),
         playlist_id: "test_playlist_id",
         title: "test_youtube_video_title",
-        channel_id: "test_creator_youtube_channel_id",
-        channel_slug: "test_creator_slug",
-        channel_slugs: ["test_creator_slug"],
-        channel_title: "test_creator_youtube_title",
+        channel_id: "test_channel_youtube_channel_id",
+        channelSlug: "test_channelSlug",
+        channelSlugs: ["test_channelSlug"],
+        channel_title: "test_channel_youtube_title",
       });
 
       const response = await YoutubeVideo.create(video);

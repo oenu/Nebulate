@@ -1,51 +1,51 @@
-import { Creator } from "../models/creator";
+import { Channel } from "../models/channel";
 import logger from "../utils/logger";
 const hourScrapeInterval = 6;
 
 /**
  * @function updateAll
- * @description This function updates all creators in the database.
- * @returns {Promise<void>} A promise that resolves if the creators are updated.
- * @throws {Error} If the creators cannot be updated.
+ * @description This function updates all channels in the database.
+ * @returns {Promise<void>} A promise that resolves if the channels are updated.
+ * @throws {Error} If the channels cannot be updated.
  * @async
  * @see {@link scrapeNebula} {@link scrapeYoutube} {@link matchVideos}
  */
 
 const updateAll = async () => {
-  // Get all creators
-  const creators = await Creator.find({}).select(
-    "last_scraped_nebula last_scraped_youtube last_matched slug"
+  // Get all channels
+  const channels = await Channel.find({}).select(
+    "lastScrapedNebula lastScrapedYoutube lastMatched slug"
   );
 
   const scrapeThreshold =
     new Date().getTime() - hourScrapeInterval * 60 * 60 * 1000;
 
-  // For each creator, check if it needs to be updated
-  for (const creator of creators) {
+  // For each channel, check if it needs to be updated
+  for (const channel of channels) {
     let needsRematch = false;
 
-    // Check if the creator needs to be updated
-    if (creator.last_scraped_nebula.getTime() < scrapeThreshold) {
-      // Scrape the creator's videos from Nebula
-      await creator.scrapeNebula();
+    // Check if the channel needs to be updated
+    if (channel.lastScrapedNebula.getTime() < scrapeThreshold) {
+      // Scrape the channel's videos from Nebula
+      await channel.scrapeNebula();
       needsRematch = true;
     }
-    if (creator.last_scraped_youtube.getTime() < scrapeThreshold) {
-      // Scrape the creator's videos from Youtube
-      await creator.scrapeYoutube();
+    if (channel.lastScrapedYoutube.getTime() < scrapeThreshold) {
+      // Scrape the channel's videos from Youtube
+      await channel.scrapeYoutube();
       needsRematch = true;
     }
 
-    // Match the creator's videos
-    // Will run if the creator has released new videos or if it has not been matched in a while
-    if (creator.last_matched.getTime() < scrapeThreshold * 3 || needsRematch) {
-      await creator.matchVideos();
+    // Match the channel's videos
+    // Will run if the channel has released new videos or if it has not been matched in a while
+    if (channel.lastMatched.getTime() < scrapeThreshold * 3 || needsRematch) {
+      await channel.matchVideos();
     }
 
-    // Wait for 1 minute before checking the next creator
+    // Wait for 1 minute before checking the next channel
     await new Promise((resolve) => setTimeout(resolve, 60000));
   }
-  logger.info("updateAll: Done updating creators");
+  logger.info("updateAll: Done updating channels");
   return;
 };
 

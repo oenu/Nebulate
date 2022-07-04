@@ -6,9 +6,9 @@ const app = express();
 import matchAll from "../batch/matchAll";
 
 app.post("/", async (_req: Request, res: Response) => {
-  logger.warn("matchAll: Matching all creators");
+  logger.warn("matchAll: Matching all channels");
   matchAll();
-  res.send("Matching all creators");
+  res.send("Matching all channels");
 });
 
 module.exports = app;

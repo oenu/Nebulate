@@ -1,13 +1,13 @@
-import { Creator } from "../models/creator";
+import { Channel } from "../models/channel";
 import logger from "../utils/logger";
 const hourMatchInterval = 6;
 
 /**
  * @function matchAll
- * @description This function matches all Nebula videos to Youtube videos and attributes the matched videos to the creators.
- * @description This function calls {@link matchVideos} on each creator
- * @returns {Promise<void>} A promise that resolves if the creators are matched.
- * @throws {Error} If the creators cannot be matched.
+ * @description This function matches all Nebula videos to Youtube videos and attributes the matched videos to the channels.
+ * @description This function calls {@link matchVideos} on each channel
+ * @returns {Promise<void>} A promise that resolves if the channels are matched.
+ * @throws {Error} If the channels cannot be matched.
  * @async
  * @see {@link matchVideos}
  */
@@ -16,21 +16,21 @@ const matchAll = async () => {
   logger.warn("matchAll: Matching videos");
   console.time("matchAll");
 
-  // Get all creators that have videos and are outside of the hourMatchInterval
-  const creators = await Creator.find({
+  // Get all channels that have videos and are outside of the hourMatchInterval
+  const channels = await Channel.find({
     $or: [
-      { last_matched: { $exists: false } },
+      { lastMatched: { $exists: false } },
       {
-        last_matched: { $lt: Date.now() - hourMatchInterval * 60 * 60 * 1000 },
+        lastMatched: { $lt: Date.now() - hourMatchInterval * 60 * 60 * 1000 },
       },
     ],
   });
-  logger.debug("matchAll: Found " + creators.length + " creators, matching");
+  logger.debug("matchAll: Found " + channels.length + " channels, matching");
 
-  // Iterate through each creator and match their videos
-  for await (const creator of creators) {
-    await creator.matchVideos();
-    await creator.save();
+  // Iterate through each channel and match their videos
+  for await (const channel of channels) {
+    await channel.matchVideos();
+    await channel.save();
     // wait for 10 seconds between matches
     await new Promise((resolve) => setTimeout(resolve, 10000));
   }

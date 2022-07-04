@@ -34,12 +34,12 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
     const video = await checkTable(videoId);
 
     if (video) {
-      // Video from Nebula creator found
+      // Video from Nebula channel found
       chrome.tabs.sendMessage(tabId, {
         type: Messages.NEW_VIDEO,
-        known: video.known, // If the Youtube video is from a Nebula Creator
+        known: video.known, // If the Youtube video is from a Nebula Channel
         videoId: videoId, // The video id
-        slug: video.creator_slug, // The creator slug
+        slug: video.channelSlug, // The channel slug
         matched: video.matched, // If the Youtube video is matched to a Nebula Video
       });
     } else {
@@ -90,21 +90,21 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
 
       case Messages.CREATOR_REDIRECT:
         console.log(
-          "background.js: received Creator redirect request from content script: " +
+          "background.js: received Channel redirect request from content script: " +
             JSON.stringify(request)
         );
 
         const response = await checkTable(request.url);
-        if (response?.creator_slug) {
+        if (response?.channelSlug) {
           chrome.storage.local.get("preferNewTab", (result) => {
             if (result.preferNewTab === true) {
               chrome.tabs.create({
-                url: `https://nebula.app/${response.creator_slug}`,
+                url: `https://nebula.app/${response.channelSlug}`,
                 active: true,
               });
             } else {
               chrome.tabs.update(request.tabId, {
-                url: `https://nebula.app/${response.creator_slug}`,
+                url: `https://nebula.app/${response.channelSlug}`,
               });
             }
           });

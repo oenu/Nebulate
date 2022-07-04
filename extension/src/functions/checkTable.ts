@@ -3,7 +3,7 @@
 export interface Match {
   known?: boolean;
   matched?: boolean;
-  creator_slug?: string;
+  channelSlug?: string;
 }
 
 export const checkTable = async (url: string) => {
@@ -13,18 +13,18 @@ export const checkTable = async (url: string) => {
 
   let video: Match = {};
 
-  // Check each creators matched videos
+  // Check each channels matched videos
 
-  for (let index = 0; index < lookupTable.creators.length; index++) {
-    const creator = lookupTable.creators[index];
-    if (creator.matched.includes(url)) {
+  for (let index = 0; index < lookupTable.channels.length; index++) {
+    const channel = lookupTable.channels[index];
+    if (channel.matched.includes(url)) {
       video.known = true;
-      video.creator_slug = creator.slug;
+      video.channelSlug = channel.slug;
       video.matched = true;
       break;
     }
   }
-  if (video.creator_slug) {
+  if (video.channelSlug) {
     console.log(
       "background.js: found youtube and nebula video in lookup table"
     );
@@ -32,17 +32,17 @@ export const checkTable = async (url: string) => {
     return video;
   }
 
-  // Check each creators not matched videos
-  for (let index = 0; index < lookupTable.creators.length; index++) {
-    const creator = lookupTable.creators[index];
-    if (creator.not_matched.includes(url)) {
+  // Check each channels not matched videos
+  for (let index = 0; index < lookupTable.channels.length; index++) {
+    const channel = lookupTable.channels[index];
+    if (channel.not_matched.includes(url)) {
       video.known = true;
-      video.creator_slug = creator.slug;
+      video.channelSlug = channel.slug;
       video.matched = false;
       break;
     }
   }
-  if (video.creator_slug) {
+  if (video.channelSlug) {
     console.log("background.js: youtube video found in lookup table");
     console.timeEnd("checkTable");
     return video;

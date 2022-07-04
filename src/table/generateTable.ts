@@ -112,3 +112,5 @@ export const generateTable = async (maximumMatchDistance?: number) => {
   // Return the lookup table
   return table;
 };
+
+export default generateTable;

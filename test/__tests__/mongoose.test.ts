@@ -19,7 +19,7 @@ describe("mongoose tests", () => {
       const channel = new Channel({
         nebula_id: "test_channel_nebula_id",
         slug: "test_channelSlug",
-        title: "test_channel_title",
+        title: "test_channelTitle",
         description: "test_channel_description",
         type: "test_channel_type",
         zypeId: "test_channel_zypeId",
@@ -46,10 +46,10 @@ describe("mongoose tests", () => {
         short_description: "test_nebula_video_short_description",
         duration: 1000,
         published_at: new Date(),
-        channel_id: "test_channel_nebula_id",
+        channelId: "test_channel_nebula_id",
         channelSlug: "test_channel_nebula_slug",
         channelSlugs: ["test_channel_nebula_slug"],
-        channel_title: "test_channel_nebula_title",
+        channelTitle: "test_channel_nebula_title",
         share_url: "test_nebula_video_share_url",
         matched: false,
       });
@@ -73,10 +73,10 @@ describe("mongoose tests", () => {
         published_at: new Date(),
         playlist_id: "test_playlist_id",
         title: "test_youtube_video_title",
-        channel_id: "test_channel_youtube_channel_id",
+        channelId: "test_channel_youtube_channelId",
         channelSlug: "test_channelSlug",
         channelSlugs: ["test_channelSlug"],
-        channel_title: "test_channel_youtube_title",
+        channelTitle: "test_channel_youtube_title",
       });
 
       const response = await YoutubeVideo.create(video);

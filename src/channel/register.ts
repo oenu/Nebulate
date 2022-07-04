@@ -130,7 +130,7 @@ export const idFromYoutube = async (channelSlug: string) => {
  * @function channelFromYoutube
  * @description Get channel data from Youtube
  * @param {string} channelYtId - The channel's youtube id
- * @returns {Promise<{upload_playlist_id, channel_title, custom_url}>} - Resolves with spcific channel data
+ * @returns {Promise<{upload_playlist_id, channelTitle, custom_url}>} - Resolves with spcific channel data
  * @throws {Error} - If the channel does not exist in Youtube or the lookup fails
  * @async
  */
@@ -146,10 +146,10 @@ export const channelFromYoutube = async (channelYtId: string) => {
     );
   const channel = response?.data?.items[0];
   const upload_playlist_id = channel.contentDetails?.relatedPlaylists?.uploads;
-  const channel_title = channel.snippet?.title;
+  const channelTitle = channel.snippet?.title;
   const custom_url = channel.snippet?.customUrl;
 
-  return { upload_playlist_id, channel_title, custom_url };
+  return { upload_playlist_id, channelTitle, custom_url };
 };
 
 export default register;

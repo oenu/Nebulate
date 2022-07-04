@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
 // Methods
-import videosFromNebula from "../scrapers/videosFromNebula";
-import videosFromYoutube from "../scrapers/videosFromYoutube";
-import matchVideos from "../server_functions/matchVideos";
+import videosFromNebula from "../scrape/videosFromNebula";
+import videosFromYoutube from "../scrape/videosFromYoutube";
+import matchVideos from "../channel/match";
 
 // Models
 import { NebulaVideo } from "./nebulaVideo";

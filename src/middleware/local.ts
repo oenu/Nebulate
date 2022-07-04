@@ -1,14 +1,14 @@
 import type { Request, Response, NextFunction } from "express";
 
 /**
- * @function onlyLocal
+ * @function local
  * @description Middleware to check if the request is from localhost, used for database operations
  * @throws {Error} If the request is not from localhost
  * @async
  * @todo add authentication to replace this middleware
  */
 
-export const onlyLocal = async (
+export const local = async (
   req: Request,
   res: Response,
   next: NextFunction

@@ -3,7 +3,7 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import matchVideos from "../server_functions/matchVideos";
+import match from "../channel/match";
 
 app.put(
   "/:channel_slug/:rematch_nebula_slug?/:rematch_yt_id?",
@@ -23,7 +23,7 @@ app.put(
       return;
     }
     try {
-      await matchVideos(channel_slug, rematch_nebula_slug, rematch_yt_id);
+      await match(channel_slug, rematch_nebula_slug, rematch_yt_id);
 
       res.send(`Matched ${channel_slug}`);
     } catch (error: any) {

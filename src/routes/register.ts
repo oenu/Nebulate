@@ -3,8 +3,8 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import registerCreatorInDB from "../server_functions/registerCreatorInDB";
-import matchVideos from "../server_functions/matchVideos";
+import register from "../channel/register";
+import matchVideos from "../channel/match";
 
 app.put("/:channel_slug", async (req: Request, res: Response) => {
   const { channel_slug } = req.params;
@@ -16,7 +16,7 @@ app.put("/:channel_slug", async (req: Request, res: Response) => {
   }
 
   try {
-    await registerCreatorInDB(channel_slug);
+    await register(channel_slug);
     res.status(201).send(`Registered ${channel_slug}`);
 
     await matchVideos(channel_slug);

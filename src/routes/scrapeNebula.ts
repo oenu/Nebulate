@@ -3,7 +3,7 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import videosFromNebula from "../scrapers/videosFromNebula";
+import videosFromNebula from "../scrape/videosFromNebula";
 
 app.put(
   "/:channel_slug/:onlySearchNew?/:searchLimit?",

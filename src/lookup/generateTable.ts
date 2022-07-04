@@ -32,72 +32,72 @@ interface LookupTable {
   id: string;
 }
 
+// /**
+//  * @function serveLookupTable
+//  * @description Serves a lookup table based on age of the lookup table and the version of the lookup table, will regenerate the lookup table if the lookup table is too old
+//  * @param {number} maximum_table_age - The maximum age of the lookup table in minutes
+//  * @param {string} version - The version of the lookup table to check against, provided by the client on request
+//  * @param {number} maximumMatchDistance - The maximum distance between a youtube video and a nebula video to be considered a match. Lower is more strict.
+//  * @returns {Promise<LookupTable | true>} A lookup table or true if the lookup table is up to date
+//  * @throws {Error} If the lookup table cannot be served
+//  * @see {@link generateTable}
+//  * @async
+//  */
+
+// const serveLookupTable = async (
+//   maximum_table_age?: number,
+//   version?: string,
+//   maximumMatchDistance?: number
+// ): Promise<LookupTable | true> => {
+//   logger.debug("serveLookupTable: serving lookup table");
+//   if (maximum_table_age === undefined) maximum_table_age = 10;
+
+//   // Check how old the lookup table is
+//   const lookupTablePath = path.join(__dirname, "/lookup_table.json");
+//   const lookupTableExists = await fs.existsSync(lookupTablePath);
+
+//   // If the lookup table doesn't exist, create it
+//   if (!lookupTableExists) {
+//     logger.warn("serveLookupTable: lookup table does not exist");
+
+//     return await generateTable(maximumMatchDistance);
+//   }
+
+//   // Get the age of the lookup table
+//   const lookupTable = JSON.parse(fs.readFileSync(lookupTablePath, "utf8"));
+//   const lookupTableAge =
+//     new Date().getTime() - Date.parse(lookupTable.generatedAt);
+
+//   // If the lookup table is too old, regenerate it and return it
+//   if (lookupTableAge > maximum_table_age * 60 * 1000) {
+//     logger.warn(
+//       `serveLookupTable: Table age: ${Math.round(
+//         lookupTableAge / 60 / 1000
+//       )} | Max ${maximum_table_age} | regenerate`
+//     );
+//     return await generateTable(maximumMatchDistance);
+//   } else {
+//     // If the lookup table is up to date, return it
+//     logger.debug(
+//       `serveLookupTable: Table age: ${Math.round(
+//         lookupTableAge / 60 / 1000
+//       )} | Max ${maximum_table_age} | use existing`
+//     );
+
+//     // If an id is provided, check if it is different from the current one. This is to reduce the impact on the server.
+//     if (version && version == lookupTable.id) {
+//       logger.debug(
+//         `serveLookupTable: Table version: ${version} | ${lookupTable.id} | table is up to date`
+//       );
+//       return true;
+//     }
+//     return lookupTable;
+//   }
+// };
+// export default serveLookupTable;
+
 /**
- * @function serveLookupTable
- * @description Serves a lookup table based on age of the lookup table and the version of the lookup table, will regenerate the lookup table if the lookup table is too old
- * @param {number} maximum_table_age - The maximum age of the lookup table in minutes
- * @param {string} version - The version of the lookup table to check against, provided by the client on request
- * @param {number} maximumMatchDistance - The maximum distance between a youtube video and a nebula video to be considered a match. Lower is more strict.
- * @returns {Promise<LookupTable | true>} A lookup table or true if the lookup table is up to date
- * @throws {Error} If the lookup table cannot be served
- * @see {@link generateLookupTable}
- * @async
- */
-
-const serveLookupTable = async (
-  maximum_table_age?: number,
-  version?: string,
-  maximumMatchDistance?: number
-): Promise<LookupTable | true> => {
-  logger.debug("serveLookupTable: serving lookup table");
-  if (maximum_table_age === undefined) maximum_table_age = 10;
-
-  // Check how old the lookup table is
-  const lookupTablePath = path.join(__dirname, "/lookup_table.json");
-  const lookupTableExists = await fs.existsSync(lookupTablePath);
-
-  // If the lookup table doesn't exist, create it
-  if (!lookupTableExists) {
-    logger.warn("serveLookupTable: lookup table does not exist");
-
-    return await generateLookupTable(maximumMatchDistance);
-  }
-
-  // Get the age of the lookup table
-  const lookupTable = JSON.parse(fs.readFileSync(lookupTablePath, "utf8"));
-  const lookupTableAge =
-    new Date().getTime() - Date.parse(lookupTable.generatedAt);
-
-  // If the lookup table is too old, regenerate it and return it
-  if (lookupTableAge > maximum_table_age * 60 * 1000) {
-    logger.warn(
-      `serveLookupTable: Table age: ${Math.round(
-        lookupTableAge / 60 / 1000
-      )} | Max ${maximum_table_age} | regenerate`
-    );
-    return await generateLookupTable(maximumMatchDistance);
-  } else {
-    // If the lookup table is up to date, return it
-    logger.debug(
-      `serveLookupTable: Table age: ${Math.round(
-        lookupTableAge / 60 / 1000
-      )} | Max ${maximum_table_age} | use existing`
-    );
-
-    // If an id is provided, check if it is different from the current one. This is to reduce the impact on the server.
-    if (version && version == lookupTable.id) {
-      logger.debug(
-        `serveLookupTable: Table version: ${version} | ${lookupTable.id} | table is up to date`
-      );
-      return true;
-    }
-    return lookupTable;
-  }
-};
-export default serveLookupTable;
-
-/**
- * @function generateLookupTable
+ * @function generateTable
  * @description Generates a lookup table that maps youtube video ids to nebula video ids for each known creator. This table is generated by the server and is sent to the client to lookup videos before requesting a redirect from the server.
  * @param {number} maximumMatchDistance - The maximum distance between a youtube video and a nebula video to be considered a match. Lower is more strict.
  * @returns {Promise<LookupTable>} A lookup table
@@ -106,7 +106,7 @@ export default serveLookupTable;
  * @async
  */
 
-const generateLookupTable = async (maximumMatchDistance?: number) => {
+export const generateTable = async (maximumMatchDistance?: number) => {
   const matchLimit = maximumMatchDistance || 2;
 
   // Find all the nebula videos in the database

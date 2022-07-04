@@ -3,10 +3,10 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import logger from "../utils/logger";
-import keyFromNebula from "./keyFromNebula";
+import keyFromNebula from "./key";
 
 /**
- * @function jwtFromNebula
+ * @function getJWT
  * @description This function fetches a JWT from Nebula using a secret provided by {@link keyFromNebula}, stores it in /store and sets global.token to it.
  * @description This function reads the secret from a file in the /store directory and will call {@link keyFromNebula} to get the secret if it does not exist.
  * @returns {Promise<string>} A promise that resolves to a JWT string.
@@ -14,25 +14,23 @@ import keyFromNebula from "./keyFromNebula";
  * @async
  */
 
-export const jwtFromNebula = async (): Promise<string> => {
+export const getJWT = async (): Promise<string> => {
   try {
     if (global.key === undefined) {
       // Fetch key from File
       try {
-        logger.debug("jwtFromNebula: Global key undefined, fetching from file");
+        logger.debug("getJWT: Global key undefined, fetching from file");
         const simple_key = await fs.promises.readFile(
-          path.join(__dirname, "..", "/store", "simple_key.txt"),
+          path.join(__dirname, "/store", "simple_key.txt"),
           "utf-8"
         );
         global.key = simple_key;
       } catch {
-        logger.error(
-          "jwtFromNebula: No key found in store, fetching from Nebula"
-        );
+        logger.error("getJWT: No key found in store, fetching from Nebula");
         await keyFromNebula();
         if (global.key === undefined) {
           throw new Error(
-            "jwtFromNebula: Fallback method: keyFromNebula failed to set key"
+            "getJWT: Fallback method: keyFromNebula failed to set key"
           );
         }
       }
@@ -46,7 +44,7 @@ export const jwtFromNebula = async (): Promise<string> => {
 
     // Write JWT to file
     await fs.promises.writeFile(
-      path.join(__dirname, "..", "/store", "json_token.txt"),
+      path.join(__dirname, "/store", "json_token.txt"),
       response.data.token
     );
 
@@ -59,4 +57,4 @@ export const jwtFromNebula = async (): Promise<string> => {
   }
 };
 
-export default jwtFromNebula;
+export default getJWT;

@@ -3,7 +3,7 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import videosFromYoutube from "../scrapers/videosFromYoutube";
+import videosFromYoutube from "../scrape/videosFromYoutube";
 
 app.put(
   "/:channel_slug/:onlySearchNew?/:videoScrapeLimit?",

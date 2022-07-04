@@ -3,11 +3,11 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import matchAllCreators from "../bulk_methods/matchAllCreators";
+import matchAll from "../batch/matchAll";
 
 app.post("/", async (_req: Request, res: Response) => {
-  logger.warn("matchAllCreators: Matching all creators");
-  matchAllCreators();
+  logger.warn("matchAll: Matching all creators");
+  matchAll();
   res.send("Matching all creators");
 });
 

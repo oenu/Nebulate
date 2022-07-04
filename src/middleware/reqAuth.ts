@@ -1,13 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 
 /**
- * @function checkAuth
+ * @function reqAuth
  * @description Middleware to check headers for authentication
  * @throws {Error} If the request is not authenticated
  * @async
  */
 
-export const checkAuth = async (
+export const reqAuth = async (
   req: Request,
   res: Response,
   next: NextFunction

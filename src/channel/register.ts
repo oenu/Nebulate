@@ -5,24 +5,24 @@ import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
 
 // Files
-import { youtubeIds } from "../store/youtubeIds";
+import { youtubeIds } from "../utils/youtubeIds";
 
 // Functions
-import videosFromNebula from "../scrapers/videosFromNebula";
-import videosFromYoutube from "../scrapers/videosFromYoutube";
+import videosFromNebula from "../scrape/videosFromNebula";
+import videosFromYoutube from "../scrape/videosFromYoutube";
 
 // Mongo Models
 import { Creator } from "../models/creator";
 
 /**
- * @function registerCreatorInDB
+ * @function register
  * @description Register a creator in the DB
  * @param {string} channel_slug - The creator's channel slug
  * @returns {Promise<void>} - Resolves when creator is registered in DB
  * @throws {Error} - If the creator already exists in the DB or if the creator does not have a youtube upload id
  * @async
  */
-const registerCreatorInDB = async (channel_slug: string) => {
+const register = async (channel_slug: string) => {
   // Check if creator exists in DB
   try {
     if (await Creator.exists({ slug: channel_slug })) {
@@ -152,4 +152,4 @@ export const creatorFromYoutube = async (creatorYtId: string) => {
   return { upload_playlist_id, channel_title, custom_url };
 };
 
-export default registerCreatorInDB;
+export default register;

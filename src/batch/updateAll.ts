@@ -3,7 +3,7 @@ import logger from "../utils/logger";
 const hourScrapeInterval = 6;
 
 /**
- * @function updateAllCreators
+ * @function updateAll
  * @description This function updates all creators in the database.
  * @returns {Promise<void>} A promise that resolves if the creators are updated.
  * @throws {Error} If the creators cannot be updated.
@@ -11,7 +11,7 @@ const hourScrapeInterval = 6;
  * @see {@link scrapeNebula} {@link scrapeYoutube} {@link matchVideos}
  */
 
-const updateAllCreators = async () => {
+const updateAll = async () => {
   // Get all creators
   const creators = await Creator.find({}).select(
     "last_scraped_nebula last_scraped_youtube last_matched slug"
@@ -45,8 +45,8 @@ const updateAllCreators = async () => {
     // Wait for 1 minute before checking the next creator
     await new Promise((resolve) => setTimeout(resolve, 60000));
   }
-  logger.info("updateAllCreators: Done updating creators");
+  logger.info("updateAll: Done updating creators");
   return;
 };
 
-export default updateAllCreators;
+export default updateAll;

@@ -21,7 +21,7 @@ interface MatchResult {
 import { Creator } from "../models/creator";
 
 /**
- * @function matchVideos
+ * @function match
  * @description Match videos from Nebula to Youtube for given creator
  * @param {string} [channel_slug] - The slug of the creator to match videos for
  * @param {string[]} [rematch_yt_ids] - The youtube_ids to rematch
@@ -30,7 +30,7 @@ import { Creator } from "../models/creator";
  * @async
  *
  */
-const matchVideos = async (
+const match = async (
   channel_slug: string,
   rematch_nebula_slug?: Array<string>,
   rematch_yt_id?: Array<string>
@@ -93,7 +93,7 @@ const matchVideos = async (
 
   return;
 };
-export default matchVideos;
+export default match;
 
 /**
  * @function matcher

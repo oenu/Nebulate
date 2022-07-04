@@ -38,6 +38,10 @@ import { reqAuth } from "./middleware/reqAuth";
 app.use(auth);
 
 // Routes
+// Default route
+app.get("/", (_req, res) => {
+  res.send("Nothing to see here...");
+});
 
 // Search internal mappings for a specific nebula video based on a provided youtube video id
 const lookup = require("./routes/lookup");

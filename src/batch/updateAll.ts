@@ -71,11 +71,15 @@ const updateAll = async () => {
 
   // Generate a new lookup table
   logger.info("updateAll: Generating new lookup table");
+  console.time("generateTable");
   await generateTable();
+  console.timeEnd("generateTable");
 
   // Upload the lookup table to storage
   logger.info("updateAll: Uploading lookup table to storage");
+  console.time("uploadTable");
   await uploadTable();
+  console.timeEnd("uploadTable");
 
   return;
 };

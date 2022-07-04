@@ -38,6 +38,7 @@ interface ChannelDocument extends ChannelInterface, mongoose.Document {
   getNebulaVideos: (nebula_slugs?: string[]) => Promise<NebulaVideoType[]>;
   getYoutubeVideos: (youtube_ids?: string[]) => Promise<YoutubeVideoType[]>;
   logScrape: (type: string, date?: Date) => Promise<void>;
+  logMatch: (date?: Date) => Promise<void>;
   scrapeNebula: (onlyScrapeNew?: boolean) => Promise<NebulaVideoType[]>;
   scrapeYoutube: (onlyScrapeNew?: boolean) => Promise<YoutubeVideoType[]>;
   matchVideos: () => Promise<void>;
@@ -202,6 +203,21 @@ channelSchema.methods.logScrape = async function (
   } else if (type === "youtube") {
     this.lastScrapedYoutube = date;
   }
+  await this.save();
+};
+
+/**
+ * @function logMatch
+ * @description Log the match of this channel
+ * @param {Date} [date] - The date of the scrape
+ * @returns {void}
+ * @memberof Channel
+ * @throws {Error} - If the channel cannot be matched
+ * @async
+ */
+channelSchema.methods.logMatch = async function (date?: Date): Promise<void> {
+  if (!date) date = new Date();
+  this.lastMatched = date;
   await this.save();
 };
 

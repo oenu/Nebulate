@@ -72,37 +72,24 @@ const matchVideos = async (
     );
   }
 
-  const modified_videos: {
-    nebula_title: string;
-    youtube_title: string;
-    score: number;
-  }[] = [];
-
-  await matched_videos.forEach(async (match_set: MatchResult) => {
+  let matchCount = 0;
+  for await (const match_set of matched_videos) {
     const { nebula_video, youtube_matches } = match_set;
-    // Try to prevent matching one youtube video to multiple nebula videos
-    for (let index = 0; index < youtube_matches.length; index++) {
-      const match = youtube_matches[index];
-      if (match === undefined) return;
-
-      const { youtube_video, score } = match;
-      await nebula_video
-        .updateMatch(youtube_video, score)
-        .then(() => {
-          modified_videos.push({
-            nebula_title: nebula_video.title,
-            youtube_title: youtube_video.title,
-            score,
-          });
-          index = youtube_matches.length * 2;
-        })
-        .catch((error) => {
-          if (error !== false) throw error;
-        });
+    for (const youtube_match of youtube_matches) {
+      if (youtube_match === undefined) return;
+      const { youtube_video, score } = youtube_match;
+      try {
+        await nebula_video.updateMatch(youtube_video, score);
+        matchCount++;
+      } catch (error) {
+        logger.error(error);
+      }
     }
-  });
+  }
 
-  logger.info(`Match: Matched ${modified_videos.length} videos`);
+  logger.info(
+    `Match: Match complete for ${channel_slug}, ${matchCount} matches`
+  );
 
   return;
 };

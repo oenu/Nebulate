@@ -46,7 +46,7 @@
   "scripts": {
     "start": "set NODE_ENV=production && node ./dist/index.js",
     "build": "tsc -p .",
-    "dev": "nodemon ./src/index.ts",
+    "dev": "set NODE_ENV=dev && nodemon ./src/index.ts",
     "lint": "eslint .",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "test": "jest --watch --detectOpenHandles --runInBand",

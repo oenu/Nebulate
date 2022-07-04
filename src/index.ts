@@ -64,15 +64,19 @@ app.use("/api/lookup", lookup);
 
 // Trigger the registration of all channels that have manual youtube id mappings
 const registerAll = require("./routes/registerAll");
-app.use("/register_all", reqAuth, registerAll);
+app.use("/registerAll", reqAuth, registerAll);
 
 // Match all videos from Nebula and Youtube for all channels without scraping new videos
 const matchAll = require("./routes/matchAll");
-app.use("/match_all", reqAuth, matchAll);
+app.use("/matchAll", reqAuth, matchAll);
 
 // Trigger a scrape of all channels and rematching of all videos
 const updateAll = require("./routes/updateAll");
-app.use("/update_all_channels", reqAuth, updateAll);
+app.use("/updateAll", reqAuth, updateAll);
+
+// Upload table to storage
+const uploadTable = require("./routes/uploadTable");
+app.use("/uploadTable", reqAuth, uploadTable);
 
 // Start the server
 mongoose.connection.once("open", async () => {

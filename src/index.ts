@@ -32,7 +32,8 @@ connectDB();
 import logger from "./utils/logger";
 import auth from "./middleware/auth";
 import globalInit from "./auth/store";
-import { onlyLocal } from "./middleware/onlyLocal";
+
+import { checkAuth } from "./middleware/checkAuth";
 
 app.use(auth);
 
@@ -43,19 +44,19 @@ app.use("/api/table", serveLookupTable);
 
 // Trigger a scrape of nebula videos for specific creator
 const scrapeNebula = require("./routes/scrapeNebula");
-app.use("/scrape/nebula", onlyLocal, scrapeNebula);
+app.use("/scrape/nebula", checkAuth, scrapeNebula);
 
 // Trigger a scrape of youtube videos for specific creator
 const scrapeYoutube = require("./routes/scrapeYoutube");
-app.use("/scrape/youtube", onlyLocal, scrapeYoutube);
+app.use("/scrape/youtube", checkAuth, scrapeYoutube);
 
 // Register a new creator
 const registerChannel = require("./routes/registerChannel");
-app.use("/register", onlyLocal, registerChannel);
+app.use("/register", checkAuth, registerChannel);
 
 // Match videos from Nebula and Youtube for specific creator
 const matchVideos = require("./routes/matchVideos");
-app.use("/match", onlyLocal, matchVideos);
+app.use("/match", checkAuth, matchVideos);
 
 // Search internal mappings for a specific nebula video based on a provided youtube video id
 const lookupRequest = require("./routes/lookupRequest");
@@ -63,15 +64,15 @@ app.use("/api/lookup", lookupRequest);
 
 // Trigger the registration of all creators that have manual youtube id mappings
 const registerAllCreators = require("./routes/registerAllCreators");
-app.use("/register_all", onlyLocal, registerAllCreators);
+app.use("/register_all", checkAuth, registerAllCreators);
 
 // Match all videos from Nebula and Youtube for all creators without scraping new videos
 const matchAllCreators = require("./routes/matchAllCreators");
-app.use("/match_all", onlyLocal, matchAllCreators);
+app.use("/match_all", checkAuth, matchAllCreators);
 
 // Trigger a scrape of all creators and rematching of all videos
 const updateAllCreators = require("./routes/updateAllCreators");
-app.use("/update_all_creators", onlyLocal, updateAllCreators);
+app.use("/update_all_creators", checkAuth, updateAllCreators);
 
 // Start the server
 mongoose.connection.once("open", async () => {

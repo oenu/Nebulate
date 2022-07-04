@@ -38,9 +38,6 @@ import { reqAuth } from "./middleware/reqAuth";
 app.use(auth);
 
 // Routes
-// Respond to request for latest version of the lookup table
-// const serveLookupTable = require("./routes/serveTable");
-// app.use("/api/table", serveLookupTable);
 
 // Search internal mappings for a specific nebula video based on a provided youtube video id
 const lookup = require("./routes/lookup");

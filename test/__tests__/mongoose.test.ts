@@ -69,7 +69,7 @@ describe("mongoose tests", () => {
   describe("YoutubeVideo", () => {
     it("should be able to add a video to the database", async () => {
       const video = new YoutubeVideo({
-        youtube_video_id: "test_youtube_video_id",
+        youtubeVideoId: "test_youtubeVideoId",
         published_at: new Date(),
         playlist_id: "test_playlist_id",
         title: "test_youtube_video_title",
@@ -85,9 +85,9 @@ describe("mongoose tests", () => {
 
     it("should be able to find a video in the database", async () => {
       const testVideo = await YoutubeVideo.findOne({
-        youtube_video_id: "test_youtube_video_id",
+        youtubeVideoId: "test_youtubeVideoId",
       });
-      expect(testVideo?.youtube_video_id).toBe("test_youtube_video_id");
+      expect(testVideo?.youtubeVideoId).toBe("test_youtubeVideoId");
     });
   });
 });

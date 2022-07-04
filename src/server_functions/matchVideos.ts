@@ -73,26 +73,19 @@ const matchVideos = async (
   }
 
   let matchCount = 0;
-  await matched_videos.forEach(async (match_set: MatchResult) => {
+  for await (const match_set of matched_videos) {
     const { nebula_video, youtube_matches } = match_set;
-    // Try to prevent matching one youtube video to multiple nebula videos
-    for (let index = 0; index < youtube_matches.length; index++) {
-      const match = youtube_matches[index];
-      if (match === undefined) return;
-
-      const { youtube_video, score } = match;
-      await nebula_video
-        .updateMatch(youtube_video, score)
-        .then(() => {
-          matchCount++;
-          index = youtube_matches.length * 2;
-        })
-        .catch((error) => {
-          logger.info("Match: Error updating match");
-          if (error !== false) throw error;
-        });
+    for (const youtube_match of youtube_matches) {
+      if (youtube_match === undefined) return;
+      const { youtube_video, score } = youtube_match;
+      try {
+        await nebula_video.updateMatch(youtube_video, score);
+        matchCount++;
+      } catch (error) {
+        logger.error(error);
+      }
     }
-  });
+  }
 
   logger.info(
     `Match: Match complete for ${channel_slug}, ${matchCount} matches`

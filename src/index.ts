@@ -42,6 +42,10 @@ app.use(auth);
 // const serveLookupTable = require("./routes/serveTable");
 // app.use("/api/table", serveLookupTable);
 
+// Search internal mappings for a specific nebula video based on a provided youtube video id
+const lookup = require("./routes/lookup");
+app.use("/api/lookup", lookup);
+
 // Trigger a scrape of nebula videos for specific channel
 const scrapeNebula = require("./routes/scrapeNebula");
 app.use("/scrape/nebula", reqAuth, scrapeNebula);
@@ -57,10 +61,6 @@ app.use("/register", reqAuth, register);
 // Match videos from Nebula and Youtube for specific channel
 const match = require("./routes/match");
 app.use("/match", reqAuth, match);
-
-// Search internal mappings for a specific nebula video based on a provided youtube video id
-const lookup = require("./routes/lookup");
-app.use("/api/lookup", lookup);
 
 // Trigger the registration of all channels that have manual youtube id mappings
 const registerAll = require("./routes/registerAll");

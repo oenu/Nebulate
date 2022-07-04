@@ -46,7 +46,7 @@ const match = async (channelSlug: string) => {
   // Get channel's nebula videos
   const nebula_videos: NebulaVideoType[] = await channel.getNebulaVideos();
 
-  logger.info(
+  logger.debug(
     `Match: Matching ${youtube_videos.length} youtube videos against ${nebula_videos.length} nebula videos`
   );
 
@@ -57,7 +57,7 @@ const match = async (channelSlug: string) => {
     logger.error(`Match: No videos matched for ${channelSlug}`);
     return;
   } else {
-    logger.info(
+    logger.debug(
       `Match: Found ${matched_videos.length} possible matched videos for ${channelSlug}`
     );
   }

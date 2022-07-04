@@ -15,7 +15,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.youtube.com/*"],
-      "js": ["js/vendor.js", "js/content_script.js"]
+      "js": ["js/content_script.js"]
     }
   ],
 
@@ -45,5 +45,9 @@
     "alarms"
   ],
 
-  "host_permissions": ["https://*.youtube.com/*", "*localhost:*"]
+  "host_permissions": [
+    "https://*.youtube.com/*",
+    "*localhost:*",
+    "https://raw.githubusercontent.com/nebulate-worker/store/main/table.json"
+  ]
 }

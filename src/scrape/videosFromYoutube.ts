@@ -244,7 +244,7 @@ export const youtubeVideosToDb = async (
 ) => {
   // Insert the nonConflictingVideos into the database
   const mongoResponse = await VideoModel.insertMany(youtube_videos);
-  logger.info(`YtScrape: ${youtube_videos.length} videos inserted`);
+  logger.debug(`YtScrape: ${youtube_videos.length} videos inserted`);
   // Add video ids to channel
 
   if (!mongoResponse[0]?.channelSlug) throw new Error("No channel slug");
@@ -265,7 +265,7 @@ export const youtubeVideosToDb = async (
         },
       }
     );
-    logger.info(`YtScrape: Channel ${channelSlug} youtube_videos updated`);
+    logger.debug(`YtScrape: Channel ${channelSlug} youtube_videos updated`);
   } catch (error) {
     logger.error(
       `YtScrape: Error updating youtube_videos for channel ${channelSlug}`

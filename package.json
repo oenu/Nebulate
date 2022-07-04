@@ -51,15 +51,19 @@
     "typesync": "^0.9.1"
   },
   "scripts": {
-    "start": "set NODE_ENV=production && node ./dist/index.js",
+    "start": "NODE_ENV=production node ./dist/index.js",
     "build": "tsc -p .",
-    "dev": "set NODE_ENV=dev && nodemon ./src/index.ts",
-    "lint": "eslint .",
+    "dev": "NODE_ENV=dev nodemon ./src/index.ts",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
+    "docker:dev": "NODE_ENV=docker nodemon ./src/index.ts",
+    "docker:build": "docker-compose -f docker-compose.prod.yml build",
+    "docker:up": "docker-compose -f docker-compose.prod.yml up ",
+    "lint": "eslint .",
     "test": "jest --watch --detectOpenHandles --runInBand",
     "test:ci": "jest --ci",
-    "install:extension": "cd extensions && yarn install",
-    "test:extension": "cd extensions && yarn test",
-    "build:extension": "cd extensions && yarn build"
+    "install:extension": "cd extension && yarn install",
+    "test:extension": "cd extension && yarn test",
+    "build:extension": "cd extension && yarn build",
+    "dev:extension": "cd extension && yarn watch"
   }
 }

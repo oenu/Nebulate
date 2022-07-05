@@ -11,6 +11,12 @@ const uploadTable = async () => {
   if (process.env.GITHUB_TOKEN === undefined) {
     throw new Error("GITHUB_TOKEN is not defined");
   }
+  if (process.env.GITHUB_REPO === undefined) {
+    throw new Error("GITHUB_REPO is not defined");
+  }
+  if (process.env.GITHUB_USER === undefined) {
+    throw new Error("GITHUB_USER is not defined");
+  }
   const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
   });
@@ -22,8 +28,8 @@ const uploadTable = async () => {
 
   // Get the current file
   const currentTable = await octokit.rest.repos.getContent({
-    owner: "nebulate-worker",
-    repo: "store",
+    owner: process.env.GITHUB_USER,
+    repo: process.env.GITHUB_REPO,
     path: "table.json",
   });
   logger.debug("Current table fetched");
@@ -39,8 +45,8 @@ const uploadTable = async () => {
     // Update the table
     logger.debug("updating with new table");
     const newTable = await octokit.rest.repos.createOrUpdateFileContents({
-      owner: "nebulate-worker",
-      repo: "store",
+      owner: process.env.GITHUB_USER,
+      repo: process.env.GITHUB_REPO,
       path: "table.json",
       message: "Update lookup table",
       content: encoded,
@@ -57,8 +63,8 @@ const uploadTable = async () => {
     // Create the table
     logger.debug("creating new table");
     const newTable = await octokit.rest.repos.createOrUpdateFileContents({
-      owner: "nebulate-worker",
-      repo: "store",
+      owner: process.env.GITHUB_USER,
+      repo: process.env.GITHUB_REPO,
       path: "table.json",
       message: "Update lookup table",
       content: encoded,

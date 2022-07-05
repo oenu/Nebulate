@@ -51,19 +51,23 @@
     "typesync": "^0.9.1"
   },
   "scripts": {
+    "//": "These scripts can be used to control the build of the server",
     "start": "NODE_ENV=prod node ./dist/index.js",
     "build": "tsc -p . && cp .env ./dist",
     "dev": "NODE_ENV=dev nodemon ./src/index.ts",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
-    "docker:dev": "NODE_ENV=docker nodemon ./src/index.ts",
-    "docker:build": "docker-compose -f docker-compose.prod.yml build",
-    "docker:up": "docker-compose -f docker-compose.prod.yml up ",
     "lint": "eslint .",
     "test": "jest --watch --detectOpenHandles --runInBand",
-    "test:ci": "jest --ci",
+    "///": "These scripts can be used to control the deployment of docker images",
+    "docker:dev": "NODE_ENV=docker nodemon ./src/index.ts",
+    "docker:build": "docker-compose down && docker-compose rm -f && docker-compose build  --no-cache",
+    "docker:up": "docker-compose -f docker-compose.yml up --build --force-recreate",
+    "////": "These scripts can be used to control the build of the extension",
     "install:extension": "cd extension && yarn install",
     "test:extension": "cd extension && yarn test",
+    "dev:extension": "cd extension && yarn watch",
     "build:extension": "cd extension && yarn build",
-    "dev:extension": "cd extension && yarn watch"
+    "/////": "These scripts are used by other scripts and have behaviors that are not documented here",
+    "test:ci": "jest --ci"
   }
 }

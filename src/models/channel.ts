@@ -7,11 +7,11 @@ import videosFromYoutube from "../scrape/videosFromYoutube";
 import matchVideos from "../channel/match";
 
 // Models
-import { NebulaVideo } from "./nebulaVideo";
+import { NebulaVideo } from "./nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "./youtubeVideo";
 
 // Types
-import type { NebulaVideoType } from "./nebulaVideo";
+import type { NebulaVideoType } from "./nebulaVideo/nebulaVideo";
 import type { YoutubeVideoType } from "./youtubeVideo";
 
 // Fantastic Doc on mongoose schemas:

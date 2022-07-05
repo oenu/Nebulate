@@ -42,6 +42,13 @@ export const getJWT = async (): Promise<string> => {
       data: { Authorization: `Token ${global.key}` },
     });
 
+    // Check if folder exists
+    const storePath = path.join(__dirname, "/store");
+    if (!fs.existsSync(storePath)) {
+      fs.mkdirSync(storePath);
+      logger.info("getJWT: Created store folder");
+    }
+
     // Write JWT to file
     await fs.promises.writeFile(
       path.join(__dirname, "/store", "json_token.txt"),

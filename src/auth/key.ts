@@ -19,9 +19,12 @@ export const getKey = async (): Promise<string> => {
     process.env.NEBULA_PASSWORD === undefined
   ) {
     throw new Error("getKey: Environment variables not set");
+  } else {
+    logger.info("getKey: Environment variables set");
   }
   try {
     // Request secret from Nebula
+    logger.info("getKey: Requesting secret from Nebula");
     const response = await axios.post(
       "https://api.watchnebula.com/api/v1/auth/login/",
       {
@@ -29,15 +32,24 @@ export const getKey = async (): Promise<string> => {
         password: process.env.NEBULA_PASSWORD,
       }
     );
-    logger.debug("getKey: Key fetched from Nebula");
+    logger.info("getKey: Key fetched from Nebula");
+
+    // Check if folder exists
+    const storePath = path.join(__dirname, "/store");
+    if (!fs.existsSync(storePath)) {
+      fs.mkdirSync(storePath);
+      logger.info("getKey: Created store folder");
+    }
 
     // Write secret to file
+    logger.info("getKey: Writing key to file");
     await fs.promises.writeFile(
       path.join(__dirname, "/store", "simple_key.txt"),
       response.data.key,
       "utf-8"
     );
 
+    logger.info("getKey: Key written to file");
     // Set global.key to secret
     global.key = response.data.key;
     return response.data.key;

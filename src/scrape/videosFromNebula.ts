@@ -7,11 +7,11 @@ import logger from "../utils/logger";
 import type {
   NebulaVideoInterface,
   // NebulaVideoType,
-} from "../models/nebulaVideo";
+} from "../models/nebulaVideo/nebulaVideo";
 
 // Mongo Models
 import { Channel } from "../models/channel";
-import { NebulaVideo as VideoModel } from "../models/nebulaVideo";
+import { NebulaVideo as VideoModel } from "../models/nebulaVideo/nebulaVideo";
 
 /**
  * @function videosFromNebula

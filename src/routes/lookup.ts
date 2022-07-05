@@ -2,7 +2,7 @@ import express from "express";
 import type { Response, Request } from "express";
 const app = express();
 
-import { NebulaVideo } from "../models/nebulaVideo";
+import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 
 app.get("/:youtubeVideoId", async (req: Request, res: Response) => {
   console.time("lookup");

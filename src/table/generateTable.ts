@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import logger from "../utils/logger";
 
 // Mongoose Schema
-import { NebulaVideo } from "../models/nebulaVideo";
+import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo";
 
 /**

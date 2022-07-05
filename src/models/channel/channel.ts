@@ -44,7 +44,7 @@ interface ChannelDocument extends ChannelInterface, mongoose.Document {
   matchVideos: () => Promise<void>;
 }
 
-const channelSchema: Schema<ChannelDocument> = new Schema(
+export const channelSchema: Schema<ChannelDocument> = new Schema(
   {
     nebulaId: {
       type: "String",
@@ -91,135 +91,14 @@ const channelSchema: Schema<ChannelDocument> = new Schema(
   }
 );
 
-/**
- * @function getNebulaVideos
- * @description Get the videos from Nebula for this channel
- * @param {string[]} [nebula_slugs] - The slugs of the videos to get
- * @returns {NebulaVideoType[]} - Nebula videos associated with this channel
- * @memberof Channel
- */
-channelSchema.methods.getNebulaVideos = async function (
-  nebula_slugs?: string[]
-) {
-  if (!nebula_slugs) {
-    return await NebulaVideo.find({
-      _id: {
-        $in: this.nebulaVideos?.map(function (video: any) {
-          return video._id;
-        }),
-      },
-    });
-  } else {
-    return await NebulaVideo.find({
-      $and: [{ slug: { $in: nebula_slugs } }, { channelSlug: this.slug }],
-    });
-  }
-};
-
-/**
- * @function scrapeNebula
- * @description Scrape the videos from Nebula for this channel
- * @param {boolean} [onlyScrapeNew=true] - Only scrape new videos
- * @returns {NebulaVideoType[]} - Nebula videos associated with this channel
- * @memberof Channel
- * @throws {Error} - If the channel has no slug
- * @async
- */
-channelSchema.methods.scrapeNebula = async function (onlyScrapeNew?: boolean) {
-  if (onlyScrapeNew === undefined) onlyScrapeNew = true;
-  return await videosFromNebula(this.slug, onlyScrapeNew);
-};
-
-/**
- * @function scrapeYoutube
- * @description Scrape the videos from Youtube for this channel
- * @param {boolean} [onlyScrapeNew=true] - Only scrape new videos
- * @returns {YoutubeVideoType[]} - Youtube videos associated with this channel
- * @memberof Channel
- * @throws {Error} - If the channel has no slug or mapped youtubeId
- * @async
- */
-channelSchema.methods.scrapeYoutube = async function (onlyScrapeNew?: boolean) {
-  if (onlyScrapeNew === undefined) onlyScrapeNew = true;
-  return await videosFromYoutube(this.slug, onlyScrapeNew);
-};
-
-/**
- * @function matchVideos
- * @description Match videos from Nebula and Youtube for this channel
- * @returns {void}
- * @memberof Channel
- * @throws {Error} - If the channel has no slug or videos
- * @async
- */
-channelSchema.methods.matchVideos = async function () {
-  return await matchVideos(this.slug);
-};
-
-/**
- * @fumction getYoutubeVideos
- * @description Get the videos from Youtube for this channel
- * @param {string[]} [youtube_ids] - The ids of the videos to get
- * @returns {YoutubeVideoType[]} - Youtube videos associated with this channel
- * @memberof Channel
- * @throws {Error} - If the channel has no mapped youtubeId or youtubeVideo
- * @async
- */
-channelSchema.methods.getYoutubeVideos = async function (
-  youtube_ids?: string[]
-) {
-  if (!youtube_ids) {
-    return await YoutubeVideo.find({
-      _id: {
-        $in: this.youtubeVideos?.map(function (video: any) {
-          return video._id;
-        }),
-      },
-    });
-  } else {
-    return await YoutubeVideo.find({
-      $and: [{ youtubeId: { $in: youtube_ids } }, { channelSlug: this.slug }],
-    });
-  }
-};
-
-/**
- * @function logScrape
- * @description Log the scrape of this channel
- * @param {string} type - The type of scrape
- * @param {Date} [date] - The date of the scrape
- * @returns {void}
- * @memberof Channel
- * @throws {Error} - If the channel cannot be updated
- * @async
- */
-channelSchema.methods.logScrape = async function (
-  type: string,
-  date?: Date
-): Promise<void> {
-  if (!date) date = new Date();
-  if (type === "nebula") {
-    this.lastScrapedNebula = date;
-  } else if (type === "youtube") {
-    this.lastScrapedYoutube = date;
-  }
-  await this.save();
-};
-
-/**
- * @function logMatch
- * @description Log the match of this channel
- * @param {Date} [date] - The date of the scrape
- * @returns {void}
- * @memberof Channel
- * @throws {Error} - If the channel cannot be matched
- * @async
- */
-channelSchema.methods.logMatch = async function (date?: Date): Promise<void> {
-  if (!date) date = new Date();
-  this.lastMatched = date;
-  await this.save();
-};
+// Methods
+require("./methods/getNebulaVideos");
+require("./methods/getYoutubeVideos");
+require("./methods/scrapeNebula");
+require("./methods/scrapeYoutube");
+require("./methods/matchVideos");
+require("./methods/logScrape");
+require("./methods/logMatch");
 
 export type ChannelPreType = InferSchemaType<typeof channelSchema>;
 

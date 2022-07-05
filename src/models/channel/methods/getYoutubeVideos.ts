@@ -1,4 +1,4 @@
-import { YoutubeVideo } from "../../youtubeVideo";
+import { YoutubeVideo } from "../../youtubeVideo/youtubeVideo";
 import { channelSchema } from "../channel";
 
 /**

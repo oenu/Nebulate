@@ -4,7 +4,7 @@ import { Schema, InferSchemaType } from "mongoose";
 // import logger from "../config/logger";
 
 // Types
-import type { NebulaVideoType } from "./nebulaVideo/nebulaVideo";
+import type { NebulaVideoType } from "../nebulaVideo/nebulaVideo";
 
 export interface YoutubeVideoInterface {
   youtubeVideoId: string;

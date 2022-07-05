@@ -1,18 +1,9 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
-// Methods
-import videosFromNebula from "../../scrape/videosFromNebula";
-import videosFromYoutube from "../../scrape/videosFromYoutube";
-import matchVideos from "../../channel/match";
-
-// Models
-import { NebulaVideo } from "../nebulaVideo/nebulaVideo";
-import { YoutubeVideo } from "../youtubeVideo";
-
 // Types
 import type { NebulaVideoType } from "../nebulaVideo/nebulaVideo";
-import type { YoutubeVideoType } from "../youtubeVideo";
+import type { YoutubeVideoType } from "../youtubeVideo/youtubeVideo";
 
 // Fantastic Doc on mongoose schemas:
 // https://millo-l.github.io/Typescript-mongoose-methods-statics/

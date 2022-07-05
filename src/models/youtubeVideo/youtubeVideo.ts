@@ -31,7 +31,7 @@ interface YoutubeVideoDocument
   findByYoutubeVideoId: (youtubeVideoId: string) => Promise<YoutubeVideoType>;
 }
 
-const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
+export const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
   {
     // Youtube Response Fields ==================================================
     // Content Details Fields -------------------------------------------------------
@@ -90,22 +90,8 @@ const youtubeVideoSchema = new Schema<YoutubeVideoDocument>(
   }
 );
 
-/**
- * @function findByYoutubeVideoId
- * @description Finds a video by its youtubeVideoId
- * @param {string} youtubeVideoId - The youtube video id
- * @returns {Promise<YoutubeVideoType>}
- * @memberof YoutubeVideo
- * @async
- */
-youtubeVideoSchema.statics.findByYoutubeVideoId = async function (
-  youtubeVideoId: string
-): Promise<YoutubeVideoType | null> {
-  const response = await YoutubeVideo.findOne({
-    youtubeVideoId: youtubeVideoId,
-  });
-  return response || null;
-};
+// Methods
+require("./methods/findByYoutubeVideoId");
 
 export type YoutubeVideoPreType = InferSchemaType<typeof youtubeVideoSchema>;
 

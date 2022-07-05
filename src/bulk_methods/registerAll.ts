@@ -1,5 +1,5 @@
 import mappedSlugs from "../utils/youtubeIds";
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 import registerChannelInDB from "../channel/register";
 import logger from "../utils/logger";
 

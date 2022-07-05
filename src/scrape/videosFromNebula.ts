@@ -10,7 +10,7 @@ import type {
 } from "../models/nebulaVideo/nebulaVideo";
 
 // Mongo Models
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 import { NebulaVideo as VideoModel } from "../models/nebulaVideo/nebulaVideo";
 
 /**

@@ -18,7 +18,7 @@ import type { NebulaVideoType } from "../models/nebulaVideo/nebulaVideo";
 // }
 
 // Mongo Models
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 
 /**
  * @function match

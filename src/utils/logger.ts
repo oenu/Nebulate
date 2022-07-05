@@ -43,42 +43,42 @@ const logger = winston.createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.prettyPrint(),
-        winston.format.splat(),
-        winston.format.simple()
-      ),
-    })
-  );
-  logger.add(
-    new winston.transports.File({
-      format: winston.format.combine(
-        winston.format.json(),
-        winston.format((info: any) => {
-          return info.level === "verbose" ? info : false;
-        })()
-      ),
-      filename: path.join(__dirname, "..", "/logs", "verbose.log"),
-      level: "verbose",
-    })
-  );
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format((info: any) => {
-          return info.level === "verbose" ? info : false;
-        })(),
+// if (process.env.NODE_ENV !== "prod") {
+logger.add(
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.prettyPrint(),
+      winston.format.splat(),
+      winston.format.simple()
+    ),
+  })
+);
+logger.add(
+  new winston.transports.File({
+    format: winston.format.combine(
+      winston.format.json(),
+      winston.format((info: any) => {
+        return info.level === "verbose" ? info : false;
+      })()
+    ),
+    filename: path.join(__dirname, "..", "/logs", "verbose.log"),
+    level: "verbose",
+  })
+);
+logger.add(
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format((info: any) => {
+        return info.level === "verbose" ? info : false;
+      })(),
 
-        winston.format.colorize(),
-        winston.format.printf((log: any) => `${log.level}: Wrote to file`)
-      ),
+      winston.format.colorize(),
+      winston.format.printf((log: any) => `${log.level}: Wrote to file`)
+    ),
 
-      level: "verbose",
-    })
-  );
-}
+    level: "verbose",
+  })
+);
+// }
 export default logger;

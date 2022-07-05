@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 node:lts-alpine 
+FROM --platform=linux/amd64 node:lts-alpine 
 WORKDIR /app
 COPY package.json /app
 COPY yarn.lock /app

@@ -30,7 +30,7 @@ services:
       - mongo
 
   node:
-    platform: linux/arm64
+    platform: linux/amd64
 
     container_name: "Nebulate-node"
     build:

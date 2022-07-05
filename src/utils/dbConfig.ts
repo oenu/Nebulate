@@ -11,7 +11,6 @@ declare let process: { env: { [key: string]: string } };
  */
 export const connectDB = async () => {
   try {
-    console.log(process.env.NODE_ENV);
     // Connect to the database in development environment
     if (process.env.NODE_ENV === "dev") {
       logger.info("Connecting to mongoDB in dev mode");
@@ -44,6 +43,8 @@ export const connectDB = async () => {
       if (i === 10) {
         throw new Error("Couldn't connect to mongoDB after 10 attempts");
       }
+    } else {
+      throw new Error("connectDB: Environment variable NODE_ENV not set");
     }
   } catch (err) {
     console.error(err);

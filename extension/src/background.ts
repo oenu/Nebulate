@@ -184,15 +184,15 @@ const setUpdateTableAlarm = async (interval?: number) => {
 
   if ((await chrome.management.getSelf()).installType === "development") {
     console.log(
-      "background.js: Development mode: scheduling update every 1 minute"
+      "background.js: Development mode: scheduling update every 2 hours"
     );
     chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 1,
+      delayInMinutes: 2 * 60,
     });
   } else {
-    console.log("background.js: scheduling update every 2 hours");
+    console.log("background.js: scheduling update every 12 hours");
     chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 2 * 60,
+      delayInMinutes: 12 * 60,
     });
   }
 };

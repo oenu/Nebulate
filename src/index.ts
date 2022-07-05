@@ -4,6 +4,10 @@ const app = express();
 const cors = require("cors");
 app.use(cors());
 
+// Check all environment variables are set
+import checkEnv from "./utils/checkEnv";
+checkEnv();
+
 // Rate Limiting
 import rateLimit from "express-rate-limit";
 const limiter = rateLimit({
@@ -26,6 +30,7 @@ declare global {
 // Mongoose
 import mongoose from "mongoose";
 import { connectDB } from "./utils/dbConfig";
+console.log("Connecting to database...");
 connectDB();
 
 // Middleware

@@ -51,8 +51,8 @@
     "typesync": "^0.9.1"
   },
   "scripts": {
-    "start": "NODE_ENV=production node ./dist/index.js",
-    "build": "tsc -p .",
+    "start": "NODE_ENV=prod node ./dist/index.js",
+    "build": "tsc -p . && cp .env ./dist",
     "dev": "NODE_ENV=dev nodemon ./src/index.ts",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "docker:dev": "NODE_ENV=docker nodemon ./src/index.ts",

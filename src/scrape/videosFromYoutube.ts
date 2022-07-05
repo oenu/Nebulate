@@ -11,7 +11,7 @@ import type {
 } from "../models/youtubeVideo";
 
 // Models
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 import { YoutubeVideo as VideoModel } from "../models/youtubeVideo";
 
 /**

@@ -3,6 +3,7 @@ version: "3.8"
 services:
   mongo:
     image: mongo
+    container_name: mongoContainer
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
@@ -20,7 +21,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${DATABASE_USERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${DATABASE_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@mongo:27017
+      ME_CONFIG_MONGODB_URL: mongodb://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@mongoContainer:27017
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USERNAME}
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
     networks:
@@ -30,22 +31,26 @@ services:
 
   node:
     platform: linux/arm64
+
+    container_name: "Nebulate-node"
     build:
       context: .
-      dockerfile: "Dockerfile"
-    container_name: "Nebulate-node-arm64"
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     networks:
       - "stack"
     volumes:
-      - .:/app
+      - node:/app
     environment:
       PORT: 3000
-
+      NODE_ENV: prod
+    depends_on:
+      - mongo
 networks:
   stack:
     driver: bridge
 
 volumes:
   mongo:
+  node:

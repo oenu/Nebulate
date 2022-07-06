@@ -25,10 +25,6 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "assets/bookmark.png",
-        "assets/play.png",
-        "assets/delete.png",
-        "assets/save.png",
         "assets/nebula_temp_dark.png",
         "assets/nebula_temp_light.png"
       ],
@@ -47,7 +43,7 @@
 
   "host_permissions": [
     "https://*.youtube.com/*",
-    "*localhost:*",
-    "https://raw.githubusercontent.com/nebulate-worker/store/main/table.json"
+    "https://raw.githubusercontent.com/nebulate-worker/store/main/table.json",
+    "http://143.244.208.70:3000/*"
   ]
 }

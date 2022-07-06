@@ -1,4 +1,4 @@
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 import { generateTable } from "../table/generateTable";
 import uploadTable from "../table/uploadTable";
 import logger from "../utils/logger";

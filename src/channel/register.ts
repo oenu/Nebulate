@@ -12,7 +12,7 @@ import videosFromNebula from "../scrape/videosFromNebula";
 import videosFromYoutube from "../scrape/videosFromYoutube";
 
 // Mongo Models
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 
 /**
  * @function register

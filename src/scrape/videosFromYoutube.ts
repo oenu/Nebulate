@@ -8,11 +8,11 @@ const yt = youtube("v3");
 import type {
   YoutubeVideoInterface,
   // YoutubeVideoType,
-} from "../models/youtubeVideo";
+} from "../models/youtubeVideo/youtubeVideo";
 
 // Models
-import { Channel } from "../models/channel";
-import { YoutubeVideo as VideoModel } from "../models/youtubeVideo";
+import { Channel } from "../models/channel/channel";
+import { YoutubeVideo as VideoModel } from "../models/youtubeVideo/youtubeVideo";
 
 /**
  * @function videosFromYoutube

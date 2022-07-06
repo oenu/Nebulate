@@ -25,7 +25,7 @@ export const checkTable = async (url: string) => {
     }
   }
   if (video.channelSlug) {
-    console.log(
+    console.debug(
       "background.js: found youtube and nebula video in lookup table"
     );
     console.timeEnd("checkTable");
@@ -43,11 +43,11 @@ export const checkTable = async (url: string) => {
     }
   }
   if (video.channelSlug) {
-    console.log("background.js: youtube video found in lookup table");
-    console.timeEnd("checkTable");
+    console.debug("background.js: youtube video found in lookup table");
+    // console.timeEnd("checkTable");
     return video;
   }
 
-  console.log("background.js: youtube video not found in lookup table");
-  console.timeEnd("checkTable");
+  console.debug("background.js: youtube video not found in lookup table");
+  // console.timeEnd("checkTable");
 };

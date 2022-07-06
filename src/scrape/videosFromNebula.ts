@@ -63,8 +63,8 @@ export const videosFromNebula = async (
   }
 
   // Save videos to database
-  logger.debug(
-    `videosFromNebula: ${nebula_videos.length} un-scraped videos to be added`
+  logger.info(
+    `videosFromNebula: ${nebula_videos.length} new videos to be added for ${channelSlug}`
   );
   await nebulaVideosToDb(nebula_videos);
   await channel.logScrape("nebula");
@@ -97,6 +97,7 @@ export const scrapeNebula = async (
     );
   }
 
+  logger.info(`scrapeNebula: Scraping videos for ${channelSlug}`);
   // Start scrape
   for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
     const url = `https://content.watchnebula.com/video/channels/${channelSlug}/`;
@@ -263,7 +264,7 @@ export const nebulaVideosToDb = async (
 export const removeNebulaDuplicates = async (
   nebula_videos: NebulaVideoInterface[]
 ): Promise<NebulaVideoInterface[]> => {
-  console.debug("removeNebulaDuplicates: Removing duplicates");
+  logger.debug("removeNebulaDuplicates: Removing duplicates");
   // Check if videos are already in the database
   const existingVideos = await VideoModel.find({
     slug: { $in: nebula_videos.map((video: any) => video.slug) },

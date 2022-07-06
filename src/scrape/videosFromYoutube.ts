@@ -64,12 +64,13 @@ const videosFromYoutube = async (
   youtube_videos = await removeYoutubeDuplicates(youtube_videos);
 
   if (youtube_videos.length === 0) {
-    logger.debug(
-      `videosFromYoutube: No new videos found for ${channelSlug}, logging scrape and exiting`
-    );
+    logger.info(`videosFromYoutube: No new videos found for ${channelSlug}`);
     await channel.logScrape("youtube");
     return;
   }
+  logger.info(
+    `videosFromYoutube: ${youtube_videos.length} new videos to be added for ${channelSlug}`
+  );
 
   // Insert videos into DB
   await youtubeVideosToDb(youtube_videos);
@@ -106,7 +107,7 @@ export const scrapeYoutube = async (
     );
   }
 
-  logger.info(`scrapeYoutube: Getting videos from youtube`);
+  logger.info(`scrapeYoutube: Getting videos from youtube for ${channelSlug}`);
   for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
     const pageToken = pagetokenBuffer ? pagetokenBuffer : "";
 
@@ -198,9 +199,7 @@ export const scrapeYoutube = async (
       };
     }
   );
-  logger.info(
-    `scrapeYoutube: Scrape found ${convertedVideos.length} YT videos for ${channelSlug} with a limit of ${videoScrapeLimit}`
-  );
+
   return convertedVideos;
 };
 

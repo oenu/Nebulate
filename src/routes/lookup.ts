@@ -3,11 +3,11 @@ import type { Response, Request } from "express";
 const app = express();
 
 import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
+import logger from "../utils/logger";
 
 app.get("/:youtubeVideoId", async (req: Request, res: Response) => {
-  console.time("lookup");
   const youtubeVideoId = req.params.youtubeVideoId;
-  console.log("Responding to req for " + youtubeVideoId);
+  logger.debug("Responding to req for " + youtubeVideoId);
   if (!youtubeVideoId) {
     res.send("No youtubeVideoId provided");
   } else {
@@ -16,11 +16,13 @@ app.get("/:youtubeVideoId", async (req: Request, res: Response) => {
     }).lean();
     if (video) {
       res.send(video.slug);
+      logger.debug("redirect: " + youtubeVideoId + " -> " + video.channelSlug);
+      return;
     } else {
       res.status(204).send("No video found");
+      return;
     }
   }
-  console.timeEnd("lookup");
 });
 
 module.exports = app;

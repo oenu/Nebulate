@@ -1,4 +1,4 @@
-console.log("CS: init");
+console.debug("CS: init");
 // Runs in the context of the youtube tab
 
 // const videoCss = require("./css/video.css");
@@ -17,10 +17,10 @@ let channelSlug: string;
 
 chrome.runtime.onMessage.addListener((message) => {
   const { type } = message;
-  console.log(message.videoId);
+  console.debug(message.videoId);
   switch (type) {
     case Messages.NEW_VIDEO:
-      console.log(
+      console.debug(
         "CS: New video loaded, known: %s, matched: %s",
         message.known,
         message.matched
@@ -31,19 +31,19 @@ chrome.runtime.onMessage.addListener((message) => {
       break;
 
     case Messages.NO_SLUG_REDIRECT:
-      console.log("CS: No slug from redirect request");
+      console.debug("CS: No slug from redirect request");
       handleNoSlugRedirect();
       break;
 
     case Messages.CLEAR:
-      console.log("CS: Clearing all styling");
+      console.debug("CS: Clearing all styling");
       unloadCSS(CSS.NEBULA_VIDEO);
       unloadCSS(CSS.CREATOR);
       removeNebulaControls();
-      // removeChannelButton();
+
       break;
     default:
-      console.log("CS: Unknown message type");
+      console.debug("CS: Unknown message type");
       break;
   }
 });
@@ -60,12 +60,12 @@ interface Video {
 let current_video_id: string | null = null;
 
 const handleNoSlugRedirect = async () => {
-  console.log("CS: No slug redirect");
+  console.debug("CS: No slug redirect");
 };
 
 export const redirectHandler = async (message: Messages) => {
   // Request redirect address for current video
-  console.log("Requesting redirect address for current video");
+  console.debug("Requesting redirect address for current video");
 
   switch (message) {
     case Messages.NEBULA_REDIRECT:
@@ -86,7 +86,7 @@ export const redirectHandler = async (message: Messages) => {
 
 // Send message to background script to open new tab
 const nebulaRedirect = async (url: string) => {
-  console.log("CS: Requesting redirect to: " + url);
+  console.debug("CS: Requesting redirect to: " + url);
 };
 
 const newVideoLoaded = async (
@@ -105,7 +105,6 @@ const newVideoLoaded = async (
     document.getElementsByClassName("nebulate-extension")[0];
 
   if (known) {
-    // addChannelButton();
     // Highlight channel
     loadCSS(CSS.CREATOR);
     if (matched) {
@@ -118,9 +117,5 @@ const newVideoLoaded = async (
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
     removeNebulaControls();
-    // removeChannelButton();
   }
 };
-
-// IDEA: #1 Highlight the video with a blue border if it has a match
-// IDEA: #4 Whenever on a nebula channels video, highlight the channel / indicate that they are a nebula channel

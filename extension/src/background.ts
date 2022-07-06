@@ -14,7 +14,6 @@ let currentVideo_url = "";
 chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   try {
     // Filters
-    // if (currentVideo_url == tab.url) return;
     if (tab.status !== "complete") return;
     if (!tab.url || !tab.url.includes("youtube.com/watch")) {
       chrome.tabs.sendMessage(tabId, {
@@ -50,7 +49,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.debug(error);
   }
 });
 
@@ -58,14 +57,14 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
   try {
     switch (request.type) {
       case Messages.NEBULA_REDIRECT:
-        console.log(
+        console.debug(
           "background.js: received redirect request from content script: " +
             JSON.stringify(request)
         );
         // Fetch Slug from server
         const nebula_slug = await requestSlug(request.url);
         if (!nebula_slug) {
-          console.log("background.js: no slug returned");
+          console.debug("background.js: no slug returned");
           return;
         }
         console.debug("background.js: received slug: " + nebula_slug);
@@ -84,12 +83,12 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
           });
         } else {
           throw new Error("No slug returned");
-          console.log("background.js: no slug returned");
+          console.debug("background.js: no slug returned");
         }
         break;
 
       case Messages.CREATOR_REDIRECT:
-        console.log(
+        console.debug(
           "background.js: received Channel redirect request from content script: " +
             JSON.stringify(request)
         );
@@ -112,7 +111,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
         break;
     }
   } catch (error: any) {
-    console.log(error);
+    console.debug(error);
     if (error.message === "No slug returned") {
       chrome.tabs.sendMessage(request.tabId, {
         type: Messages.NO_SLUG_REDIRECT,
@@ -124,19 +123,32 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
 // Background functions ======================================================
 
 chrome.runtime.onInstalled.addListener(async function () {
+  // Check if this is a first install
+  chrome.storage.local.get("installed", (result) => {
+    if (result.installed === true) {
+      // This is not the first install
+      console.debug("background.js: not first install");
+      return;
+    } else {
+      // This is the first install
+      console.debug("background.js: first install");
+      chrome.storage.local.set({ installed: true });
+      fetch(`${server_url}/api/install`, {
+        method: "POST",
+      });
+    }
+  });
+
   chrome.storage.local.set({ preferNewTab: false });
   try {
-    console.log("set server_url to: " + server_url);
-    fetch(`${server_url}/api/install`, {
-      method: "POST",
-    });
-    console.log("background.js: installed");
+    console.debug("set server_url to: " + server_url);
+    console.debug("background.js: installed");
     await refreshTable();
 
-    console.log((await chrome.management.getSelf()).installType);
+    console.debug((await chrome.management.getSelf()).installType);
     setUpdateTableAlarm();
   } catch (error) {
-    console.log(error);
+    console.debug(error);
   }
 });
 
@@ -149,11 +161,11 @@ chrome.runtime.onStartup.addListener(async function () {
       const diff = now.getTime() - lastUpdated.getTime();
       const hours = Math.floor(diff / (1000 * 60 * 60));
       if (hours > 6) {
-        console.log("background.js: last updated more than 6 hours ago");
+        console.debug("background.js: last updated more than 6 hours ago");
         await refreshTable();
       }
     } else {
-      console.log("background.js: last updated never");
+      console.debug("background.js: last updated never");
       await refreshTable();
     }
   });
@@ -163,17 +175,17 @@ chrome.runtime.onStartup.addListener(async function () {
 // Check for alarms
 chrome.alarms.get(Alarms.UPDATE_LOOKUP_TABLE, (alarm) => {
   if (alarm) {
-    console.log("background.js: alarm exists");
+    console.debug("background.js: alarm exists");
   } else {
-    console.log("background.js: alarm does not exist");
+    console.debug("background.js: alarm does not exist");
     setUpdateTableAlarm();
   }
 });
 
 const setUpdateTableAlarm = async (interval?: number) => {
-  console.log("background.js: setting alarm");
+  console.debug("background.js: setting alarm");
   if (interval) {
-    console.log(
+    console.debug(
       "background.js: Setting table update alarm with interval: " + interval
     );
     chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
@@ -183,27 +195,27 @@ const setUpdateTableAlarm = async (interval?: number) => {
   }
 
   if ((await chrome.management.getSelf()).installType === "development") {
-    console.log(
+    console.debug(
       "background.js: Development mode: scheduling update every 2 hours"
     );
     chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
       delayInMinutes: 2 * 60,
     });
   } else {
-    console.log("background.js: scheduling update every 12 hours");
+    console.debug("background.js: scheduling update every 6 hours");
     chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 12 * 60,
+      delayInMinutes: 6 * 60,
     });
   }
 };
 
 chrome.alarms.onAlarm.addListener(async function (alarm) {
-  console.log("background.js: alarm triggered: " + alarm.name);
+  console.debug("background.js: alarm triggered: " + alarm.name);
   switch (alarm.name) {
     case Alarms.UPDATE_LOOKUP_TABLE:
       await refreshTable();
       break;
     default:
-      console.log("background.js: unknown alarm");
+      console.debug("background.js: unknown alarm");
   }
 });

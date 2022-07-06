@@ -55,7 +55,7 @@ const register = async (channelSlug: string) => {
       `Register: Channel ${channelSlug} no upload playlist id from youtube API`
     );
 
-  logger.info(`Adding ${channelSlug} to the database`);
+  logger.info(`Register: Adding ${channelSlug} to the database`);
   // Map channel data to schema
   const channel = new Channel({
     nebulaId: id,

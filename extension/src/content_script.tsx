@@ -40,7 +40,7 @@ chrome.runtime.onMessage.addListener((message) => {
       unloadCSS(CSS.NEBULA_VIDEO);
       unloadCSS(CSS.CREATOR);
       removeNebulaControls();
-      // removeChannelButton();
+
       break;
     default:
       console.debug("CS: Unknown message type");
@@ -105,7 +105,6 @@ const newVideoLoaded = async (
     document.getElementsByClassName("nebulate-extension")[0];
 
   if (known) {
-    // addChannelButton();
     // Highlight channel
     loadCSS(CSS.CREATOR);
     if (matched) {
@@ -118,9 +117,5 @@ const newVideoLoaded = async (
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
     removeNebulaControls();
-    // removeChannelButton();
   }
 };
-
-// IDEA: #1 Highlight the video with a blue border if it has a match
-// IDEA: #4 Whenever on a nebula channels video, highlight the channel / indicate that they are a nebula channel

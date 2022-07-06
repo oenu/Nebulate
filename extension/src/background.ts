@@ -14,7 +14,6 @@ let currentVideo_url = "";
 chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
   try {
     // Filters
-    // if (currentVideo_url == tab.url) return;
     if (tab.status !== "complete") return;
     if (!tab.url || !tab.url.includes("youtube.com/watch")) {
       chrome.tabs.sendMessage(tabId, {
@@ -124,12 +123,25 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
 // Background functions ======================================================
 
 chrome.runtime.onInstalled.addListener(async function () {
+  // Check if this is a first install
+  chrome.storage.local.get("installed", (result) => {
+    if (result.installed === true) {
+      // This is not the first install
+      console.debug("background.js: not first install");
+      return;
+    } else {
+      // This is the first install
+      console.debug("background.js: first install");
+      chrome.storage.local.set({ installed: true });
+      fetch(`${server_url}/api/install`, {
+        method: "POST",
+      });
+    }
+  });
+
   chrome.storage.local.set({ preferNewTab: false });
   try {
     console.debug("set server_url to: " + server_url);
-    fetch(`${server_url}/api/install`, {
-      method: "POST",
-    });
     console.debug("background.js: installed");
     await refreshTable();
 
@@ -190,9 +202,9 @@ const setUpdateTableAlarm = async (interval?: number) => {
       delayInMinutes: 2 * 60,
     });
   } else {
-    console.debug("background.js: scheduling update every 12 hours");
+    console.debug("background.js: scheduling update every 6 hours");
     chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 12 * 60,
+      delayInMinutes: 6 * 60,
     });
   }
 };

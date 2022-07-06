@@ -34,6 +34,7 @@ console.log("Connecting to database...");
 connectDB();
 
 // Middleware
+import morgan from "morgan";
 import logger from "./utils/logger";
 import auth from "./middleware/refreshAuth";
 import globalInit from "./auth/init";
@@ -41,6 +42,7 @@ import globalInit from "./auth/init";
 import { reqAuth } from "./middleware/reqAuth";
 
 app.use(auth);
+app.use(morgan("dev"));
 
 // Routes
 // Default route

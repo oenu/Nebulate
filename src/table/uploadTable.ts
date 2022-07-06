@@ -5,6 +5,7 @@ import crypto from "crypto";
 import util from "util";
 import { Octokit } from "octokit";
 import logger from "../utils/logger";
+import generateTable from "./generateTable";
 // import { gzip, ungzip } from "node-gzip";
 
 const uploadTable = async () => {
@@ -22,6 +23,15 @@ const uploadTable = async () => {
   });
 
   const lookupTablePath = path.join(__dirname, "/lookup_table.json");
+
+  if (!fs.existsSync(lookupTablePath)) {
+    logger.warn(
+      "uploadTable: lookup table does not exist, generating new table"
+    );
+
+    await generateTable();
+  }
+
   const existingTable = JSON.parse(fs.readFileSync(lookupTablePath, "utf8"));
 
   const { encoded, hash } = formatForGithub(JSON.stringify(existingTable));

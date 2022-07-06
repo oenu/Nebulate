@@ -24,10 +24,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "assets/nebula_temp_dark.png",
-        "assets/nebula_temp_light.png"
-      ],
+      "resources": ["assets/icon.png"],
       "matches": ["https://*.youtube.com/*"]
     }
   ],

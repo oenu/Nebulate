@@ -103,12 +103,12 @@ export const addNebulaControls = () => {
   );
   if (!nebulate_button_exists) {
     const nebulate_button = document.createElement("img");
-    nebulate_button.src = chrome.runtime.getURL("assets/nebula_temp_light.png");
+    nebulate_button.src = chrome.runtime.getURL("assets/icon.png");
 
     // Assign DOM element attributes
     nebulate_button.className = "ytp-button " + CSS_CLASSES.NEBULA_VIDEO_BTN;
     nebulate_button.id = CSS_CLASSES.NEBULA_VIDEO_BTN;
-    nebulate_button.title = "RIGHT View this video on Nebula";
+    nebulate_button.title = "View this video on Nebula";
 
     youtube_right_controls =
       document.getElementsByClassName("ytp-right-controls")[0];

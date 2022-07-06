@@ -8,7 +8,6 @@ export interface Match {
 
 export const checkTable = async (url: string) => {
   // Check matched videos (shorter set)
-  console.time("checkTable");
   const { lookupTable } = await chrome.storage.local.get("lookupTable");
 
   let video: Match = {};
@@ -28,7 +27,6 @@ export const checkTable = async (url: string) => {
     console.debug(
       "background.js: found youtube and nebula video in lookup table"
     );
-    console.timeEnd("checkTable");
     return video;
   }
 
@@ -44,10 +42,8 @@ export const checkTable = async (url: string) => {
   }
   if (video.channelSlug) {
     console.debug("background.js: youtube video found in lookup table");
-    // console.timeEnd("checkTable");
     return video;
   }
 
   console.debug("background.js: youtube video not found in lookup table");
-  // console.timeEnd("checkTable");
 };

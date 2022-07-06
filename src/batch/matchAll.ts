@@ -1,4 +1,4 @@
-import { Channel } from "../models/channel";
+import { Channel } from "../models/channel/channel";
 import logger from "../utils/logger";
 const hourMatchInterval = 6;
 

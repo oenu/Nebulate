@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
 // Types
-import type { YoutubeVideoType } from "../youtubeVideo";
+import type { YoutubeVideoType } from "../youtubeVideo/youtubeVideo";
 
 export interface NebulaVideoInterface {
   nebulaVideoId: string;

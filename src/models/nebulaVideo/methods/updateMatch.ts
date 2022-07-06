@@ -1,6 +1,6 @@
 import logger from "../../../utils/logger";
 import { NebulaVideo, nebulaVideoSchema } from "../nebulaVideo";
-import type { YoutubeVideoType } from "../../youtubeVideo";
+import type { YoutubeVideoType } from "../../youtubeVideo/youtubeVideo";
 /**
  * @function updateMatch
  * @description Update the match parameters for a video

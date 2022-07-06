@@ -1,5 +1,5 @@
 import { NebulaVideo, nebulaVideoSchema } from "../nebulaVideo";
-import type { YoutubeVideoType } from "../../youtubeVideo";
+import type { YoutubeVideoType } from "../../youtubeVideo/youtubeVideo";
 
 /**
  * @function setMatch

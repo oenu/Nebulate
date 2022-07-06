@@ -1,7 +1,7 @@
 import logger from "../../../utils/logger";
 import { NebulaVideo, nebulaVideoSchema } from "../nebulaVideo";
 import Fuse from "fuse.js";
-import { Channel } from "../../channel";
+import { Channel } from "../../channel/channel";
 
 // TODO: Docs
 const rematch = (nebulaVideoSchema.methods.rematch = async function (): Promise<

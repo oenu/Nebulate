@@ -117,6 +117,7 @@ The database functions are listed in the `/src/index.js` file and are:
 PUT: /register_all -- This will register all channels in the database. This is a one time function and should not be run again.
 PUT: /update_all_channels -- This will scrape all new videos from all channels, match them and update the database.
 PUT: /match_all -- This will match all videos from all channels in the database.
+PUT: /uploadTable -- This will attempt to upload the Lookup table to a directory specified in the .ENV, this allows the package to use Github as a low volume hosting provider.
 
 // Individual Functions
 PUT: /register/<channel nebula slug> -- This will register a channel in the database and trigger a scrape and match cycle.

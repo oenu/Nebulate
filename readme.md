@@ -1,6 +1,6 @@
 # Nebulate
 
-> **I am excited to announce that this extension has prompted Nebula to begin development on a Developer API to support similar projects. I will be putting extension publishing on hold until this has been released**
+> **I am excited to announce that this extension has prompted Nebula to begin development on a Developer API to support similar projects. I will be putting publishing to users on hold until this API becomes available**
 
 ## Introduction
 

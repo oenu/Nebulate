@@ -1,10 +1,10 @@
 # Nebulate
 
-> Note: This is not production ready, though id love to work on it to get it there!
+> **I am excited to announce that this extension has prompted Nebula to begin development on a Developer API to support similar projects. I will be putting extension publishing on hold until this has been released**
 
 ## Introduction
 
-Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of the [Nebulate](https://github.com/oenu/Nebulate/tree/main/extension) chrome extension included in this repo.
+Nebulate-Node is a backend web scraper and caching server designed to integrate the Nebula and YouTube video platforms, through the use of the [Nebulate](https://github.com/oenu/Nebulate/tree/main/extension) chrome extension included in this repository.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/51684443/176912666-f47000a9-439c-41cf-9ae9-fd4de93b8092.gif">
@@ -14,16 +14,17 @@ _Demonstration of the Chrome extension recognizing a Nebula video and the server
 
 ## Table of contents
 
-1. [Motivation](#motivation)
-2. [Composition](#composition)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [Screenshots](#screenshots)
-6. [Limitations](#limitations)
-7. [Contributing](#contributing)
-8. [Credits](#credits)
-9. [Support](#support)
-10. [License](#license)
+1. [Motivation](#motivation) - Why I created this project
+2. [Composition](#composition) - How this project works
+3. [Installation](#installation) - How to install this project
+4. [Usage](#usage) - How to use this project once installed
+5. [Screenshots](#screenshots) - Screenshots of this project
+6. [User Stories](#user-stories) - User stories for this project
+7. [Limitations](#limitations) - Limitations of this project
+8. [Contributing](#contributing) - How to contribute to this project
+9. [Credits](#credits) - Credits for this project
+10. [Support](#support) - How to support this project
+11. [License](#license) - The license for this project
 
 ---
 
@@ -41,9 +42,9 @@ When using YouTube I often forget to check Nebula for an enhanced version of a v
 
 ### Node Package
 
-This is a Node package that uses a Nebula account to match YouTube videos to Nebula releases. It relies on YouTubes public API to get video information and an undocumented Nebula API. Data is stored in a MongoDB database and a fast lookup table is generated and sent to clients to reduce load on the Nebula API. This table holds a list of YouTube videos that are known to be from Nebula channels and a list of the videos that are available in Nebula.
+This is a Node package that uses a Nebula account to match YouTube videos to Nebula releases. It relies on YouTubes public API to get video information and an undocumented Nebula API. Data is stored in a MongoDB database and a fast lookup table is generated and sent to a GitHub repo where it can be downloaded by clients every 6 hours. This table holds a list of YouTube videos that are known to be from Nebula channels and a list of the videos that are available in Nebula. By using this method clients are able to locally identify nebula creators without having to check in with the Nebulate server.
 
-The mongoDB database holds approximately 44,000 videos at this time and take up around 7MB with lookup tables shipped to users taking up approximately 360KB (1/4 the size of the screenshots in this file).
+The mongoDB database holds approximately 44,000 videos at this time and take up around 7MB with lookup tables downloaded by users taking up approximately 360KB (1/4 the size of the screenshots in this file).
 
 ### Chrome Extension
 
@@ -55,6 +56,10 @@ This is a Chrome extension that interfaces with the node package to offer video 
 
 > Note: This package ships with no video data for copyright reasons. Using this package requires you to use your own Nebula login and Youtube API key. If you would like to see a demo please [get in touch](https://twitter.com/_a_nb)
 
+> Note: This package is best deployed via Docker. Due to issues with Docker-Compose caching, the commands to initiate the Docker containers are not specified in this file, if you wish to use this package you will need to follow the instructions below.
+
+> **If you understand Docker and are aware of the limitations of Docker Build Caching you can use the Docker specific Yarn commands specified in the Package file.**
+
 ### Node Package
 
 To install this package, run the following command: `yarn install`
@@ -62,13 +67,28 @@ To install this package, run the following command: `yarn install`
 You must then create an .env file in the root directory of the project. This file should contain the following variables:
 
 ```
+// Scraper configs
 NEBULA_USERNAME=<username> // Your Nebula account username
 NEBULA_PASSWORD=<password> // Your Nebula account password
 YOUTUBE_API_KEY=<api key> // Your YouTube API key
-DATABASE_URI=<database uri> // mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
+
+// MongoDB connection information
+DATABASE_URI=<database uri> // mongodb+srv://<username>:<password>@<cluster>:27017/nebulate?authSource=admin
+DATABASE_USERNAME=<username> // Your mongoDB username
+DATABASE_PASSWORD=<password> // Your mongoDB password
+
+// Github repository information
+GITHUB_TOKEN=<Personal access Token> // Personal github access token for storing the lookup table
+GITHUB_USER=<Your github username> // Your github username
+GITHUB_REPO=<Github Repo Name> // The repo name for the lookup table
+
+// Auth Configs
+AUTH_SECRET=<password> // A password used to authenticate database management functions
 ```
 
-Once you have created the .env file, you can run the following command to start the server: `yarn build && yarn start`
+Once you have created the .env file, you can run the following command to start the server: `yarn build && yarn start` This will attempt to connect to the production database specified in the env file.
+
+If you are not using the dockerfile then you should run the server in development mode by running the following command: `yarn dev`, this will attempt to connect to a local mongoDB instance.
 
 This will start the server and will automatically connect to the database, it will also create the models in the database from the Mongoose schema included in the package.
 
@@ -88,7 +108,7 @@ This will install the extension with the assumption that you are running the ser
 
 To run this package run `yarn build && yarn start` this will build the package and start the server on port 3000.
 
-This package has a number of methods that can be called to interact with the database. As a proof of concept project I have not implemented authentication beyond restricting access to database functions to requests coming from localhost. Requests from Extension users will be accepted and may trigger database functions, but will not be able to trigger database functions directly.
+This package has a number of methods that can be called to interact with the database. Requests from Extension users will be accepted and may trigger database functions, but will not be able to trigger database functions directly. Any request that interacts with the database requires a Bearer token, this is specified in .env file.
 
 The database functions are listed in the `/src/index.js` file and are:
 
@@ -121,6 +141,78 @@ _Highlighted video and channel have been found on Nebula, a button has been pres
 ![](screenshots/matched_nebula_video_cinema.png)
 _Video also highlighted in cinema mode_
 
+---
+
+# User-Stories
+
+ <!-- Describe how a user will use this tool, in sentence structure -->
+
+### User 1 - Extension User
+
+#### Who Am I?
+
+I am a user who has installed the extension and is using it while watching videos on YouTube.
+
+#### What do I want?
+
+I want to be shown when a Nebula version of a video is available and I want to be able to be redirected to the Nebula version.
+
+#### Why does this benefit me?
+
+I benefit because I can watch the enhanced version of the video without having to remember each creator individually.
+
+#### Acceptance Criteria
+
+I should be notified of a matching video and have a button to redirect to the Nebula version.
+
+---
+
+### User 2 - System Administrator
+
+#### Who Am I?
+
+I am a system administrator who is using the server to maintain a database of videos.
+
+#### What do I want?
+
+I want the database to automatically be up to date with the latest videos on YouTube and Nebula, and I want to be able to match videos to their releases.
+
+I want to respect API limits while maintaining an accurate database of videos.
+
+#### Why does this benefit me?
+
+I benefit because I can serve user requests and update the database without having to manage each video individually.
+
+I benefit because I will not be rate limited by API's.
+
+#### Acceptance Criteria
+
+I should be able to update the database with new videos and match them to their releases without excessive manual intervention.
+
+My database should only request deep scrapes from API's when absolutely necessary and use cached data when possible.
+
+---
+
+### User 3 - Nebula Creator
+
+#### Who Am I?
+
+I am a Video Creator who is creating videos for Nebula and Youtube
+
+#### What do I want?
+
+I want viewers to have access to the best version of my video regardless of platform.
+
+#### Why does this benefit me?
+
+I benefit because viewers will enjoy my content more, and will continue to support my work through the Nebula platform.
+
+#### Acceptance Criteria
+
+My viewers should be prompted to view Nebula versions of my videos.
+
+---
+
 # Limitations
 
  <!-- How this package is limited -->
@@ -135,19 +227,27 @@ This package does not support the use of a database other than MongoDB, but may 
 
 This package includes basic unit tests but does not include mock api responses due to possible rights implications.
 
+---
+
 # Contributing
 
 <!-- How to contribute to this project -->
 
 If you would like to contribute to this project, please open an issue or pull request on [GitHub](https://github.com/oenu/Nebulate). You can also contact me by creating an issue or pull request and I will reach out to you.
 
+---
+
 # Credits
 
 This project was built by [@oenu](https://github.com/oenu) and utilizes data from the fantastic [Nebula](https://nebula.app/) platform along with data from the [YouTube API](https://developers.google.com/youtube/v3/).
 
+---
+
 # Support
 
 Though I am happy to help if you have any questions or issues, I do not provide any support for this project.
+
+---
 
 # License
 

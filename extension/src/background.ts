@@ -3,7 +3,8 @@ import { refreshTable } from "./functions/refreshTable";
 import requestSlug from "./functions/requestSlug";
 import { Alarms, Messages } from "./enums";
 
-export const server_url = "http://143.244.208.70:3000";
+// export const server_url = "http://143.244.213.109:3000";
+export const server_url = "http://localhost:3000";
 
 const redirect_preference = false;
 

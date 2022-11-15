@@ -53,18 +53,12 @@
     "typesync": "^0.9.1"
   },
   "scripts": {
-    "docker:reset": "docker system prune --all --force",
     "start": "NODE_ENV=prod node ./dist/index.js",
     "build": "tsc -p . && cp .env ./dist",
     "dev": "NODE_ENV=dev nodemon ./src/index.ts",
     "inspect": "node --inspect -r ts-node/register ./src/index.ts",
     "lint": "eslint .",
     "test": "jest --watch --detectOpenHandles --runInBand",
-    "docker:dev": "NODE_ENV=docker nodemon ./src/index.ts",
-    "docker:build": "docker-compose down && docker-compose rm -f && docker-compose build  --no-cache",
-    "docker:up:clean": "docker-compose down && docker-compose rm -f && docker system prune --all --force && docker builder build --no-cache . && docker-compose up -d",
-    "docker:up": "docker-compose down && docker-compose rm -f && docker-compose up ",
-    "dockerpm2": "NODE_ENV=prod pm2-runtime ./dist/index.js",
     "install:extension": "cd extension && yarn install",
     "test:extension": "cd extension && yarn test",
     "dev:extension": "cd extension && yarn watch",

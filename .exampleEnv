@@ -22,11 +22,10 @@ MONGO_EXPRESS_PASSWORD= <Used for MongoExpress monitoring>
 
 YOUTUBE_API_KEY= <From the Google Developers Console>
 
-# For Github Uploads
+# For R2 Uploads
 
-GITHUB_TOKEN= <Personal access token>
-GITHUB_USER= <Your github username>
-GITHUB_REPO= <Your upload repo name>
+ACCESS_KEY_ID= <Used for AWS or Cloudflare upload>
+SECRET_ACCESS_KEY= <Used for AWS or Cloudflare upload>
 
 # For Authenticating Server Functions
 

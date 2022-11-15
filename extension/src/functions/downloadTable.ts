@@ -9,7 +9,7 @@ const downloadTable = async (): Promise<any> => {
     const table = await chrome.storage.local.get("lookupTable");
 
     response = await fetch(
-      `https://raw.githubusercontent.com/nebulate-worker/store/main/table.json`
+      `https://table.oenu.org/neb-table/lookup_table.json`
     );
     // Check response
     if (response.status === 204) {

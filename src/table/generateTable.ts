@@ -66,7 +66,6 @@ export const generateTable = async (maximumMatchDistance?: number) => {
     .select("youtubeVideoObjectId channelSlug slug")
     .lean();
 
-  console.log(nebulaVideos);
   logger.debug(
     `generateTable: Found ${nebulaVideos.length} matched nebula videos`
   );

@@ -115,7 +115,7 @@ export const addNebulaControls = () => {
 
     youtube_right_controls.prepend(nebulate_button);
     nebulate_button.addEventListener("click", () => {
-      redirectHandler(Messages.NEBULA_REDIRECT);
+      redirectHandler(Messages.VIDEO_REDIRECT);
     });
     return;
   } else {

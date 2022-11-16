@@ -13,7 +13,7 @@ import { YoutubeVideo } from "../models/youtubeVideo/youtubeVideo";
  * @property {string[]} not_matched - A list of youtube video ids that have not been matched to a nebula video
  * @property {string} slug - The channel slug of the channel that the videos belong to
  */
-interface ChannelEntry {
+export interface ChannelEntry {
   matched: string[];
   not_matched: string[];
   slug: string;
@@ -26,7 +26,7 @@ interface ChannelEntry {
  * @property {ChannelEntry[]} channels - A list of channel entries {@link ChannelEntry}
  * @property {string} id - The id of the lookup table
  */
-interface LookupTable {
+export interface LookupTable {
   channels: ChannelEntry[];
   generatedAt: Date;
   id: string;

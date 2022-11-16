@@ -1,49 +1,54 @@
-// Check the local table for the given url
+// Check the local table for the given videoId
+import { Video } from "../enums";
+import { LookupTable } from "../types";
 
-export interface Match {
-  known?: boolean;
-  matched?: boolean;
-  channelSlug?: string;
-}
+export const checkTable = async (videoId: string) => {
+  console.log("background.js: checking lookup table for video");
 
-export const checkTable = async (url: string) => {
   // Check matched videos (shorter set)
-  const { lookupTable } = await chrome.storage.local.get("lookupTable");
+  const { lookupTable } = (await chrome.storage.local.get("lookupTable")) as {
+    lookupTable: LookupTable;
+  };
 
-  let video: Match = {};
+  let video: Video = {
+    // Default to not known
+    videoId,
+    known: false,
+    matched: false,
+  };
 
-  // Check each channels matched videos
-
-  for (let index = 0; index < lookupTable.channels.length; index++) {
-    const channel = lookupTable.channels[index];
-    if (channel.matched.includes(url)) {
-      video.known = true;
-      video.channelSlug = channel.slug;
-      video.matched = true;
-      break;
+  // Check each channels matched videos (shorter set)
+  for (const channel of lookupTable.channels) {
+    for (const matchedVideo of channel.matched) {
+      if (videoId.includes(matchedVideo.id)) {
+        video.known = true;
+        video.matched = true;
+        video.videoSlug = matchedVideo.slug;
+        video.channelSlug = channel.slug;
+        console.debug("background.js: video is known and matched");
+        return video;
+      } else {
+        video.matched = false;
+      }
     }
   }
-  if (video.channelSlug) {
-    console.debug(
-      "background.js: found youtube and nebula video in lookup table"
-    );
-    return video;
-  }
 
-  // Check each channels not matched videos
-  for (let index = 0; index < lookupTable.channels.length; index++) {
-    const channel = lookupTable.channels[index];
-    if (channel.not_matched.includes(url)) {
-      video.known = true;
-      video.channelSlug = channel.slug;
-      video.matched = false;
-      break;
+  console.debug("background.js: video is not matched");
+
+  // Check unmatched videos (longer set)
+  for (const channel of lookupTable.channels) {
+    for (const unmatchedVideo of channel.not_matched) {
+      if (videoId.includes(unmatchedVideo)) {
+        video.known = true;
+        video.matched = false;
+        video.channelSlug = channel.slug;
+        console.debug("background.js: video is known but not matched");
+        return video;
+      } else {
+        video.known = false;
+      }
     }
   }
-  if (video.channelSlug) {
-    console.debug("background.js: youtube video found in lookup table");
-    return video;
-  }
 
-  console.debug("background.js: youtube video not found in lookup table");
+  return video;
 };

@@ -40,7 +40,7 @@
 
   "host_permissions": [
     "https://*.youtube.com/*",
-    "https://raw.githubusercontent.com/nebulate-worker/store/main/table.json",
+    "https://table.oenu.org/neb-table/lookup_table.json",
     "http://143.244.208.70:3000/*"
   ]
 }

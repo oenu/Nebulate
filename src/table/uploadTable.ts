@@ -1,102 +1,117 @@
+import generateTable from "./generateTable";
+import type { LookupTable } from "./generateTable";
+import logger from "../utils/logger";
+import AWS from "aws-sdk";
 import fs = require("fs");
 import path = require("path");
-import Base64 from "js-base64";
-import crypto from "crypto";
-import util from "util";
-import { Octokit } from "octokit";
-import logger from "../utils/logger";
-import generateTable from "./generateTable";
-// import { gzip, ungzip } from "node-gzip";
-
+import hash from "object-hash";
+// Use AWS S3 to upload the table to cloudflare R2 CDN
 const uploadTable = async () => {
-  if (process.env.GITHUB_TOKEN === undefined) {
-    throw new Error("GITHUB_TOKEN is not defined");
+  // Check that env variables are set
+  if (!process.env.ACCESS_KEY_ID) {
+    throw new Error("ACCESS_KEY_ID not set");
   }
-  if (process.env.GITHUB_REPO === undefined) {
-    throw new Error("GITHUB_REPO is not defined");
+  if (!process.env.SECRET_ACCESS_KEY) {
+    throw new Error("SECRET_ACCESS_KEY not set");
   }
-  if (process.env.GITHUB_USER === undefined) {
-    throw new Error("GITHUB_USER is not defined");
+  if (!process.env.R2_ENDPOINT) {
+    throw new Error("R2_ENDPOINT not set");
   }
-  const octokit = new Octokit({
-    auth: process.env.GITHUB_TOKEN,
+  if (!process.env.R2_BUCKET_NAME) {
+    throw new Error("R2_BUCKET_NAME not set");
+  }
+  if (!process.env.R2_TABLE_KEY) {
+    throw new Error("R2_TABLE_KEY not set");
+  }
+
+  // Create S3 client
+  const s3 = new AWS.S3({
+    endpoint: process.env.R2_ENDPOINT,
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+    signatureVersion: "v4",
   });
 
+  // Check if S3 has connection
+  try {
+    await s3.listBuckets().promise();
+  } catch (e) {
+    logger.error("S3 connection failed");
+    throw e;
+  }
+
+  // Get the table to upload
   const lookupTablePath = path.join(__dirname, "/lookup_table.json");
 
+  // Check if the table exists - if it doesn't generate it
   if (!fs.existsSync(lookupTablePath)) {
     logger.warn(
       "uploadTable: lookup table does not exist, generating new table"
     );
-
     await generateTable();
   }
 
-  const existingTable = JSON.parse(fs.readFileSync(lookupTablePath, "utf8"));
+  // Read the lookup table
+  const newTable = fs.readFileSync(lookupTablePath, "utf8");
 
-  const { encoded, hash } = formatForGithub(JSON.stringify(existingTable));
+  // Convert the lookup table to a JSON object
+  const newTableObject: LookupTable = JSON.parse(newTable);
 
-  // Get the current file
-  const currentTable = await octokit.rest.repos.getContent({
-    owner: process.env.GITHUB_USER,
-    repo: process.env.GITHUB_REPO,
-    path: "table.json",
+  // Hash the lookup table without the generatedAt property or the id property
+  const newTableHash = hash(newTableObject, {
+    excludeKeys: (key) => key === "generatedAt" || key === "id",
   });
-  logger.debug("Current table fetched");
 
-  if ("content" in currentTable.data) {
-    // Check if new table hashes match - sanity check
-    if (currentTable.data.sha === hash) {
-      logger.debug("No change");
+  // Get the table from cloudflare
+  const response = await s3
+    .getObject({
+      Bucket: "neb-table",
+      Key: "lookup_table.json",
+    })
+    .promise();
 
-      return;
-    }
+  if (!response.Body) {
+    throw new Error("No body in response");
+  }
 
-    // Update the table
-    logger.debug("updating with new table");
-    const newTable = await octokit.rest.repos.createOrUpdateFileContents({
-      owner: process.env.GITHUB_USER,
-      repo: process.env.GITHUB_REPO,
-      path: "table.json",
-      message: "Update lookup table",
-      content: encoded,
-      sha: currentTable.data.sha,
+  // If the table exists, check if the hash is the same
+  if (response.Body) {
+    const existingTableObject: LookupTable = JSON.parse(
+      response.Body.toString()
+    );
+    const existingTableHash = hash(existingTableObject, {
+      excludeKeys: (key) => key === "generatedAt" || key === "id",
     });
-
-    if (newTable.status === 200) {
-      logger.debug("Table updated");
+    if (existingTableHash === newTableHash) {
+      logger.info("uploadTable: Table is up to date");
       return;
     } else {
-      throw new Error("Table update failed");
-    }
-  } else {
-    // Create the table
-    logger.debug("creating new table");
-    const newTable = await octokit.rest.repos.createOrUpdateFileContents({
-      owner: process.env.GITHUB_USER,
-      repo: process.env.GITHUB_REPO,
-      path: "table.json",
-      message: "Update lookup table",
-      content: encoded,
-    });
-
-    if (newTable.status === 201) {
-      return;
-    } else {
-      throw new Error("Failed to create table");
+      logger.info("uploadTable: Table is out of date, updating table...");
     }
   }
+
+  // Log the size of the table in bytes
+  logger.info(
+    `uploadTable: Uploading table with size ${Buffer.byteLength(
+      newTable,
+      "utf8"
+    )} bytes`
+  );
+
+  // Upload the lookup table to cloudflare R2 CDN
+  const params = {
+    Bucket: process.env.R2_BUCKET_NAME,
+    Key: process.env.R2_TABLE_KEY,
+    Body: newTable,
+  };
+
+  s3.upload(params, function (err: Error, data: any) {
+    if (err) {
+      throw err;
+    }
+    logger.verbose(`uploadTable: ${data}`);
+    logger.info(`uploadTable: upload successful ${data.Location}`);
+  });
 };
+
 export default uploadTable;
-
-const formatForGithub = (tableString: string) => {
-  // Generate base64 encoded string for transmission
-  const encoded = Base64.encode(tableString);
-
-  // Get byte length of string
-  const length = new util.TextEncoder().encode(tableString).length;
-  // Combine with git properties to create SHA1
-  const fullString = `blob ${length}\0` + tableString;
-  const hash = crypto.createHash("sha1").update(fullString).digest("hex");
-  return { encoded, hash };
-};

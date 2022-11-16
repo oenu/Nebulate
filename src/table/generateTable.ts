@@ -8,13 +8,24 @@ import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo/youtubeVideo";
 
 /**
+ * @type {Object} MatchedVideo
+ * @description A matched video object that includes the Nebula video and the Youtube video
+ * @property {string} id - The youtube id of the video
+ * @property {string} nebulaId - The nebula id of the video
+ */
+export type MatchedVideo = {
+  id: string; // Short youtube id
+  slug: string; // Nebula slug
+};
+
+/**
  * @type {Object} ChannelEntry
  * @property {string[]} matched - A list of youtube video ids that have been matched to a nebula video
  * @property {string[]} not_matched - A list of youtube video ids that have not been matched to a nebula video
  * @property {string} slug - The channel slug of the channel that the videos belong to
  */
-interface ChannelEntry {
-  matched: string[];
+export interface ChannelEntry {
+  matched: MatchedVideo[];
   not_matched: string[];
   slug: string;
 }
@@ -26,7 +37,7 @@ interface ChannelEntry {
  * @property {ChannelEntry[]} channels - A list of channel entries {@link ChannelEntry}
  * @property {string} id - The id of the lookup table
  */
-interface LookupTable {
+export interface LookupTable {
   channels: ChannelEntry[];
   generatedAt: Date;
   id: string;
@@ -42,6 +53,8 @@ interface LookupTable {
  * @async
  */
 
+// rewrite the following to be more clear and efficient
+
 export const generateTable = async (maximumMatchDistance?: number) => {
   const matchLimit = maximumMatchDistance || 2;
 
@@ -50,8 +63,9 @@ export const generateTable = async (maximumMatchDistance?: number) => {
     youtubeVideoId: { $exists: true },
     matchStrength: { $lte: matchLimit },
   })
-    .select("youtubeVideoObjectId channelSlug")
+    .select("youtubeVideoObjectId channelSlug slug")
     .lean();
+
   logger.debug(
     `generateTable: Found ${nebulaVideos.length} matched nebula videos`
   );
@@ -65,39 +79,51 @@ export const generateTable = async (maximumMatchDistance?: number) => {
   const channelSlugs = [...new Set(nebulaVideos.map((v) => v.channelSlug))];
   logger.debug(`generateTable: Found ${channelSlugs.length} channels`);
 
-  // Create a useful data structure for the lookup table, with a list of youtube video ids for each channel
-  const videoEntries = youtubeVideos.map((youtubeVideo) => {
+  // Create a channel entry for each channel
+  const channelEntries: ChannelEntry[] = channelSlugs.map((slug) => {
     return {
-      url: youtubeVideo.youtubeVideoId,
-      slug: youtubeVideo.channelSlug,
-      matched: nebulaVideos.some((nebulaVideo) => {
-        return nebulaVideo.youtubeVideoObjectId
-          ? nebulaVideo.youtubeVideoObjectId.toString() ===
-              youtubeVideo._id.toString()
-          : false;
-      }),
+      matched: [],
+      not_matched: [],
+      slug,
     };
   });
 
-  // Compress the data structure into a lookup table
-  const lookup_prototype = {
-    generatedAt: new Date(),
-    channels: channelSlugs.map<ChannelEntry>((channelSlug) => {
-      const channelVideos = videoEntries.filter((v) => v.slug === channelSlug);
-      const matched = channelVideos.filter((v) => v.matched);
-      const notMatched = channelVideos.filter((v) => !v.matched);
-      return {
-        matched: matched.map((v) => v.url),
-        not_matched: notMatched.map((v) => v.url),
-        slug: channelSlug,
-      };
-    }),
-  };
+  // For each youtube video, find the matching nebula video and add it to the channel entry
+  youtubeVideos.forEach((youtubeVideo) => {
+    // Find the channel for the youtube video
+    const channelEntry = channelEntries.find(
+      (entry) => entry.slug === youtubeVideo.channelSlug
+    );
+    if (!channelEntry) {
+      logger.error(
+        `generateTable: Could not find channel entry for channel ${youtubeVideo.channelSlug}`
+      );
+      return;
+    }
+
+    // Find the matching nebula video for the youtube video
+    const nebulaVideo = nebulaVideos.find(
+      (video) =>
+        video.youtubeVideoObjectId?.toString() === youtubeVideo._id.toString()
+    );
+
+    // If there is a matching nebula video, add it to the channel entry as a matched video
+    if (nebulaVideo) {
+      channelEntry.matched.push({
+        id: youtubeVideo.youtubeVideoId,
+        slug: nebulaVideo.slug,
+      });
+    } else {
+      // If there is no matching nebula video, add the youtube video id to the channel entry as not matched
+      channelEntry.not_matched.push(youtubeVideo.youtubeVideoId);
+    }
+  });
 
   // Generate a new id and assign it to the lookup table
   const id = uuidv4();
   const table: LookupTable = {
-    ...lookup_prototype,
+    generatedAt: new Date(),
+    channels: channelEntries,
     id,
   };
 

@@ -4,28 +4,31 @@
 
 # For Nebula Scraping
 
-NEBULA_USERNAME= <Your nebula username>
-NEBULA_PASSWORD= <Your nebula password>
+NEBULA_USERNAME= <Your nebula username> | "example@example.com"
+NEBULA_PASSWORD= <Your nebula password> | "examplePassword123"
 
 # Database address
 
-DATABASE_URI= mongodb://<username>:<password>@mongo:27017
-DATABASE_USERNAME= <Used to connect to the database>
-DATABASE_PASSWORD= <Used to connect to the database>
+DATABASE_URI= <URL where the mongodb instance can be found> | "mongodb://<username>:<password>@mongo:27017"
+DATABASE_USERNAME= <Used to connect to the database> | "exampleUser"
+DATABASE_PASSWORD= <Used to connect to the database> | "examplePassword123"
 
 # MongoExpress
 
-MONGO_EXPRESS_USERNAME= <Used for MongoExpress monitoring>
-MONGO_EXPRESS_PASSWORD= <Used for MongoExpress monitoring>
+MONGO_EXPRESS_USERNAME= <Used for MongoExpress monitoring> | "exampleUser"
+MONGO_EXPRESS_PASSWORD= <Used for MongoExpress monitoring> | "examplePassword"
 
 # For Youtube Scraping
 
-YOUTUBE_API_KEY= <From the Google Developers Console>
+YOUTUBE_API_KEY= <From the Google Developers Console> | "eXaMpLeApIkEy-1234_5678"
 
 # For R2 Uploads
 
-ACCESS_KEY_ID= <Used for AWS or Cloudflare upload>
-SECRET_ACCESS_KEY= <Used for AWS or Cloudflare upload>
+ACCESS_KEY_ID= <Used for AWS or Cloudflare upload> | "eXampleAcCesSKeyID"
+SECRET_ACCESS_KEY= <Used for AWS or Cloudflare upload> | "eXampleSeCrEtAcCesSKey"
+
+R2_BUCKET_NAME= <Used for AWS or Cloudflare upload> | "table-bucket"
+R2_TABLE_KEY= <Used for AWS or Cloudflare upload> | "table.json"
 
 # For Authenticating Server Functions
 

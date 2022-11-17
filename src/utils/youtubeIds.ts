@@ -36,12 +36,7 @@ export const youtubeIds = [
     id: "video_channel:2cf5b90d-b6ad-49c5-8e5c-09259cca49f0",
     youtubeId: "UCmmtZ28wLMH2wBcCmB7w4mA",
   },
-  {
-    slug: "alex-goes-bananas",
-    title: "Alex Goes Bananas",
-    id: "video_channel:a1523607-d02f-4845-9fac-502dab90a49e",
-    youtubeId: null,
-  },
+
   {
     slug: "alexscorner",
     title: "Alex's Corner",
@@ -78,24 +73,14 @@ export const youtubeIds = [
     id: "video_channel:15dffc69-6508-4501-bb99-e888a25cd44d",
     youtubeId: "UCOFH59uoSs8SUF0L_p3W0sg",
   },
-  {
-    slug: "battleofbritain",
-    title: "Battle of Britain",
-    id: "video_channel:345d423a-2005-4b40-89c6-7bb645bb8510",
-    youtubeId: null,
-  },
+
   {
     slug: "bermpeak",
     title: "Berm Peak",
     id: "video_channel:28365b94-1495-4907-8e45-234aca021adc",
     youtubeId: "UCu8YylsPiu9XfaQC74Hr_Gw",
   },
-  {
-    slug: "betterelevation",
-    title: "Better Elevation",
-    id: "video_channel:322f5485-ed65-469a-8bb9-9b5b52340df7",
-    youtubeId: null,
-  },
+
   {
     slug: "bigjoel",
     title: "Big Joel",
@@ -114,30 +99,14 @@ export const youtubeIds = [
     id: "video_channel:e5ddbaf7-2d55-4321-b516-9b37b47381cf",
     youtubeId: "UCQ4FyiI_1mWI2AtLS5ChdPQ",
   },
-  {
-    slug: "braincraft",
-    title: "BrainCraft",
-    id: "video_channel:d6de9005-08f3-466f-a599-6979b333fa96",
-    youtubeId: null,
-  },
-  {
-    slug: "questionableadvice",
-    title: "BrainCraft — Questionable Advice",
-    id: "video_channel:18c5e56b-a3a7-4713-bd6f-792fdd112b93",
-    youtubeId: null,
-  },
+
   {
     slug: "bright-sun-films",
     title: "Bright Sun Films",
     id: "video_channel:c9f9f841-35a5-4ea6-857f-1c00cad8029b",
     youtubeId: "UC5k3Kc0avyDJ2nG9Kxm9JmQ",
   },
-  {
-    slug: "avoidclimatechange",
-    title: "Can We Avoid a Climate Change Disaster?",
-    id: "video_channel:5f116338-f80b-40d7-86d6-4ff1c599f198",
-    youtubeId: null,
-  },
+
   {
     slug: "captainmidnight",
     title: "Captain Midnight",
@@ -168,18 +137,7 @@ export const youtubeIds = [
     id: "video_channel:7a8d3e20-6893-4edc-ac43-e2686906d2f2",
     youtubeId: "UCGc8ZVCsrR3dAuhvUbkbToQ",
   },
-  {
-    slug: "city-beautiful-best-city-awards",
-    title: "City Beautiful — Best City Awards",
-    id: "video_channel:1bd18fa2-0373-40b5-8791-0c43e6d3c8e4",
-    youtubeId: null,
-  },
-  {
-    slug: "planning-ancient-rome",
-    title: "City Beautiful — Planning Ancient Rome",
-    id: "video_channel:7d76aa4c-95aa-4f9f-96a4-dd6fc7cd083a",
-    youtubeId: null,
-  },
+
   {
     slug: "the-closer-look",
     title: "The Closer Look",
@@ -222,12 +180,7 @@ export const youtubeIds = [
     id: "video_channel:65c7404f-b3fe-4425-a14a-a0e575f05129",
     youtubeId: "UCeNyqKqfgv1HJBuD1DavHOQ",
   },
-  {
-    slug: "curiouselephant",
-    title: "Curious Elephant",
-    id: "video_channel:bff81668-2684-4bb4-9637-a6fe4ff80b58",
-    youtubeId: null,
-  },
+
   {
     slug: "thedailybriefing",
     title: "TLDR Daily",
@@ -258,12 +211,7 @@ export const youtubeIds = [
     id: "video_channel:9657c3c5-fc91-4b95-893e-6fe878d99c02",
     youtubeId: "UCOs_jEnQF2ePJzjJTgRtunA",
   },
-  {
-    slug: "edith",
-    title: "E.D.I.T.H. — The Framing of Tony Stark",
-    id: "video_channel:c69b98bb-3d96-4340-b1de-16ac9d7c8e20",
-    youtubeId: null,
-  },
+
   {
     slug: "elizabethfilips",
     title: "Elizabeth Filips",
@@ -288,24 +236,7 @@ export const youtubeIds = [
     id: "video_channel:2067bfde-8a51-4f76-9482-0199192ac342",
     youtubeId: "UCCODtTcd5M1JavPCOr_Uydg",
   },
-  {
-    slug: "extrahistory",
-    title: "Extra History",
-    id: "video_channel:88a72e1e-1065-46d1-8b79-91cfbaf356ad",
-    youtubeId: null, //"UCCODtTcd5M1JavPCOr_Uydg",
-  },
-  {
-    slug: "tipusultan",
-    title: "Extra History — Tipu Sultan: Tiger or Tyrant?",
-    id: "video_channel:a8e7758a-68ec-4d34-9d8c-26fba19b0e25",
-    youtubeId: null,
-  },
-  {
-    slug: "extramythology",
-    title: "Extra Mythology",
-    id: "video_channel:0c02e9bf-79a9-4e6f-ae1b-9ede7dfc8581",
-    youtubeId: null, //"UCCODtTcd5M1JavPCOr_Uydg",
-  },
+
   {
     slug: "extremities",
     title: "Extremities",
@@ -348,18 +279,7 @@ export const youtubeIds = [
     id: "video_channel:82b5ec83-cc5e-4a92-9238-42fe0a0e0f45",
     youtubeId: "UCBNA43Ppw3sCUbq-x2SvP8g",
   },
-  {
-    slug: "gonebirds",
-    title: "Bright Trip — Gone Birds",
-    id: "video_channel:5c446de2-3e7a-4860-9782-f04a4e48a9d7",
-    youtubeId: null,
-  },
-  {
-    slug: "grandtestauto",
-    title: "Grand Test Auto",
-    id: "video_channel:221d128f-1374-4e8e-bbac-2b4d68a3517d",
-    youtubeId: null,
-  },
+
   {
     slug: "the-great-war",
     title: "The Great War",
@@ -372,18 +292,7 @@ export const youtubeIds = [
     id: "video_channel:8f3a2a56-3f9f-4ce0-b105-ede41688d84b",
     youtubeId: "UCuCkxoKLYO_EQ2GeFtbM_bw",
   },
-  {
-    slug: "haicrimespree",
-    title: "Half as Interesting’s Crime Spree",
-    id: "video_channel:b3153e23-7728-4a28-a064-aed44e418bbe",
-    youtubeId: null,
-  },
-  {
-    slug: "brick-facade",
-    title: "Half as Interesting — The Brick Facade",
-    id: "video_channel:6fb5d443-d926-48ea-b453-cce2c565e045",
-    youtubeId: null,
-  },
+
   {
     slug: "haminations",
     title: "Haminations",
@@ -456,24 +365,14 @@ export const youtubeIds = [
     id: "video_channel:2940aa70-829b-40a1-9e15-bdc95a01240f",
     youtubeId: "UChBcQ24GbjS5xCXm3K4e8-A",
   },
-  {
-    slug: "jetlag",
-    title: "Jet Lag: The Game",
-    id: "video_channel:9cea6296-223e-4c7e-a245-d96db75de32f",
-    youtubeId: null,
-  },
+
   {
     slug: "joescott",
     title: "Joe Scott",
     id: "video_channel:ee1b232b-999c-464b-8305-135f3dacd747",
     youtubeId: "UC-2YHgc363EdcusLIBbgxzg",
   },
-  {
-    slug: "joescottmysteries",
-    title: "Joe Scott Presents: Mysteries of the Human Body",
-    id: "video_channel:7fb81159-fb2c-40fc-90ab-b8ff29353b62",
-    youtubeId: null,
-  },
+
   {
     slug: "jordan-harrod",
     title: "Jordan Harrod",
@@ -510,19 +409,7 @@ export const youtubeIds = [
     id: "video_channel:8b985d4e-00d6-4770-b9c4-4d0280f35276",
     youtubeId: "UCLOwKVD0bYHxaDZxXkK4piw",
   },
-  {
-    slug: "mostinsanehijacking",
-    title:
-      "Kento Bento — Orchestrating the Most Insane Hijacking in Japanese History",
-    id: "video_channel:2ccf3fed-2045-46c6-9955-cc11d836302d",
-    youtubeId: null,
-  },
-  {
-    slug: "kento-bento-pork-bun-murders",
-    title: "Kento Bento — The Shocking Chinese Pork Bun Murders",
-    id: "video_channel:6a3da2bc-cfb1-45d1-a25d-f53c9eef951f",
-    youtubeId: null,
-  },
+
   {
     slug: "knowingbetter",
     title: "Knowing Better",
@@ -553,12 +440,7 @@ export const youtubeIds = [
     id: "video_channel:85bf1f47-7cb1-409f-ae8f-4ea1a9b4414b",
     youtubeId: "UCpa-Zb0ZcQjTCPP1Dx_1M8Q",
   },
-  {
-    slug: "badlawwordsgood",
-    title: "LegalEagle — Bad Law Words Good",
-    id: "video_channel:5d8f6122-e0a2-4c39-914b-9f56850ebcde",
-    youtubeId: null,
-  },
+
   {
     slug: "leovader",
     title: "Leo Vader",
@@ -589,36 +471,14 @@ export const youtubeIds = [
     id: "video_channel:11e9d866-d05a-466f-80a9-ce9f9e061aa2",
     youtubeId: "UCG1h-Wqjtwz7uUANw6gazRw",
   },
-  {
-    slug: "blazingsaddles",
-    title: "Lindsay Ellis — Could Blazing Saddles Be Made Today?",
-    id: "video_channel:b79b168d-de3c-46bb-85d3-55f2ee0eb5fc",
-    youtubeId: null,
-  },
-  {
-    slug: "lindsayellistropicthunder",
-    title: "Lindsay Ellis — How Tropic Thunder Exposes the Sham",
-    id: "video_channel:2b68afe1-9072-484d-a374-b3c285ea8330",
-    youtubeId: null,
-  },
-  {
-    slug: "lindsay-ellis-tom-hoopers-les-miserables",
-    title: "Lindsay Ellis — Tom Hooper's Les Miserables",
-    id: "video_channel:f4b27b7f-0dee-48e6-b4e6-4248469808ff",
-    youtubeId: null,
-  },
+
   {
     slug: "listeningin",
     title: "Listening In",
     id: "video_channel:125f21a1-b425-4fd3-8767-835c49556979",
     youtubeId: "UCiawGYzxoZSPDLReSFETqeQ",
   },
-  {
-    slug: "d-day",
-    title: "The Logistics of D-Day",
-    id: "video_channel:f01ef19c-9b35-4899-baff-818f1f8d5422",
-    youtubeId: null,
-  },
+
   {
     slug: "lolasebastian",
     title: "Lola Sebastian",
@@ -631,24 +491,14 @@ export const youtubeIds = [
     id: "video_channel:e5476a8f-b7be-4afa-a128-081609cdca14",
     youtubeId: "UCQkd05iAYed2-LOmhjzDG6g",
   },
-  {
-    slug: "goldminers",
-    title: "LowSpecGamer — Digital GoldMiners",
-    id: "video_channel:d2a0cf3d-c2dd-44d8-b639-b9d2b758029f",
-    youtubeId: null,
-  },
+
   {
     slug: "maggiemaefish",
     title: "Maggie Mae Fish",
     id: "video_channel:815bdf38-d6a9-4e2f-9749-83a9bc989ac3",
     youtubeId: "UChBD4NpITiW2CzIz5GwppDA",
   },
-  {
-    slug: "makingphilosophytube",
-    title: "Making Philosophy Tube",
-    id: "video_channel:94ec30de-4388-46fb-9b9b-a265e7c2c09c",
-    youtubeId: null,
-  },
+
   {
     slug: "mariana",
     title: "Mariana's Corner",
@@ -667,24 +517,14 @@ export const youtubeIds = [
     id: "video_channel:dcfbfca7-fa67-4153-a109-d8173fe96346",
     youtubeId: "UCpV5A65O3mvaJmlc669cI1A",
   },
-  {
-    slug: "makingofsongbook",
-    title: "Mary Spender — The Making of Songbook",
-    id: "video_channel:b7d6801c-6421-44b1-9d17-e186367cabdf",
-    youtubeId: null,
-  },
+
   {
     slug: "medlifecrisis",
     title: "Medlife Crisis",
     id: "video_channel:7876cc79-764b-4cfb-8b1c-4bc2c9d4abbe",
     youtubeId: "UCgRBRE1DUP2w7HTH9j_L4OQ",
   },
-  {
-    slug: "miamulder",
-    title: "Mia Mulder",
-    id: "video_channel:558de3dc-7986-4609-b269-406acc3b42a3",
-    youtubeId: null,
-  },
+
   {
     slug: "michaelwuerth",
     title: "Michael Wuerth",
@@ -703,12 +543,7 @@ export const youtubeIds = [
     id: "video_channel:15f31e35-f05d-4564-8d6e-7e1cb59a5ad2",
     youtubeId: "UCIRiWCPZoUyZDbydIqitHtQ",
   },
-  {
-    slug: "minutebody",
-    title: "MinuteBody",
-    id: "video_channel:2e5bee30-3803-4029-9771-a20fba19e874",
-    youtubeId: null, //UCeiYXex_fwgYDonaTcSIk6w
-  },
+
   {
     slug: "minutephysics",
     title: "MinutePhysics",
@@ -739,31 +574,14 @@ export const youtubeIds = [
     id: "video_channel:18a3366f-21ea-4856-869e-f27f2874c4b7",
     youtubeId: "UC1ZBQ-F-yktYD4m5AzM6pww",
   },
-  {
-    slug: "originsofstealth",
-    title: "Mustard — The Origins of Stealth: The F-117 Nighthawk",
-    id: "video_channel:678a260b-f636-4c6a-985d-646a16ea3b11",
-    youtubeId: null,
-  },
-  {
-    slug: "mustard-underwater-aircraft-carriers",
-    title:
-      "Mustard — Underwater Aircraft Carriers: Imperial Japan’s Secret Weapon",
-    id: "video_channel:2752b848-ba6a-45a9-b199-4da7a12ec2a8",
-    youtubeId: null,
-  },
+
   {
     slug: "nandovmovies",
     title: "Nando v Movies",
     id: "video_channel:19ae1516-af16-4dd9-a239-1c31c1db123f",
     youtubeId: "UCf29Sq6-XxLQG_XuJwMHaFg",
   },
-  {
-    slug: "promos",
-    title: "Nebula Promos",
-    id: "video_channel:8f0cb852-4e84-4a22-9adf-0439aea6796b",
-    youtubeId: null,
-  },
+
   {
     slug: "neo",
     title: "neo",
@@ -782,12 +600,7 @@ export const youtubeIds = [
     id: "video_channel:de9aa902-8128-4d0c-89dd-45cb8c25e1ef",
     youtubeId: "UCYLrBefhyp8YyI9VGPbghvw",
   },
-  {
-    slug: "thenewfword",
-    title: "The New F Word",
-    id: "video_channel:ebcabf16-f9b2-4870-8aa5-3771dd8e55f4",
-    youtubeId: null,
-  },
+
   {
     slug: "notesbyniba",
     title: "NotesByNiba",
@@ -812,18 +625,7 @@ export const youtubeIds = [
     id: "video_channel:d26ebc1f-2f45-4777-b93d-b4accea60485",
     youtubeId: "UCWTFGPpNQ0Ms6afXhaWDiRw",
   },
-  {
-    slug: "one-villainous-scene",
-    title: "One Villainous Scene",
-    id: "video_channel:5e01ca89-d124-409c-ad3e-109e88c8dd30",
-    youtubeId: null,
-  },
-  {
-    slug: "one-x-cellent-scene",
-    title: "One X-Cellent Scene",
-    id: "video_channel:9a06d179-5f32-4385-b44f-a36d1896feb9",
-    youtubeId: null,
-  },
+
   {
     slug: "occ",
     title: "Our Changing Climate",
@@ -842,12 +644,7 @@ export const youtubeIds = [
     id: "video_channel:ceb19452-2108-4619-9cb5-a16f54f49833",
     youtubeId: "UCR0O-1cvuPNxDosvSDLpWHg",
   },
-  {
-    slug: "paperclips",
-    title: "The Paperclip Maximizer",
-    id: "video_channel:3e364299-2c33-4254-a0ba-dedc898d585c",
-    youtubeId: null,
-  },
+
   {
     slug: "paperskies",
     title: "Paper Skies",
@@ -860,12 +657,7 @@ export const youtubeIds = [
     id: "video_channel:a909a46f-3b6b-4a15-a590-6e77fd9d9051",
     youtubeId: "UCF1fG3gT44nGTPU2sVLoFWg",
   },
-  {
-    slug: "nightofthecoconut",
-    title: "Night of the Coconut",
-    id: "video_channel:c895a58a-f8c1-4ec5-8fbc-ebcc09191ad9",
-    youtubeId: null,
-  },
+
   {
     slug: "people-make-games",
     title: "People Make Games",
@@ -884,36 +676,14 @@ export const youtubeIds = [
     id: "video_channel:1ba9e83c-5522-463c-bd95-321864144b25",
     youtubeId: "UCgNg3vwj3xt7QOrcIDaHdFg",
   },
-  {
-    slug: "chinaactually",
-    title: "PolyMatter — China, Actually",
-    id: "video_channel:d96d774d-597b-4b9d-b113-02dad39a3451",
-    youtubeId: null,
-  },
-  {
-    slug: "polymatter-macau",
-    title: "PolyMatter — Macau: The Story of China’s Golden Child",
-    id: "video_channel:10067ec1-6d49-463d-95d6-c0061cb74745",
-    youtubeId: null,
-  },
+
   {
     slug: "polyphonic",
     title: "Polyphonic",
     id: "video_channel:a2ad8f3a-47df-4b5d-8786-e5fee9ba6733",
     youtubeId: "UCXkNod_JcH7PleOjwK_8rYQ",
   },
-  {
-    slug: "polyphonic-dark-side",
-    title: "Polyphonic — Dark Side of the Moon",
-    id: "video_channel:62314c17-eace-4cbf-8358-e598c2089b80",
-    youtubeId: null,
-  },
-  {
-    slug: "polyphonic-epics",
-    title: "Polyphonic — Led Zeppelin's Epics",
-    id: "video_channel:fa6535da-656c-4b7d-b214-b802bb6d1187",
-    youtubeId: null,
-  },
+
   {
     slug: "practical-engineering",
     title: "Practical Engineering",
@@ -932,12 +702,7 @@ export const youtubeIds = [
     id: "video_channel:42773a32-2268-4bda-81d4-2f0848977de2",
     youtubeId: "UCtGG8ucQgEJPeUPhJZ4M4jA",
   },
-  {
-    slug: "rare-earth-originals",
-    title: "Rare Earth Originals",
-    id: "video_channel:363bc5f8-6adf-4d68-9381-2eadbe1159d0",
-    youtubeId: null,
-  },
+
   {
     slug: "razbuten",
     title: "Razbuten",
@@ -956,18 +721,7 @@ export const youtubeIds = [
     id: "video_channel:67fdf179-b530-46c6-a0d1-6e998ae1167c",
     youtubeId: "UCP5tjEmvPItGyLhmjdwP7Ww",
   },
-  {
-    slug: "ghosttowns",
-    title: "RealLifeLore — Ghost Towns",
-    id: "video_channel:1277d93e-8ad5-4b70-b0f8-28859adda82e",
-    youtubeId: null,
-  },
-  {
-    slug: "modernconflicts",
-    title: "RealLifeLore — Modern Conflicts",
-    id: "video_channel:8e4165c3-8582-4044-a5a0-1465d66bc0c6",
-    youtubeId: null,
-  },
+
   {
     slug: "realscience",
     title: "Real Science",
@@ -980,36 +734,14 @@ export const youtubeIds = [
     id: "video_channel:72450552-861a-4702-a0f2-74091779c5ff",
     youtubeId: "UCB1eDEd1AYG3YrRIJSZzMOQ",
   },
-  {
-    slug: "16daysinberlin",
-    title: "Real Time History — 16 Days in Berlin",
-    id: "video_channel:19c04dbf-b6e7-45e8-99e4-ad1318ce6b52",
-    youtubeId: null,
-  },
+
   {
     slug: "reneritchie",
     title: "Rene Ritchie",
     id: "video_channel:156c4256-8dbd-4787-a958-3b928151ce1b",
     youtubeId: "UCLBHPoY3NugnZYURxln3fKQ",
   },
-  {
-    slug: "impact",
-    title: "Rene Ritchie — Impact",
-    id: "video_channel:6d86a754-9239-4017-9ed7-bc71c6f07003",
-    youtubeId: null,
-  },
-  {
-    slug: "rng",
-    title: "RnG",
-    id: "video_channel:92589cd5-adae-4662-8cfd-a099f7be0efe",
-    youtubeId: null,
-  },
-  {
-    slug: "avgts",
-    title: "Sam From Wendover's 'A Very Good Trivia Show'",
-    id: "video_channel:d04b8647-5307-4173-90e1-14997955d20b",
-    youtubeId: null,
-  },
+
   {
     slug: "samonella",
     title: "Sam O'Nella",
@@ -1022,12 +754,7 @@ export const youtubeIds = [
     id: "video_channel:57586ec8-7cdd-4bbe-a666-f06737fb33f8",
     youtubeId: "UCK-GxvzttTnNhq3JPYpXhqg",
   },
-  {
-    slug: "sarah-z-debater-theater",
-    title: "Sarah Z  — Debater Theater",
-    id: "video_channel:ff298ddb-b160-4f5c-85bc-10a53b5349e0",
-    youtubeId: null,
-  },
+
   {
     slug: "katiestewart",
     title: "Science With Katie",
@@ -1064,12 +791,7 @@ export const youtubeIds = [
     id: "video_channel:780bb853-592b-4669-99e0-a57d5783f565",
     youtubeId: "UCiuOCDkRu0-ncKMK8K4R96Q",
   },
-  {
-    slug: "soyouhaventread",
-    title: "So You Haven't Read",
-    id: "video_channel:1603eeeb-9562-471c-ab58-4f45899b6009",
-    youtubeId: null,
-  },
+
   {
     slug: "stevenbridges",
     title: "Steven Bridges",
@@ -1082,12 +804,7 @@ export const youtubeIds = [
     id: "video_channel:54bff8a1-574a-49fe-9be1-68fad64f5215",
     youtubeId: "https://www.youtube.com/user/stewarthicks",
   },
-  {
-    slug: "storymode",
-    title: "Story Mode",
-    id: "video_channel:d7a9fe83-bb42-4eed-a6f6-54d7a5d43aeb",
-    youtubeId: null,
-  },
+
   {
     slug: "strangeparts",
     title: "Strange Parts",
@@ -1118,12 +835,7 @@ export const youtubeIds = [
     id: "video_channel:b72734fe-e61d-418d-84dc-2965e3b3833e",
     youtubeId: "UCusb0SpT8elBJdbcEJS_l2A",
   },
-  {
-    slug: "teamseas",
-    title: "#TeamSeas",
-    id: "video_channel:0b7faa58-7a18-41b3-b98f-53d4e7d61111",
-    youtubeId: null,
-  },
+
   {
     slug: "techaltar",
     title: "TechAltar",
@@ -1136,12 +848,7 @@ export const youtubeIds = [
     id: "video_channel:b64e9493-1278-4449-9632-72d1ebfb107c",
     youtubeId: "UCnoIjdOZF4tTA7M7C4Nt4-w",
   },
-  {
-    slug: "technorama",
-    title: "Technorama",
-    id: "video_channel:cbd0df8e-5955-4218-a029-9be3c272f88b",
-    youtubeId: null,
-  },
+
   {
     slug: "terriblewritingadvice",
     title: "Terrible Writing Advice",
@@ -1154,12 +861,7 @@ export const youtubeIds = [
     id: "video_channel:d87deae5-7dea-4d2c-b07c-18e5d336fdf7",
     youtubeId: "UCQ9HvHH-KRYHI5ynj2kbLwQ",
   },
-  {
-    slug: "nextlevelworldbuilding",
-    title: "The Closer Look — Next-Level Worldbuilding",
-    id: "video_channel:0830b88a-0e5b-4e56-a575-fadaf6efe407",
-    youtubeId: null,
-  },
+
   {
     slug: "the-efficient-engineer",
     title: "The Efficient Engineer",
@@ -1202,12 +904,7 @@ export const youtubeIds = [
     id: "video_channel:6ca6d676-e2d2-4e7f-8b04-aead15f41996",
     youtubeId: "UCHsRtomD4twRf5WVHHk-cMw",
   },
-  {
-    slug: "tierzoo-lets-play",
-    title: "TierZoo — Let's Play Outside",
-    id: "video_channel:dff00d5b-9915-4ec9-890e-c2dcc4a63bb5",
-    youtubeId: null,
-  },
+
   {
     slug: "tldrnewseu",
     title: "TLDR News EU",
@@ -1244,18 +941,7 @@ export const youtubeIds = [
     id: "video_channel:396542ae-0dda-4b8c-b751-31b66e0428ca",
     youtubeId: "UCxt2r57cLastdmrReiQJkEg",
   },
-  {
-    slug: "tom-scott-presents-money",
-    title: "Tom Scott Presents: Money",
-    id: "video_channel:54967c6b-3473-4260-8e72-26511af7a3c6",
-    youtubeId: null,
-  },
-  {
-    slug: "unknowncity",
-    title: "The Unknown City",
-    id: "video_channel:41e6c81c-07b6-459c-b05a-81595d260b13",
-    youtubeId: null,
-  },
+
   {
     slug: "tracedominguez",
     title: "Uno Dos of Trace",
@@ -1268,18 +954,7 @@ export const youtubeIds = [
     id: "video_channel:3514e35d-3640-4047-9a03-4a280b72f7db",
     youtubeId: "UCSIvk78tK2TiviLQn4fSHaw",
   },
-  {
-    slug: "an-argument-against-reality",
-    title: "Up and Atom — An Argument Against Reality",
-    id: "video_channel:2601d385-c22e-46a0-9a00-5c9e4a3eb65b",
-    youtubeId: null,
-  },
-  {
-    slug: "ismathinvented",
-    title: "Up and Atom — Is Mathematics Invented or Discovered?",
-    id: "video_channel:8bb46a00-e05a-44fc-bd11-450cb04f03b4",
-    youtubeId: null,
-  },
+
   {
     slug: "vector",
     title: "Vector",
@@ -1292,42 +967,14 @@ export const youtubeIds = [
     id: "video_channel:197dfaf2-ec84-4512-9475-27ebbd4e3b69",
     youtubeId: "UCikpumVCosztN-ZUthleRug",
   },
-  {
-    slug: "volksgeist-a-brief-history-of-music",
-    title: "Volksgeist — A Brief History of Music",
-    id: "video_channel:2dc63969-a85b-4fd8-8d82-f4d10f59f9e0",
-    youtubeId: null,
-  },
+
   {
     slug: "wendover",
     title: "Wendover",
     id: "video_channel:fe4d9c1c-017b-494c-9afc-e79e6859b211",
     youtubeId: "UC9RM-iSvTu1uPJb8X5yp3EQ",
   },
-  {
-    slug: "alaskassilentsummer",
-    title: "Wendover — Alaska’s Silent Summer",
-    id: "video_channel:276b4d44-658d-4d60-9491-a04d1143936a",
-    youtubeId: null,
-  },
-  {
-    slug: "thecoloradoproblem",
-    title: "Wendover — The Colorado Problem",
-    id: "video_channel:1cad47b0-cc28-427e-b6f0-4faf05d02ccb",
-    youtubeId: null,
-  },
-  {
-    slug: "wendover-final-days-of-majuro",
-    title: "Wendover — The Final Years of Majuro",
-    id: "video_channel:573ca46e-7ff2-41e4-9fbd-084774b4fff8",
-    youtubeId: null,
-  },
-  {
-    slug: "wendover-airport",
-    title: "Wendover — The World's Most Useful Airport",
-    id: "video_channel:88d3ff2d-09cd-403e-90dc-d35c4fd5d9ab",
-    youtubeId: null,
-  },
+
   {
     slug: "wonderwhy",
     title: "WonderWhy",

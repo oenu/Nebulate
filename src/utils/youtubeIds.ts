@@ -23,7 +23,7 @@ export const slugIgnoreList = [
   "one-villainous-scene",
   "rng",
   "teamseas",
-
+  "workingtitles",
   // Duplicate channels
   "battleofbritain",
   // "extrahistory",
@@ -89,6 +89,13 @@ export const slugIgnoreList = [
   "trussissues",
   "theeditorial",
   "underexposure",
+
+  // No youtube content?
+  "miamulder",
+
+  // No longer on the platform?
+  "iphonedo",
+  "mkbhd",
 ];
 
 // TODO: Add a way to automatically update this list/check if the slugs have changed
@@ -181,12 +188,6 @@ export const youtubeIds: YouTubeID[] = [
     id: "video_channel:d92686eb-7d1c-429c-b2be-bd4d83eb7366",
     youtubeId: "UCVkgJKL07bSQ1b54Pnz186Q",
   },
-  {
-    slug: "boyinaband",
-    title: "Boyinaband",
-    id: "video_channel:e5ddbaf7-2d55-4321-b516-9b37b47381cf",
-    youtubeId: "UCQ4FyiI_1mWI2AtLS5ChdPQ",
-  },
 
   {
     slug: "bright-sun-films",
@@ -208,7 +209,7 @@ export const youtubeIds: YouTubeID[] = [
     youtubeId: "UC7u-Dg0jb7g9s7XjmtJrtpg",
   },
   {
-    slug: "charles-cornell",
+    slug: "charlescornell",
     title: "Charles Cornell",
     id: "video_channel:086ada3a-8fb4-4e3f-a0cc-b8fa0f528e66",
     youtubeId: "UC4PIiYewI1YGyiZvgNlJNrA",
@@ -257,8 +258,8 @@ export const youtubeIds: YouTubeID[] = [
     youtubeId: "UCJzc7TiJ2nnuyJkUpOZ8RKA",
   },
   {
-    slug: "channeldynamics",
-    title: "Channel Dynamics",
+    slug: "creatordynamics",
+    title: "Creator Dynamics",
     id: "video_channel:94995c52-5c95-4413-a9ce-45da06945846",
     youtubeId: "UCdQytVTN3EqMNcEO3m1d2Jg",
   },
@@ -423,12 +424,12 @@ export const youtubeIds: YouTubeID[] = [
     id: "video_channel:83aa6c67-467b-4d70-ac42-463fa0b6744d",
     youtubeId: "UCh4pyZUB0mNzieaKv831flA",
   },
-  {
-    slug: "iphonedo",
-    title: "iPhonedo",
-    id: "video_channel:8e034e20-ad08-4b90-8202-6480a2015b7d",
-    youtubeId: "UCvkODZ-I4tsdP2Qopov0jrA",
-  },
+  // {
+  //   slug: "iphonedo",
+  //   title: "iPhonedo",
+  //   id: "video_channel:8e034e20-ad08-4b90-8202-6480a2015b7d",
+  //   youtubeId: "UCvkODZ-I4tsdP2Qopov0jrA",
+  // },
   {
     slug: "isaacarthur",
     title: "Isaac Arthur",
@@ -593,18 +594,18 @@ export const youtubeIds: YouTubeID[] = [
     id: "video_channel:b72aea31-f600-40c2-bc24-745966d6ce56",
     youtubeId: "UCEHp_b02I0GvTYCBPX_0w1g",
   },
-  {
-    slug: "mkbhd",
-    title: "Marques Brownlee",
-    id: "video_channel:d23c07c6-6312-4dbe-aa44-2a31e5e0fbd7",
-    youtubeId: "UCBJycsmduvYEL83R_U4JriQ",
-  },
-  {
-    slug: "mary-spender",
-    title: "Mary Spender",
-    id: "video_channel:dcfbfca7-fa67-4153-a109-d8173fe96346",
-    youtubeId: "UCpV5A65O3mvaJmlc669cI1A",
-  },
+  // {
+  //   slug: "mkbhd",
+  //   title: "Marques Brownlee",
+  //   id: "video_channel:d23c07c6-6312-4dbe-aa44-2a31e5e0fbd7",
+  //   youtubeId: "UCBJycsmduvYEL83R_U4JriQ",
+  // },
+  // {
+  //   slug: "mary-spender",
+  //   title: "Mary Spender",
+  //   id: "video_channel:dcfbfca7-fa67-4153-a109-d8173fe96346",
+  //   youtubeId: "UCpV5A65O3mvaJmlc669cI1A",
+  // },
 
   {
     slug: "medlifecrisis",
@@ -1069,12 +1070,7 @@ export const youtubeIds: YouTubeID[] = [
     id: "video_channel:6a7cd221-3b93-416a-82e1-b985dba78b36",
     youtubeId: "UCcEPmwpXKrKzZahqjwpIAsQ",
   },
-  {
-    slug: "workingtitles",
-    title: "Working Titles",
-    id: "video_channel:41aa6b97-98a2-4df0-9977-ca4c1b2aa581",
-    youtubeId: "UCI_39phihRzJz_y5ySfp9NA",
-  },
+
   {
     slug: "zachhighley",
     title: "Zach Highley",
@@ -1187,12 +1183,12 @@ export const youtubeIds: YouTubeID[] = [
     id: "video_channel:dcfbfca7-fa67-4153-a109-d8173fe96346",
     youtubeId: "UCpV5A65O3mvaJmlc669cI1A",
   },
-  {
-    slug: "miamulder",
-    title: "Mia Mulder",
-    id: "video_channel:558de3dc-7986-4609-b269-406acc3b42a3",
-    youtubeId: "UC1GtnBho4AnibEHDnwBs0AA",
-  },
+  // {
+  //   slug: "miamulder",
+  //   title: "Mia Mulder",
+  //   id: "video_channel:558de3dc-7986-4609-b269-406acc3b42a3",
+  //   youtubeId: "UC1GtnBho4AnibEHDnwBs0AA",
+  // },
   {
     slug: "minutebody",
     title: "MinuteBody",
@@ -1325,6 +1321,12 @@ youtubeIds.forEach((channel) => {
 export default mappedSlugs;
 
 // ---------------------------- Duplicates  ---------------------------- //
+//  {
+//     slug: "workingtitles",
+//     title: "Working Titles",
+//     id: "video_channel:41aa6b97-98a2-4df0-9977-ca4c1b2aa581",
+//     youtubeId: "UCI_39phihRzJz_y5ySfp9NA",
+//   },
 // {
 //   slug: "battleofbritain",
 //   title: "Battle of Britain",

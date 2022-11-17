@@ -25,6 +25,8 @@ export const slugIgnoreList = [
   "teamseas",
 ];
 
+// TODO: Add a way to automatically update this list/check if the slugs have changed
+
 export const youtubeIds: YouTubeID[] = [
   {
     slug: "12tone",

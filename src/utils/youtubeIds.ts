@@ -5,7 +5,16 @@
  * YouTube IDs
  * @description Manually mapped YouTube IDs for channels
  */
-export const youtubeIds = [
+
+type YouTubeID = {
+  id: string; // Nebula unique channel id
+  title: string; // Channel title (for reference)
+  slug: string; // Channel slug for nebula (used as identifier)
+  youtubeId: string; // YouTube channel id
+  parent_slug?: string; // Parent channel slug - used for grouping channels as many nebula channels may be mapped to a single YouTube channel
+};
+
+export const youtubeIds: YouTubeID[] = [
   {
     slug: "12tone",
     title: "12tone",
@@ -802,7 +811,7 @@ export const youtubeIds = [
     slug: "stewarthicks",
     title: "Stewart Hicks",
     id: "video_channel:54bff8a1-574a-49fe-9be1-68fad64f5215",
-    youtubeId: "https://www.youtube.com/user/stewarthicks",
+    youtubeId: "UCYAm24PkejQR2xMgJgn7xwg",
   },
 
   {

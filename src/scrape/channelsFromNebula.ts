@@ -3,13 +3,15 @@ import axios from "axios";
 import logger from "../utils/logger";
 
 // Files
-import { youtubeIds as mappedIds } from "../utils/youtubeIds";
+import { youtubeIds as mappedIds, slugIgnoreList } from "../utils/youtubeIds";
 
 // Types
 type ShortChannel = {
   // Utility type to shorten the channel object to make it easier to read
   slug: string;
   title: string;
+  id?: string;
+  youtubeId?: string;
   merch_collection?: string;
   nebula_link: string;
   youtube_link?: string;
@@ -18,6 +20,14 @@ type ShortChannel = {
 };
 
 type MatchedChannelPair = {
+  easy_copy: {
+    // This is an object that can be copied and pasted into the channel mapping file
+    slug: string;
+    title: string;
+    id: string;
+    youtubeId: string;
+    parent_slug?: string;
+  };
   registered: ShortChannel;
   unmapped: ShortChannel;
   confidence: number;
@@ -29,7 +39,9 @@ type MatchedChannelPair = {
  * @description Generate a list of channels that need to be mapped to youtube channels
  */
 export const channelsFromNebula = async () => {
-  const channels = await scrapeChannels();
+  const channels = await (
+    await scrapeChannels()
+  ).filter((channel) => !slugIgnoreList.includes(channel.slug));
   let unmappedChannels = [] as ShortChannel[];
 
   logger.info(`ChannelsFromNebula : Found ${channels.length} channels`);
@@ -71,9 +83,11 @@ export const channelsFromNebula = async () => {
 
       unmappedChannels.push({
         ...channelProperties,
+
         slug: channel.slug,
         title: channel.title,
         nebula_link: `https://nebula.tv/${channel.slug}`,
+        id: channel.id,
       });
     }
   }
@@ -120,9 +134,11 @@ export const channelsFromNebula = async () => {
 
       mappedChannels.push({
         ...channelProperties,
+        id: nebulaChannel.id,
         slug: nebulaChannel.slug,
         title: nebulaChannel.title,
         nebula_link: `https://nebula.tv/${nebulaChannel.slug}`,
+        youtubeId: manualMapping.youtubeId,
         youtube_link: `https://www.youtube.com/channel/${manualMapping.youtubeId}`,
       });
     }
@@ -146,6 +162,14 @@ export const channelsFromNebula = async () => {
         `Channel ${merch_match.slug} is most likely a sub-channel of ${mappedChannel.slug} based on merch collection`
       );
       merch_matches.push({
+        easy_copy: {
+          slug: merch_match.slug,
+          title: merch_match.title,
+          id: merch_match.id || "UNKNOWN",
+          youtubeId: mappedChannel.youtubeId || "UNKNOWN",
+          parent_slug: mappedChannel.slug,
+        },
+
         registered: mappedChannel,
         unmapped: merch_match,
         confidence: 1,
@@ -202,6 +226,13 @@ export const channelsFromNebula = async () => {
           `Channel ${website_match.slug} is most likely a sub-channel of ${mappedChannel.slug} based on website`
         );
         website_matches.push({
+          easy_copy: {
+            slug: website_match.slug,
+            title: website_match.title,
+            id: website_match.id || "UNKNOWN",
+            youtubeId: mappedChannel.youtubeId || "UNKNOWN",
+            parent_slug: mappedChannel.slug,
+          },
           registered: mappedChannel,
           unmapped: website_match,
           confidence: 1,
@@ -282,6 +313,13 @@ export const channelsFromNebula = async () => {
             `Channel ${patreon_match.slug} is most likely a sub-channel of ${mappedChannel.slug} based on patreon`
           );
           patreon_matches.push({
+            easy_copy: {
+              slug: patreon_match.slug,
+              title: patreon_match.title,
+              id: patreon_match.id || "UNKNOWN",
+              youtubeId: mappedChannel.youtubeId || "UNKNOWN",
+              parent_slug: mappedChannel.slug,
+            },
             registered: mappedChannel,
             unmapped: patreon_match,
             confidence: 1,
@@ -307,6 +345,10 @@ export const channelsFromNebula = async () => {
   );
 
   const allMatches = [...merch_matches, ...website_matches, ...patreon_matches];
+
+  const still_unmapped = unmappedChannels.filter((channel) => {
+    return !allMatches.find((match) => match.unmapped.slug === channel.slug);
+  });
 
   const high_confidence = allMatches
     .filter((match) => match.confidence >= 3)
@@ -351,10 +393,16 @@ export const channelsFromNebula = async () => {
       website_matches,
       patreon_matches,
     },
-    unMatched,
+    still_unmapped,
   };
 
-  return output;
+  // Check if any video is still unmapped or has a match of any kind
+  if (still_unmapped.length > 0 || allMatches.length > 0) {
+    return output;
+  } else {
+    logger.info("ChannelsFromNebula: All channels have been mapped!");
+    return "All channels have been mapped!";
+  }
 };
 
 /**

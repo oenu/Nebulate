@@ -29,9 +29,9 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
 
     // If the url is not a youtube video, return
     if (!tab.url.includes("youtube.com/watch")) {
-      chrome.tabs.sendMessage(tabId, {
-        type: Messages.CLEAR,
-      });
+      // chrome.tabs.sendMessage(tabId, {
+      //   type: Messages.CLEAR,
+      // });
       return;
     }
 

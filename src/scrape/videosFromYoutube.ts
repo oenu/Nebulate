@@ -107,6 +107,12 @@ export const scrapeYoutube = async (
     );
   }
 
+  // Check if channel has a youtube upload id
+  if (channel.youtubeUploadId === "" || !channel.youtubeUploadId)
+    throw new Error(
+      `scrapeYoutube: Channel ${channelSlug} does not have a youtube_upload_id`
+    );
+
   logger.info(`scrapeYoutube: Getting videos from youtube for ${channelSlug}`);
   for (let scrapedVideos = 0; scrapedVideos < videoScrapeLimit; ) {
     const pageToken = pagetokenBuffer ? pagetokenBuffer : "";

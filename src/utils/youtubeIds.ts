@@ -14,8 +14,6 @@ type YouTubeID = {
   parent_slug?: string; // Parent channel slug - used for grouping channels as many nebula channels may be mapped to a single YouTube channel
 };
 
-// TODO: Add a blacklist of channels to ignore (e.g. Nebula Academy)
-
 export const slugIgnoreList = [
   "one-x-cellent-scene",
   "betterelevation",
@@ -47,7 +45,7 @@ export const youtubeIds: YouTubeID[] = [
     youtubeId: "UC_EzCruiFF-QNJCkBOSCYhA",
   },
   {
-    slug: "aimeenoltemusic",
+    slug: "aimeenolte",
     title: "Aimee Nolte Music",
     id: "video_channel:26be8e30-1687-4bd7-8dd6-888ed5ede10e",
     youtubeId: "UCZIB_p5AgVVdxgkYWHeUy-Q",

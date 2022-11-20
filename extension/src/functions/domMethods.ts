@@ -73,7 +73,7 @@ export const generateNebulaStyling = () => {
   const player_width = parseInt(window.getComputedStyle(player).width, 10);
   const player_height = parseInt(window.getComputedStyle(player).height, 10);
   if (player_height > player_width)
-    console.info("generateNebulaStyling: Vertical video detected");
+    console.log("generateNebulaStyling: Vertical video detected");
 
   return player_height > player_width ? default_css : default_css;
 };
@@ -92,8 +92,6 @@ export const generateChannelStyling = () => {
      border: 1px solid rgb(62, 187, 243) !important; 
     /* background-color: rgb(62, 187, 243); */
   }
-
-
 }`;
   return channel_css;
 };
@@ -102,21 +100,6 @@ let youtube_right_controls: Element | null = null;
 
 // Generate Creator redirect button styling
 export const generateCreatorRedirectStyling = () => {
-  //   let creator_redirect_css = `
-  //   .nebulate-creator-redirect {
-  //     background-color: rgb(62, 187, 243) !important;
-  //     border-radius: 2px;
-  //     color: rgb(255, 255, 255);
-  //     padding: var(--yt-button-padding);
-  //     margin: auto var(--ytd-subscribe-button-margin,4px);
-  //     white-space: nowrap;
-  //     font-size: var(--ytd-tab-system-font-size);
-  //     font-weight: var(--ytd-tab-system-font-weight);
-  //     letter-spacing: var(--ytd-tab-system-letter-spacing);
-  //     text-transform: var(--ytd-tab-system-text-transform);
-  //     display: flex;
-  //     flex-direction: row;
-  // }`;
   const creator_redirect_css = `
   .nebulate-creator-redirect {
     max-height: 100%;

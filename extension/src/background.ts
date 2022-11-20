@@ -2,9 +2,6 @@ import { checkTable } from "./functions/checkTable";
 import { refreshTable } from "./functions/refreshTable";
 import { Alarms, MessageParams, Messages } from "./enums";
 
-// export const server_url = "http://143.244.213.109:3000";
-export const server_url = "http://localhost:3000";
-
 const redirect_preference = true;
 
 let urlCache: string;
@@ -164,6 +161,62 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
           throw new Error("bad channel slug");
         }
         break;
+
+      case Messages.REFRESH_TABLE:
+        // Log the message - for debugging
+        console.debug(
+          "background.js: received refresh table request from content script: " +
+            JSON.stringify(request)
+        );
+
+        // Add typing to request
+        const refreshMessage: MessageParams[Messages.REFRESH_TABLE] = {
+          type: Messages.REFRESH_TABLE,
+        };
+
+        // Refresh the lookup table
+        await refreshTable();
+        break;
+
+      case Messages.POPUP_REDIRECT:
+        // Log the message - for debugging
+        console.debug(
+          "background.js: received popup redirect request from content script: " +
+            JSON.stringify(request)
+        );
+
+        // Add typing to request
+        const popupMessage: MessageParams[Messages.POPUP_REDIRECT] = {
+          type: Messages.POPUP_REDIRECT,
+          url: request.url,
+        };
+
+        // Open a new tab with the url provided
+        chrome.tabs.create({
+          url: request.url,
+          active: true,
+        });
+        break;
+
+      case Messages.REPORT_ISSUE:
+        // Log the message - for debugging
+        console.debug(
+          "background.js: received report issue request from content script: " +
+            JSON.stringify(request)
+        );
+
+        // Add typing to request
+        const reportMessage: MessageParams[Messages.REPORT_ISSUE] = {
+          type: Messages.REPORT_ISSUE,
+          message: request.message,
+        };
+
+        // Open a new mailto tab with the url provided
+        chrome.tabs.create({
+          url: `mailto:oenu.dev@gmail.com?subject=YouTube%20Nebula%20Extension%20Issue&body=${request.message}`,
+          active: true,
+        });
+        break;
     }
   } catch (error: any) {
     console.debug(error);
@@ -178,19 +231,11 @@ chrome.runtime.onInstalled.addListener(async function () {
       // This is not the first install
       console.debug("background.js: not first install");
       return;
-    } else {
-      // This is the first install
-      console.debug("background.js: first install");
-      chrome.storage.local.set({ installed: true });
-      fetch(`${server_url}/api/install`, {
-        method: "POST",
-      });
     }
   });
 
   chrome.storage.local.set({ preferNewTab: false });
   try {
-    console.debug("set server_url to: " + server_url);
     console.debug("background.js: installed");
     await refreshTable();
 

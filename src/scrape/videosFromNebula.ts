@@ -27,48 +27,53 @@ export const videosFromNebula = async (
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
 ) => {
-  // Default scrape limit if none is provided
-  if (!videoScrapeLimit) videoScrapeLimit = 20;
+  try {
+    // Default scrape limit if none is provided
+    if (!videoScrapeLimit) videoScrapeLimit = 20;
 
-  // Check if channel exists
-  if (await !Channel.exists({ slug: channelSlug })) {
-    throw new Error(
-      `videosFromNebula: Channel ${channelSlug} does not exist in DB`
+    // Check if channel exists
+    if (await !Channel.exists({ slug: channelSlug })) {
+      throw new Error(
+        `videosFromNebula: Channel ${channelSlug} does not exist in DB`
+      );
+    }
+
+    // Find channel in DB
+    const channel = await Channel.findOne({ slug: channelSlug });
+    if (!channel) {
+      throw new Error(
+        `videosFromNebula: Channel ${channelSlug} does not have a nebula_id`
+      );
+    }
+
+    logger.debug(`videosFromNebula: Getting videos for ${channelSlug}`);
+    // Scrape videos from Nebula
+    let nebula_videos = await scrapeNebula(
+      channelSlug,
+      videoScrapeLimit,
+      onlyScrapeNew
     );
-  }
 
-  // Find channel in DB
-  const channel = await Channel.findOne({ slug: channelSlug });
-  if (!channel) {
-    throw new Error(
-      `videosFromNebula: Channel ${channelSlug} does not have a nebula_id`
+    // Remove videos that are already in the DB
+    nebula_videos = await removeNebulaDuplicates(nebula_videos);
+
+    if (nebula_videos.length === 0) {
+      logger.debug(`videosFromNebula: No new videos found for ${channelSlug}`);
+      await channel.logScrape("nebula");
+      return;
+    }
+
+    // Save videos to database
+    logger.info(
+      `videosFromNebula: ${nebula_videos.length} new videos to be added for ${channelSlug}`
     );
-  }
-
-  logger.debug(`videosFromNebula: Getting videos for ${channelSlug}`);
-  // Scrape videos from Nebula
-  let nebula_videos = await scrapeNebula(
-    channelSlug,
-    videoScrapeLimit,
-    onlyScrapeNew
-  );
-
-  // Remove videos that are already in the DB
-  nebula_videos = await removeNebulaDuplicates(nebula_videos);
-
-  if (nebula_videos.length === 0) {
-    logger.debug(`videosFromNebula: No new videos found for ${channelSlug}`);
+    await nebulaVideosToDb(nebula_videos);
     await channel.logScrape("nebula");
-    return;
+    return nebula_videos;
+  } catch (error) {
+    logger.error(`videosFromNebula: ${error}`);
+    return [];
   }
-
-  // Save videos to database
-  logger.info(
-    `videosFromNebula: ${nebula_videos.length} new videos to be added for ${channelSlug}`
-  );
-  await nebulaVideosToDb(nebula_videos);
-  await channel.logScrape("nebula");
-  return nebula_videos;
 };
 
 /**

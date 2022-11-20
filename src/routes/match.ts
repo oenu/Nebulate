@@ -13,14 +13,15 @@ app.put("/:channelSlug", async (req: Request, res: Response) => {
     logger.error("No channelSlug provided");
     return;
   }
-  try {
-    await match(channelSlug);
 
-    res.send(`Matched ${channelSlug}`);
-  } catch (error: any) {
-    logger.error(error.message);
-    throw error;
-  }
+  await match(channelSlug)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.status(400).send(err.message);
+      logger.error(err.message);
+    });
 });
 
 module.exports = app;

@@ -36,7 +36,7 @@ const register = async (channelSlug: string) => {
 
   // Get channel from Nebula
   const channel_nebula = await channelFromNebula(channelSlug);
-  const { id, slug, title, description, type, zypeId } =
+  const { id, slug, title, description, type, zypeId, merch_collection } =
     channel_nebula.data.details;
 
   // Get channel youtube id from youtube mapping
@@ -65,6 +65,7 @@ const register = async (channelSlug: string) => {
     type,
     zypeId,
     youtubeId: channelYtId,
+    merch_collection,
     youtubeUploadId: channel_youtube.upload_playlist_id,
   });
 
@@ -113,13 +114,15 @@ export const channelFromNebula = async (channelSlug: string) => {
  * @throws {Error} - If the channel does not have a youtube id
  * @async
  */
-export const idFromYoutube = async (channelSlug: string) => {
+export const idFromYoutube = async (
+  channelSlug: string
+): Promise<string | undefined> => {
   try {
     const channelYtId = youtubeIds.find(
       (channel) => channel.slug === channelSlug
     )?.youtubeId;
     if (channelYtId) return channelYtId;
-    else return null;
+    else return undefined;
   } catch (error) {
     logger.error(error);
     throw error;

@@ -15,7 +15,7 @@ export const connectDB = async () => {
     if (process.env.NODE_ENV === "dev") {
       logger.info("Connecting to mongoDB in dev mode");
       logger.warn("WARNING: YOU SHOULD HAVE MONGODB RUNNING LOCALLY");
-      await mongoose.connect("mongodb://localhost:27017");
+      await mongoose.connect("mongodb://localhost:27017/development");
 
       // Connect to the database in production environment
     } else if (process.env.NODE_ENV === "prod") {

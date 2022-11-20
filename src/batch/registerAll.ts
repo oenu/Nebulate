@@ -16,6 +16,8 @@ import logger from "../utils/logger";
 const registerAll = async () => {
   console.time("registerAll");
 
+  const sleepDuration = 1000 * 30; // 30 seconds
+
   // Filter out channels that are already in DB
   const existingChannels = await Channel.find({});
   const new_slugs = mappedSlugs.filter(
@@ -26,7 +28,11 @@ const registerAll = async () => {
   const existing_slugs = mappedSlugs.length - new_slugs.length;
 
   logger.info(`registerAll: Registering ${new_slugs.length} channels`);
-  logger.info(`registerAll: estimated time: ${new_slugs.length} minutes`);
+  logger.info(
+    `registerAll: estimated time: ${Math.round(
+      new_slugs.length * (sleepDuration / 1000 / 60)
+    )} minutes`
+  );
   logger.info(
     `registerAll: Expected eta: ${new Date(
       Date.now() + new_slugs.length * 60 * 1000
@@ -58,8 +64,15 @@ const registerAll = async () => {
 
       // Report the progress of the registration process and wait for 1 minute
       logger.info(`registerAll: ${remaining_slugs} channels remaining`);
-      console.timeLog("registerAll", "Sleeping for 1 minute");
-      await new Promise((resolve) => setTimeout(resolve, 60000));
+      console.timeLog(
+        "registerAll",
+        `Sleeping for ${
+          sleepDuration / 1000
+        } seconds. ${remaining_slugs} channels remaining. Estimated time remaining: ${Math.round(
+          remaining_slugs * (sleepDuration / 1000 / 60)
+        )} minutes`
+      );
+      await new Promise((resolve) => setTimeout(resolve, sleepDuration));
     }
   }
 

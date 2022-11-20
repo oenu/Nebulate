@@ -1,5 +1,3 @@
-import { server_url } from "../background";
-
 const downloadTable = async (): Promise<any> => {
   let response;
   try {

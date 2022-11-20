@@ -93,17 +93,30 @@ export const redirectHandler = async (message: Messages) => {
   // Send a message to the background script to trigger the redirect
   switch (message) {
     case Messages.VIDEO_REDIRECT: // Redirect to Nebula video
-      chrome.runtime.sendMessage({
-        type: Messages.VIDEO_REDIRECT,
-        videoSlug: localVideo.videoSlug,
-      } as MessageParams[Messages.VIDEO_REDIRECT]);
+      if (!localVideo.videoSlug) {
+        console.error("CS: Redirect: No video slug set");
+        return;
+      } else {
+        const videoRedirect: MessageParams[Messages.VIDEO_REDIRECT] = {
+          type: Messages.VIDEO_REDIRECT,
+          videoSlug: localVideo.videoSlug,
+        };
+        chrome.runtime.sendMessage(videoRedirect);
+      }
       break;
 
-    case Messages.CREATOR_REDIRECT: // Redirect to nebula creator
-      chrome.runtime.sendMessage({
-        type: Messages.CREATOR_REDIRECT,
-        channelSlug: localVideo.channelSlug,
-      } as MessageParams[Messages.CREATOR_REDIRECT]);
+    case Messages.CREATOR_REDIRECT: // Redirect to Nebula creator
+      if (!localVideo.channelSlug) {
+        console.error("CS: Redirect: No channel slug set");
+        return;
+      } else {
+        const creatorRedirect: MessageParams[Messages.CREATOR_REDIRECT] = {
+          type: Messages.CREATOR_REDIRECT,
+          channelSlug: localVideo.channelSlug,
+        };
+        chrome.runtime.sendMessage(creatorRedirect);
+      }
+      break;
   }
 };
 

@@ -7,6 +7,11 @@ export enum Messages {
   // Messages to the background script
   VIDEO_REDIRECT = "VIDEO_REDIRECT", // Sent to the background script to request a redirect to a nebula video.
   CREATOR_REDIRECT = "CREATOR_REDIRECT", // Sent to the background script to request a redirect to a channel.
+
+  // Messages from the popup
+  POPUP_REDIRECT = "POPUP_REDIRECT", // Sent from the popup to request a redirect to a social media page for the developer.
+  REFRESH_TABLE = "REFRESH_TABLE", // Sent from the popup to request a refresh of the table.
+  REPORT_ISSUE = "REPORT_ISSUE", // Sent from the popup to send a report issue email.
 }
 
 export type Video = {
@@ -40,6 +45,23 @@ export interface MessageParams {
     // Sent to the background script to request a redirect to a channel.
     type: Messages.CREATOR_REDIRECT;
     channelSlug: string; // The nebula channel slug to redirect to
+  };
+
+  [Messages.POPUP_REDIRECT]: {
+    // Sent from the popup to request a redirect to a social media page for the developer.
+    type: Messages.POPUP_REDIRECT;
+    url: string; // The url to redirect to
+  };
+
+  [Messages.REFRESH_TABLE]: {
+    // Sent from the popup to request a refresh of the table.
+    type: Messages.REFRESH_TABLE;
+  };
+
+  [Messages.REPORT_ISSUE]: {
+    // Sent from the popup to send a report issue email.
+    type: Messages.REPORT_ISSUE;
+    message: string; // The message to send in the email
   };
 }
 

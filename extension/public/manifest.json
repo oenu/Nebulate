@@ -4,7 +4,8 @@
   "description": "Nebulate links YouTube and Nebula videos",
   "version": "0.1",
   "options_ui": {
-    "page": "options.html"
+    "page": "options.html",
+    "open_in_tab": true
   },
 
   "action": {
@@ -40,7 +41,6 @@
 
   "host_permissions": [
     "https://*.youtube.com/*",
-    "https://table.oenu.org/neb-table/lookup_table.json",
-    "http://143.244.208.70:3000/*"
+    "https://table.oenu.org/neb-table/lookup_table.json"
   ]
 }

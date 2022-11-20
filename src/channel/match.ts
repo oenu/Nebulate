@@ -17,7 +17,7 @@ import { Channel } from "../models/channel/channel";
 const match = async (channelSlug: string) => {
   logger.info(`Match: Matching videos for ${channelSlug}`);
   // Check for channel slug
-  if (await !Channel.exists({ slug: channelSlug })) {
+  if (!Channel.exists({ slug: channelSlug })) {
     throw new Error(`Match: Channel ${channelSlug} doesn't exist in database`);
   }
 
@@ -65,6 +65,6 @@ const match = async (channelSlug: string) => {
     `Match: Match complete for ${channelSlug}, ${newMatchCount} new, ${replacedMatchCount} replaced, ${anotherBetterMatchCount} another better, ${noMatchCount} no match, ${noChangeCount} no change`
   );
 
-  return;
+  return `Match: Match complete for ${channelSlug}, ${newMatchCount} new, ${replacedMatchCount} replaced, ${anotherBetterMatchCount} another better, ${noMatchCount} no match, ${noChangeCount} no change`;
 };
 export default match;

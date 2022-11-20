@@ -83,9 +83,10 @@ logger.add(
 logger.add(
   new winston.transports.File({
     format: winston.format.combine(
+      winston.format.timestamp(),
       winston.format.json(),
       winston.format((info: any) => {
-        return info.message.includes("redirect") ? info : false;
+        return info.message?.includes("redirect") ? info : false;
       })()
     ),
     filename: path.join(__dirname, "..", "/logs", "lookups.log"),

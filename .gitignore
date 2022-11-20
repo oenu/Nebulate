@@ -42,3 +42,4 @@ lookup_table.json
 globalConfig.json
 junit.xml
 src/lookup/key.pem
+extension/dist.zip

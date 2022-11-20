@@ -1,6 +1,7 @@
 import { redirectHandler } from "../content_script";
 import { CSS, CSS_CLASSES, Messages } from "../enums";
 
+// Load the CSS for Videos or Creator depending on the message
 export const loadCSS = (css: CSS) => {
   if (css === CSS.NEBULA_VIDEO) {
     const head = document.head || document.getElementsByTagName("head")[0];
@@ -25,6 +26,7 @@ export const loadCSS = (css: CSS) => {
   }
 };
 
+// Remove the CSS for Videos or Creator depending on the message
 export const unloadCSS = (css: CSS) => {
   console.debug("unloadCSS: unloading styling");
   try {
@@ -50,6 +52,7 @@ export const unloadCSS = (css: CSS) => {
   }
 };
 
+// Add a background glow to the video player to indicate that the video is on Nebula
 export const generateNebulaStyling = () => {
   let default_css = `#player {
   transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -70,11 +73,12 @@ export const generateNebulaStyling = () => {
   const player_width = parseInt(window.getComputedStyle(player).width, 10);
   const player_height = parseInt(window.getComputedStyle(player).height, 10);
   if (player_height > player_width)
-    console.info("generateNebulaStyling: Vertical video detected");
+    console.log("generateNebulaStyling: Vertical video detected");
 
   return player_height > player_width ? default_css : default_css;
 };
 
+// Add a blue border to the channel icon and name box to indicate that the channel is on Nebula
 export const generateChannelStyling = () => {
   let channel_css = `
   #avatar {
@@ -88,14 +92,102 @@ export const generateChannelStyling = () => {
      border: 1px solid rgb(62, 187, 243) !important; 
     /* background-color: rgb(62, 187, 243); */
   }
-
-
 }`;
   return channel_css;
 };
 
 let youtube_right_controls: Element | null = null;
 
+// Generate Creator redirect button styling
+export const generateCreatorRedirectStyling = () => {
+  const creator_redirect_css = `
+  .nebulate-creator-redirect {
+    max-height: 100%;
+    max-width: 100%;
+
+    // Indicate that the button is clickable
+    cursor: pointer;
+    
+
+// Add on-hover styling
+    &:hover {
+
+      color: rgb(255, 255, 255);
+
+
+
+  }`;
+
+  return creator_redirect_css;
+};
+
+export const addCreatorRedirect = () => {
+  console.debug("addCreatorRedirect: Adding redirect button");
+
+  // Check if button already exists
+  if (document.getElementsByClassName("nebulate-creator-redirect").length > 0)
+    return;
+
+  // Create a clickable png
+  const nebulate_logo = document.createElement("img");
+  nebulate_logo.src = chrome.runtime.getURL("assets/icon.png");
+
+  nebulate_logo.className = "nebulate-creator-redirect";
+  // Indicate that the button is clickable
+  nebulate_logo.style.cursor = "pointer";
+
+  // Add Creator Redirect Styling
+  const head = document.head || document.getElementsByTagName("head")[0];
+  const redirectStyling = document.createElement("style");
+  if (
+    // Check if the redirect styling has already been added
+    document.getElementsByClassName("nebulate-creator-redirect-css").length ===
+    0
+  ) {
+    redirectStyling.className = "nebulate-creator-redirect-css";
+    redirectStyling.textContent = generateCreatorRedirectStyling();
+    head.appendChild(redirectStyling);
+  }
+
+  nebulate_logo.addEventListener("click", () => {
+    redirectHandler(Messages.CREATOR_REDIRECT);
+  });
+
+  // Check if the subscribe button exists
+  const subscribe_button = document.querySelector(
+    "#subscribe-button:not(.skeleton-bg-color)"
+  );
+  if (subscribe_button) {
+    // Add the button to the DOM
+    console.log(subscribe_button);
+    console.debug("addCreatorRedirect: Adding button to DOM");
+    subscribe_button.insertAdjacentElement("beforebegin", nebulate_logo);
+  } else {
+    console.warn(
+      "addCreatorRedirect: Could not find subscribe button, waiting"
+    );
+    setTimeout(
+      () => {
+        addCreatorRedirect();
+      } /* 1 second */,
+      1000
+    );
+  }
+};
+
+// Remove creator redirect button
+export const removeCreatorRedirect = () => {
+  const creator_redirect = document.getElementById("nebulate-creator-redirect");
+  if (!creator_redirect) {
+    console.warn(
+      "removeCreatorRedirect: Could not find creator redirect button"
+    );
+    return;
+  }
+  creator_redirect.remove();
+};
+
+// Add a button to the YouTube player to redirect to the Nebula video
 export const addNebulaControls = () => {
   // Add nebula controls
   const nebulate_button_exists = document.getElementById(
@@ -115,7 +207,7 @@ export const addNebulaControls = () => {
 
     youtube_right_controls.prepend(nebulate_button);
     nebulate_button.addEventListener("click", () => {
-      redirectHandler(Messages.NEBULA_REDIRECT);
+      redirectHandler(Messages.VIDEO_REDIRECT);
     });
     return;
   } else {
@@ -124,6 +216,7 @@ export const addNebulaControls = () => {
   }
 };
 
+// Remove the Nebula button from the YouTube player
 export const removeNebulaControls = () => {
   const nebulate_button = document.getElementById(CSS_CLASSES.NEBULA_VIDEO_BTN);
   if (nebulate_button) nebulate_button.remove();

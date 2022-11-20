@@ -7,21 +7,22 @@ import type { YoutubeVideoType } from "../youtubeVideo/youtubeVideo";
 
 // Fantastic Doc on mongoose schemas:
 // https://millo-l.github.io/Typescript-mongoose-methods-statics/
-interface ChannelInterface {
+export interface ChannelInterface {
   nebulaId: string;
   type: string;
   slug: string;
   title: string;
   description: string;
   zypeId: string;
-  youtubeId: string;
-  youtubeTitle: string;
-  youtubeUploadId: string;
+  youtubeId?: string;
+  youtubeTitle?: string;
+  youtubeUploadId?: string;
   lastScrapedNebula: Date;
   lastScrapedYoutube: Date;
   lastMatched: Date;
   nebulaVideos: NebulaVideoType[];
   youtubeVideos: YoutubeVideoType[];
+  merch_collection: string;
 }
 
 interface ChannelDocument extends ChannelInterface, mongoose.Document {
@@ -75,6 +76,7 @@ export const channelSchema: Schema<ChannelDocument> = new Schema(
     lastScrapedNebula: { type: "Date" },
     lastScrapedYoutube: { type: "Date" },
     lastMatched: { type: "Date" },
+    merch_collection: { type: "String" },
   },
   {
     collection: "channels",

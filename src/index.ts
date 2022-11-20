@@ -54,6 +54,10 @@ app.get("/", (_req, res) => {
 const lookup = require("./routes/lookup");
 app.use("/api/lookup", lookup);
 
+// Find all channels on Nebula
+const channels = require("./routes/findChannels");
+app.use("/channels", reqAuth, channels);
+
 // Register a new channel
 const register = require("./routes/register");
 app.use("/register", reqAuth, register);

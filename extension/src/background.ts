@@ -5,7 +5,7 @@ import { Alarms, MessageParams, Messages } from "./enums";
 // export const server_url = "http://143.244.213.109:3000";
 export const server_url = "http://localhost:3000";
 
-const redirect_preference = false;
+const redirect_preference = true;
 
 let urlCache: string;
 
@@ -29,9 +29,20 @@ chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
 
     // If the url is not a youtube video, return
     if (!tab.url.includes("youtube.com/watch")) {
-      // chrome.tabs.sendMessage(tabId, {
-      //   type: Messages.CLEAR,
-      // });
+      // Check if the last url was a youtube video
+      if (urlCache && urlCache.includes("youtube.com/watch")) {
+        // If so, send a message to the content script to remove the button
+        try {
+          chrome.tabs.sendMessage(tabId, {
+            type: Messages.CLEAR,
+          });
+        } catch (error) {
+          console.debug("Sending Clear Error: " + error);
+        }
+
+        // Clear the cache
+        urlCache = "";
+      }
       return;
     }
 
@@ -138,13 +149,13 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
             // If the preference is set to new tab, open the channel in a new tab
             if (result.preferNewTab === true) {
               chrome.tabs.create({
-                url: `https://nebula.app/channels/${channelSlug}`,
+                url: `https://nebula.app/${channelSlug}`,
                 active: true,
               });
             } else {
               // If the preference is set to current tab, open the channel in the current tab
               chrome.tabs.update(request.tabId, {
-                url: `https://nebula.app/channels/${channelSlug}`,
+                url: `https://nebula.app/${channelSlug}`,
               });
             }
           });

@@ -4,8 +4,10 @@ console.debug("CS: init");
 import { CSS, MessageParams, Messages, Video } from "./enums";
 
 import {
+  addCreatorRedirect,
   addNebulaControls,
   loadCSS,
+  removeCreatorRedirect,
   removeNebulaControls,
   unloadCSS,
   // addChannelButton,
@@ -115,6 +117,7 @@ const newVideoLoaded = async (video: Video) => {
   // Remove nebula styling to enable animation
   unloadCSS(CSS.NEBULA_VIDEO);
   unloadCSS(CSS.CREATOR);
+  removeCreatorRedirect();
 
   // Check if the the page already has the Nebula controls
   const video_styling_exists =
@@ -124,12 +127,14 @@ const newVideoLoaded = async (video: Video) => {
   if (!video.known) {
     unloadCSS(CSS.NEBULA_VIDEO);
     unloadCSS(CSS.CREATOR);
+    removeCreatorRedirect();
     removeNebulaControls();
     return;
   }
 
   // If the video is known to be from a nebula creator, add the creator highlight
   loadCSS(CSS.CREATOR);
+  addCreatorRedirect();
 
   if (video.matched) {
     // If the video is matched, add the nebula video highlight and controls

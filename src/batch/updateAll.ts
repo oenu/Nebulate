@@ -3,7 +3,7 @@ import { generateTable } from "../table/generateTable";
 import uploadTable from "../table/uploadTable";
 import logger from "../utils/logger";
 const youtubeScrapeInterval = 2 * 60 * 60 * 1000; // 2 hours
-const nebulaScrapeInterval = 12 * 60 * 60 * 1000; // 12 hours
+const nebulaScrapeInterval = 2 * 24 * 60 * 60 * 1000; // 2 days
 const matchInterval = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 /**
@@ -41,27 +41,29 @@ const updateAll = async () => {
       nebulaScrapeThreshold
     ).toLocaleString()}`
   );
+  const matchThreshold = new Date().getTime() - matchInterval;
+  // Log match threshold
+  logger.info(
+    `UpdateAll: Match threshold: ${new Date(matchThreshold).toLocaleString()}`
+  );
 
   // Quickly check if any channels need to be scraped, note that some will not have a lastScrapedNebula or lastScrapedYoutube
+  let needsNebulaScrape = 0;
+  let needsYoutubeScrape = 0;
   const channelsToScrape = channels.filter((channel) => {
-    // Debug this
-    console.log(
-      "Nebula threshold",
-      channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold
-    );
-    console.log(
-      "Youtube Threshold",
-      channel.lastScrapedYoutube.getTime() < youtubeScrapeThreshold
-    );
-
     if (!channel.lastScrapedNebula || !channel.lastScrapedYoutube) {
       return true;
-    }
+    } else {
+      if (channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold)
+        needsNebulaScrape++;
+      if (channel.lastScrapedYoutube.getTime() < youtubeScrapeThreshold)
+        needsYoutubeScrape++;
 
-    return (
-      channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold ||
-      channel.lastScrapedYoutube.getTime() < youtubeScrapeThreshold
-    );
+      return (
+        channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold ||
+        channel.lastScrapedYoutube.getTime() < youtubeScrapeThreshold
+      );
+    }
   });
 
   // If no channels need to be scraped, return
@@ -70,115 +72,103 @@ const updateAll = async () => {
     console.timeEnd("updateAll");
     return;
   } else {
-    logger.info(`${channelsToScrape.length} channels might need to be scraped`);
+    logger.info(
+      `${
+        channelsToScrape.length
+      } channels need to be scraped, ${needsNebulaScrape} need nebula scrape, ${needsYoutubeScrape} need youtube scrape, estimating ${Math.round(
+        needsNebulaScrape * (1 / 3)
+      )} minutes`
+    );
   }
 
   // For each channel, check if it needs to be updated
-  for await (const channel of channels) {
-    let needsRematch = false; // If the channel needs to be rematched, only actually rematch if it has been scraped
-    let needsDeepScrape = false; // Catch channels that were registered but never scraped
+  for await (const [index, channel] of channels.entries()) {
+    let status = {
+      needsYoutubeScrape: false, // If the channel needs to be scraped from youtube
+      needsNebulaScrape: false, // If the channel needs to be scraped from nebula
+      needsMatch: false, // If the channel needs to be matched
+      needsDeepScrape: false, // If the channel needs to be scraped deeply (i.e. all videos)
+    };
 
-    // ================================ Youtube ================================
-    // Check if the channel needs to be updated
-    let newYoutubeVideos = [];
-    if (!channel.lastScrapedYoutube) {
-      logger.warn("No lastScrapedNebula for channel " + channel.slug);
-      needsDeepScrape = true;
-      newYoutubeVideos = (await channel.scrapeYoutube(needsDeepScrape)) || [];
-      needsRematch = true;
-    } else if (channel.lastScrapedYoutube.getTime() < youtubeScrapeThreshold) {
-      // Scrape the channel's videos from Youtube
-      newYoutubeVideos = (await channel.scrapeYoutube()) || [];
-    }
-
-    // Check if any new youtube videos were scraped
-    if (newYoutubeVideos.length > 0) {
-      addedYoutube += newYoutubeVideos.length;
-      needsRematch = true;
+    // Work out what needs to be done
+    // If the channel has never been scraped, it needs a deep scrape
+    if (!channel.lastScrapedNebula || !channel.lastScrapedYoutube) {
+      status.needsDeepScrape = true;
       logger.info(
-        `Scraped ${newYoutubeVideos?.length} new youtube videos for ${channel.slug}`
+        `UpdateAll: ${index}/${channels.length} ${channel.slug} needs a deep scrape`
       );
-    }
-
-    // Check if channel has new youtube videos
-    if (!needsRematch) {
-      // Catch channels that don't have new youtube videos but also haven't been matched in 7 days
-      if (
-        !channel.lastMatched ||
-        channel.lastMatched.getTime() <
-          youtubeScrapeThreshold - 1000 * 60 * 60 * 24 * 7 // 7 days
-      ) {
+      !channel.lastScrapedNebula && (status.needsNebulaScrape = true);
+      !channel.lastScrapedYoutube && (status.needsYoutubeScrape = true);
+    } else {
+      // Youtube Scrape
+      if (channel.lastScrapedYoutube.getTime() < youtubeScrapeThreshold) {
+        // If the last scrape was before the threshold, scrape it
         logger.info(
-          "Channel " +
-            channel.slug +
-            " has not been matched in the last 7 days, rematching"
+          `UpdateAll: ${index}/${channels.length}: ${channel.slug} needs a youtube scrape`
         );
-        needsRematch = true;
+        status.needsYoutubeScrape = true;
+      }
 
-        // Catch channels that don't have new youtube videos but also haven't been nebula scraped in the last 2 days
-      } else if (
-        channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold
-        // nebulaScrapeInterval - 1000 * 60 * 60 * 24 * 2
-      ) {
+      // Nebula Scrape
+      if (channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold) {
+        // If the last scrape was before the threshold, scrape it
         logger.info(
-          "Channel " +
-            channel.slug +
-            "'s Nebula videos haven't been scraped in the last 2 days, continuing"
+          `UpdateAll: ${index}/${channels.length}: ${channel.slug} needs a nebula scrape`
         );
-      } else {
-        logger.debug(
-          "Channel " + channel.slug + " does not need to be updated, skipping"
+        status.needsNebulaScrape = true;
+      }
+
+      // Match
+      if (channel.lastMatched.getTime() < matchThreshold) {
+        // If the last match was before the threshold, match it
+        logger.info(
+          `UpdateAll: ${index}/${channels.length}: ${channel.slug} needs a match`
         );
-        continue;
+        status.needsMatch = true;
       }
     }
-    // ================================ Nebula ================================
+
+    // Arrays to store the videos that have been added
+    let newYoutubeVideos = [];
     let newNebulaVideos = [];
-    let scrapedNebula = false;
-    if (!channel.lastScrapedNebula) {
-      logger.warn("No lastScrapedNebula for channel " + channel.slug);
-      needsDeepScrape = true;
-      newNebulaVideos = (await channel.scrapeNebula(needsDeepScrape)) || [];
-      scrapedNebula = true;
-      needsRematch = true;
-    } else if (channel.lastScrapedNebula.getTime() < nebulaScrapeThreshold) {
-      // Scrape the channel's videos from Nebula
-      newNebulaVideos = (await channel.scrapeNebula(needsDeepScrape)) || [];
-      scrapedNebula = true;
+
+    // Scrape youtube (if needed)
+    if (status.needsYoutubeScrape || status.needsDeepScrape) {
+      newYoutubeVideos =
+        (await channel.scrapeYoutube(status.needsDeepScrape)) || [];
+      addedYoutube += newYoutubeVideos.length;
     }
 
-    // Check if any new nebula videos were scraped
-    if (newNebulaVideos.length > 0) {
+    // Scrape nebula (if needed)
+    let scrapedNebula = false; // Used for rate limiting
+    if (
+      status.needsNebulaScrape ||
+      status.needsDeepScrape ||
+      newYoutubeVideos.length > 0
+    ) {
+      newNebulaVideos =
+        (await channel.scrapeNebula(status.needsDeepScrape)) || [];
+      scrapedNebula = true;
       addedNebula += newNebulaVideos.length;
-      needsRematch = true;
-      logger.info(
-        `Scraped ${newNebulaVideos?.length} new nebula videos for ${channel.slug}`
-      );
     }
 
-    // Match the channel's videos
-    // Will run if the channel has released new videos or if it has not been matched in a while
-    if (!channel.lastMatched) {
-      logger.warn("No lastMatched for channel " + channel.slug);
-      await channel.matchVideos();
-      ranMatch++;
-    } else if (needsRematch) {
+    // Match videos (if needed)
+    if (
+      status.needsMatch ||
+      newNebulaVideos.length > 0 ||
+      newYoutubeVideos.length > 0
+    ) {
       await channel.matchVideos();
       ranMatch++;
     }
 
-    /**
-     * Note: Nebula has a much stricter rate limit than Youtube, so we will only have to wait if we scraped from Nebula
-     */
-
-    console.timeLog("updateAll", "Finished " + channel.slug);
-
-    // Wait if we scraped from Nebula
+    // If nebula was scraped, sleep for 20 seconds to avoid rate limiting
     if (scrapedNebula) {
-      logger.info("Waiting 30s for Nebula rate limit");
-      await new Promise((resolve) => setTimeout(resolve, 30000));
+      logger.info("UpdateAll: Sleeping for 20 seconds to avoid rate limiting");
+      await new Promise((resolve) => setTimeout(resolve, 20000));
     }
   }
+
   logger.info(
     `updateAll: Done updating channels, added ${addedYoutube} youtube videos, ${addedNebula} nebula videos and ran ${ranMatch} match jobs`
   );

@@ -55,12 +55,23 @@ const videosFromYoutube = async (
       );
 
     // Scrape youtube API to get videos for a channel
+
     let youtube_videos = await scrapeYoutube(
       channelSlug,
       videoScrapeLimit,
       onlyScrapeNew
-    );
+    ).catch((err) => {
+      if (err.response.status === 404) {
+        logger.error(
+          `videosFromYoutube: Channel ${channelSlug} either does not have any videos or the playlist id is incorrect`
+        );
+        return [];
+      } else {
+        throw err;
+      }
+    });
 
+    console.log(youtube_videos);
     // Remove videos that are already in the DB
     youtube_videos = await removeYoutubeDuplicates(youtube_videos);
 
@@ -78,8 +89,8 @@ const videosFromYoutube = async (
     await channel.logScrape("youtube");
     logger.debug(`videosFromYoutube: ${youtube_videos.length} videos found`);
     return youtube_videos;
-  } catch (err) {
-    logger.error(err);
+  } catch (err: unknown) {
+    logger.error("videosFromYoutube: unknown error: " + err);
     return [];
   }
 };

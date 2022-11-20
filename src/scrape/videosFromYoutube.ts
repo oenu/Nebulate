@@ -20,7 +20,7 @@ import { YoutubeVideo as VideoModel } from "../models/youtubeVideo/youtubeVideo"
  * @param {string} channelSlug - The channel's channel slug
  * @param {boolean} onlyScrapeNew - Only scrape new videos, will stop when a known video is found
  * @param {number} videoScrapeLimit - The number of videos to scrape
- * @returns {Promise<YoutubeVideo[]>}  - The videos scraped from youtube
+ * @returns {Promise<any[]>}  - The videos scraped from youtube
  * @throws {Error} - If the channel does not exist in the DB or if the channel does not have a youtube upload id
  * @async
  */
@@ -28,55 +28,60 @@ const videosFromYoutube = async (
   channelSlug: string,
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
-) => {
-  // Default scrape limit if none is provided
-  if (!videoScrapeLimit) videoScrapeLimit = 20;
+): Promise<any[]> => {
+  try {
+    // Default scrape limit if none is provided
+    if (!videoScrapeLimit) videoScrapeLimit = 20;
 
-  // Check if channel exists
-  if (await !Channel.exists({ slug: channelSlug })) {
-    throw new Error(
-      `videosFromYoutube: Channel ${channelSlug} does not exist in DB`
+    // Check if channel exists
+    if (await !Channel.exists({ slug: channelSlug })) {
+      throw new Error(
+        `videosFromYoutube: Channel ${channelSlug} does not exist in DB`
+      );
+    }
+
+    // Get Channel
+    const channel = await Channel.findOne({ slug: channelSlug });
+
+    if (!channel)
+      throw new Error(
+        `videosFromYoutube: Channel ${channelSlug} does not have a youtube_id`
+      );
+
+    // Check if channel has a youtube upload id
+    if (channel.youtubeUploadId === "" || channel.youtubeUploadId === null)
+      throw new Error(
+        `videosFromYoutube: Channel ${channelSlug} does not have a youtube_upload_id`
+      );
+
+    // Scrape youtube API to get videos for a channel
+    let youtube_videos = await scrapeYoutube(
+      channelSlug,
+      videoScrapeLimit,
+      onlyScrapeNew
     );
-  }
 
-  // Get Channel
-  const channel = await Channel.findOne({ slug: channelSlug });
+    // Remove videos that are already in the DB
+    youtube_videos = await removeYoutubeDuplicates(youtube_videos);
 
-  if (!channel)
-    throw new Error(
-      `videosFromYoutube: Channel ${channelSlug} does not have a youtube_id`
+    if (youtube_videos.length === 0) {
+      logger.info(`videosFromYoutube: No new videos found for ${channelSlug}`);
+      await channel.logScrape("youtube");
+      return [];
+    }
+    logger.info(
+      `videosFromYoutube: ${youtube_videos.length} new videos to be added for ${channelSlug}`
     );
 
-  // Check if channel has a youtube upload id
-  if (channel.youtubeUploadId === "" || channel.youtubeUploadId === null)
-    throw new Error(
-      `videosFromYoutube: Channel ${channelSlug} does not have a youtube_upload_id`
-    );
-
-  // Scrape youtube API to get videos for a channel
-  let youtube_videos = await scrapeYoutube(
-    channelSlug,
-    videoScrapeLimit,
-    onlyScrapeNew
-  );
-
-  // Remove videos that are already in the DB
-  youtube_videos = await removeYoutubeDuplicates(youtube_videos);
-
-  if (youtube_videos.length === 0) {
-    logger.info(`videosFromYoutube: No new videos found for ${channelSlug}`);
+    // Insert videos into DB
+    await youtubeVideosToDb(youtube_videos);
     await channel.logScrape("youtube");
-    return;
+    logger.debug(`videosFromYoutube: ${youtube_videos.length} videos found`);
+    return youtube_videos;
+  } catch (err) {
+    logger.error(err);
+    return [];
   }
-  logger.info(
-    `videosFromYoutube: ${youtube_videos.length} new videos to be added for ${channelSlug}`
-  );
-
-  // Insert videos into DB
-  await youtubeVideosToDb(youtube_videos);
-  await channel.logScrape("youtube");
-  logger.debug(`videosFromYoutube: ${youtube_videos.length} videos found`);
-  return youtube_videos;
 };
 
 export default videosFromYoutube;

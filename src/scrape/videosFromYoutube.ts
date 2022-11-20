@@ -71,7 +71,6 @@ const videosFromYoutube = async (
       }
     });
 
-    console.log(youtube_videos);
     // Remove videos that are already in the DB
     youtube_videos = await removeYoutubeDuplicates(youtube_videos);
 

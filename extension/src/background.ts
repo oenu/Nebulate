@@ -1,315 +1,303 @@
+import { Messages, Alarms } from "./enums";
 import { checkTable } from "./functions/checkTable";
-import { refreshTable } from "./functions/refreshTable";
-import { Alarms, MessageParams, Messages } from "./enums";
+import { updateTable } from "./functions/updateTable";
 
-const redirect_preference = true;
+import { Channel, Video } from "./types";
 
+// Config Variables
+const defaults = {
+  // Time to wait before refreshing the lookup table.
+  updateInterval: 60 * 4,
+  // Whether to open in a new tab or the current tab.
+  preferNewTab: true,
+  // Whether to show the channel redirect button on a youtube page.
+  showChannelButton: true,
+  // Whether to show the video redirect button on a youtube player.
+  showVideoButton: true,
+
+  // Development mode
+  devUpdateInterval: 5,
+};
+
+const version = "0.1.0";
 let urlCache: string;
 
-// Watch for changes to tabs and send a message to the content script when a new video is loaded
-// ================ Tab Change Listener ================= //
-chrome.tabs.onUpdated.addListener(async function (tabId, _changeInfo, tab) {
-  try {
-    // If the tab is not fully loaded, return
-    if (tab.status !== "complete") return;
-
-    // If a tab doesn't have a url, return
-    if (!tab.url) {
-      return;
-    }
-
-    // If the url has already been checked, return
-    if (urlCache === tab.url) {
-      console.debug("background.js: video already checked");
-      return;
-    }
-
-    // If the url is not a youtube video, return
-    if (!tab.url.includes("youtube.com/watch")) {
-      // Check if the last url was a youtube video
-      if (urlCache && urlCache.includes("youtube.com/watch")) {
-        // If so, send a message to the content script to remove the button
-        try {
+/**
+ * Listener Tasks:
+ * 1. If a new video is loaded, check if it (or its creator) is on Nebula
+ * 1.1 If it is on Nebula, send a message to the content script to load the CSS
+ * 1.2 If it is not on Nebula, send a message to the content script to unload the CSS
+ * 2. If a new page is loaded and it isn't a video page, send a message to the content script to unload the CSS
+ */
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete") {
+    if (tab.url?.includes("youtube.com/watch")) {
+      const url = tab.url;
+      if (url !== urlCache) {
+        urlCache = url;
+        const response = await checkTable(url);
+        if (response) {
+          handleVideo(response, tabId);
+        } else {
           chrome.tabs.sendMessage(tabId, {
             type: Messages.CLEAR,
           });
-        } catch (error) {
-          console.debug("Sending Clear Error: " + error);
         }
-
-        // Clear the cache
-        urlCache = "";
       }
-      return;
-    }
-
-    // If the url is a youtube video, check the table
-    urlCache = tab.url;
-    const queryParameters = tab.url.split("?")[1];
-    const urlParameters = new URLSearchParams(queryParameters);
-    const videoId = urlParameters.get("v");
-
-    // If the videoId is not found, return
-    if (!videoId) return;
-
-    // Check the lookup table to see if the video is known or matched
-    const video = await checkTable(videoId);
-
-    // If the video is known, send a message to the content script with the video information
-    if (video.known) {
-      const message: MessageParams["NEW_VIDEO"] = {
-        type: Messages.NEW_VIDEO,
-        video,
-      };
-      chrome.tabs.sendMessage(tabId, {
-        ...message,
-      });
     } else {
-      // If the video is not known, send a message to the content script to clear the page
-      const message: MessageParams["CLEAR"] = {
+      // Not a video page
+      chrome.tabs.sendMessage(tabId, {
         type: Messages.CLEAR,
-      };
-      chrome.tabs.sendMessage(tabId, {
-        ...message,
       });
     }
-  } catch (error) {
-    console.debug(error);
   }
 });
 
-// ================== Message Listeners ================== //
-
-// Listen for redirect messages from the content script
-chrome.runtime.onMessage.addListener(async function (request, sender) {
-  try {
-    switch (request.type) {
-      // Log the message - for debugging
-      case Messages.VIDEO_REDIRECT:
-        console.debug(
-          "background.js: received redirect request from content script: " +
-            JSON.stringify(request)
-        );
-
-        // Add typing to request
-        const message: MessageParams[Messages.VIDEO_REDIRECT] = {
-          type: Messages.VIDEO_REDIRECT,
-          videoSlug: request.videoSlug,
-        };
-
-        // Extract the video slug from the message
-        const videoSlug = message.videoSlug;
-
-        // Check if the videoSlug is valid
-        if (videoSlug && videoSlug.length > 0) {
-          // Check if the redirect preference is set to new tab or current tab ( true = new tab, false = current tab)
-          chrome.storage.local.get("preferNewTab", (result) => {
-            // If the preference is set to new tab, open the video in a new tab
-            if (result.preferNewTab === true) {
-              chrome.tabs.create({
-                url: `https://nebula.app/videos/${videoSlug}`,
-                active: true,
-              });
-            } else {
-              // If the preference is set to current tab, open the video in the current tab
-              chrome.tabs.update(request.tabId, {
-                url: `https://nebula.app/videos/${videoSlug}`,
-              });
-            }
-          });
-        } else {
-          console.debug("background.js: bad video slug");
-          throw new Error("bad video slug");
-        }
-        break;
-
-      case Messages.CREATOR_REDIRECT:
-        // Log the message - for debugging
-        console.debug(
-          "background.js: received Channel redirect request from content script: " +
-            JSON.stringify(request)
-        );
-
-        // Add typing to request
-        const channelMessage: MessageParams[Messages.CREATOR_REDIRECT] = {
-          type: Messages.CREATOR_REDIRECT,
-          channelSlug: request.channelSlug,
-        };
-
-        // Extract the channel slug from the message
-        const channelSlug = channelMessage.channelSlug;
-
-        // Check if the channelSlug is valid
-        if (channelSlug && channelSlug.length > 0) {
-          // Check if the redirect preference is set to new tab or current tab ( true = new tab, false = current tab)
-          chrome.storage.local.get("preferNewTab", (result) => {
-            // If the preference is set to new tab, open the channel in a new tab
-            if (result.preferNewTab === true) {
-              chrome.tabs.create({
-                url: `https://nebula.app/${channelSlug}`,
-                active: true,
-              });
-            } else {
-              // If the preference is set to current tab, open the channel in the current tab
-              chrome.tabs.update(request.tabId, {
-                url: `https://nebula.app/${channelSlug}`,
-              });
-            }
-          });
-        } else {
-          console.debug("background.js: bad channel slug");
-          throw new Error("bad channel slug");
-        }
-        break;
-
-      case Messages.REFRESH_TABLE:
-        // Log the message - for debugging
-        console.debug(
-          "background.js: received refresh table request from content script: " +
-            JSON.stringify(request)
-        );
-
-        // Add typing to request
-        const refreshMessage: MessageParams[Messages.REFRESH_TABLE] = {
-          type: Messages.REFRESH_TABLE,
-        };
-
-        // Refresh the lookup table
-        await refreshTable();
-        break;
-
-      case Messages.POPUP_REDIRECT:
-        // Log the message - for debugging
-        console.debug(
-          "background.js: received popup redirect request from content script: " +
-            JSON.stringify(request)
-        );
-
-        // Add typing to request
-        const popupMessage: MessageParams[Messages.POPUP_REDIRECT] = {
-          type: Messages.POPUP_REDIRECT,
-          url: request.url,
-        };
-
-        // Open a new tab with the url provided
-        chrome.tabs.create({
-          url: request.url,
-          active: true,
-        });
-        break;
-
-      case Messages.REPORT_ISSUE:
-        // Log the message - for debugging
-        console.debug(
-          "background.js: received report issue request from content script: " +
-            JSON.stringify(request)
-        );
-
-        // Add typing to request
-        const reportMessage: MessageParams[Messages.REPORT_ISSUE] = {
-          type: Messages.REPORT_ISSUE,
-          message: request.message,
-        };
-
-        // Open a new mailto tab with the url provided
-        chrome.tabs.create({
-          url: `mailto:oenu.dev@gmail.com?subject=YouTube%20Nebula%20Extension%20Issue&body=${request.message}`,
-          active: true,
-        });
-        break;
-    }
-  } catch (error: any) {
-    console.debug(error);
-  }
-});
-
-// ================== First Install Functions ================== //
-chrome.runtime.onInstalled.addListener(async function () {
-  // Check if this is a first install
-  chrome.storage.local.get("installed", (result) => {
-    if (result.installed === true) {
-      // This is not the first install
-      console.debug("background.js: not first install");
-      return;
-    }
-  });
-
-  chrome.storage.local.set({ preferNewTab: false });
-  try {
-    console.debug("background.js: installed");
-    await refreshTable();
-
-    console.debug((await chrome.management.getSelf()).installType);
-    setUpdateTableAlarm();
-  } catch (error) {
-    console.debug(error);
-  }
-});
-
-// ================== Startup: Table Refresh Function ================== //
-chrome.runtime.onStartup.addListener(async function () {
-  // Check when the lookup table was last updated
-  chrome.storage.local.get("lastUpdated", async (result) => {
-    if (result.lastUpdated) {
-      const lastUpdated = new Date(result.lastUpdated);
-      const now = new Date();
-      const diff = now.getTime() - lastUpdated.getTime();
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      if (hours > 6) {
-        console.debug("background.js: last updated more than 6 hours ago");
-        await refreshTable();
-      }
-    } else {
-      console.debug("background.js: last updated never");
-      await refreshTable();
-    }
-  });
-});
-
-// ================== Alarm Scheduler ================== //
-chrome.alarms.get(Alarms.UPDATE_LOOKUP_TABLE, (alarm) => {
-  if (alarm) {
-    console.debug("background.js: alarm exists");
-  } else {
-    console.debug("background.js: alarm does not exist");
-    setUpdateTableAlarm();
-  }
-});
-
-const setUpdateTableAlarm = async (interval?: number) => {
-  console.debug("background.js: setting alarm");
-  if (interval) {
-    console.debug(
-      "background.js: Setting table update alarm with interval: " + interval
-    );
-    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: interval,
+/**
+ * Handler tasks
+ * 1. If the channel is on Nebula, send a message to the content script to load the channel button
+ * 1.1 If the channel is not on Nebula, send a message to the content script to unload the channel button
+ * 2. If the video is on Nebula, send a message to the content script to load the video button
+ * 2.1 If the video is not on Nebula, send a message to the content script to unload the video button
+ */
+const handleVideo = (video: Video, tabId: number): void => {
+  // Channel is on Nebula?
+  if (video.known) {
+    chrome.scripting.insertCSS({
+      target: { tabId: tabId },
+      files: ["./css/channel.css"],
     });
-    return;
-  }
-
-  if ((await chrome.management.getSelf()).installType === "development") {
-    console.debug(
-      "background.js: Development mode: scheduling update every 2 hours"
-    );
-    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 2 * 60,
+    chrome.tabs.sendMessage(tabId, {
+      type: Messages.ADD_CHANNEL_BUTTON,
+      channelSlug: video.channelSlug,
     });
   } else {
-    console.debug("background.js: scheduling update every 6 hours");
-    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-      delayInMinutes: 6 * 60,
+    chrome.scripting.removeCSS({
+      target: { tabId: tabId },
+      files: ["./css/channel.css"],
+    });
+    chrome.tabs.sendMessage(tabId, {
+      type: Messages.REMOVE_CHANNEL_BUTTON,
+    });
+  }
+
+  // Video is on Nebula?
+  if (video.matched) {
+    chrome.scripting.insertCSS({
+      target: { tabId: tabId },
+      files: ["./css/video.css"],
+    });
+    chrome.tabs.sendMessage(tabId, {
+      type: Messages.ADD_VIDEO_BUTTON,
+      video,
+    });
+  } else {
+    chrome.scripting.removeCSS({
+      target: { tabId: tabId },
+      files: ["./css/video.css"],
+    });
+    chrome.tabs.sendMessage(tabId, {
+      type: Messages.REMOVE_VIDEO_BUTTON,
     });
   }
 };
 
+/**
+ * Listener Tasks:
+ * 1. If a content script sends a message to the background script, handle it
+ * 1.1 If the message is to open the Nebula page for a video, open the Nebula page for that video
+ * 1.2 If the message is to open the Nebula page for a channel, open the Nebula page for that channel
+ *
+ * 2. If a popup script sends a message to the background script, handle it
+ * 2.1 If the message is to open a url, open the url in a new tab
+ * 2.2 If the message is to refresh the lookup table, refresh the lookup table
+ * 2.3 If the message is to report an error, open a mailto link to report the error
+ */
+chrome.runtime.onMessage.addListener(async (request, sender) => {
+  // Get redirect preference
+  const newTab = await chrome.storage.sync.get("preferNewTab");
+  const preferNewTab = newTab.preferNewTab ?? defaults.preferNewTab;
+
+  switch (request.type) {
+    case Messages.VIDEO_REDIRECT: {
+      const video = request as Video;
+      if (video.matched) {
+        console.debug("BG: known video redirect: " + video.videoSlug);
+        const url = `https://nebula.app/videos/${video.videoSlug}`;
+        if (preferNewTab || sender.tab === undefined) {
+          chrome.tabs.create({ url });
+        } else {
+          chrome.tabs.update(request.tabId, { url });
+        }
+      } else {
+        console.debug("BG: unknown video redirect: " + video.videoSlug);
+      }
+      break;
+    }
+    case Messages.CHANNEL_REDIRECT: {
+      const channel = request as Channel;
+      console.debug("BG: channel redirect: " + channel.slug);
+      if (channel.known) {
+        const url = `https://nebula.app/${channel.slug}`;
+        if (preferNewTab || sender.tab === undefined) {
+          chrome.tabs.create({ url });
+        } else {
+          chrome.tabs.update(request.tabId, { url });
+        }
+      }
+      break;
+    }
+    case Messages.REFRESH_TABLE: {
+      console.debug("BG: refresh table");
+      await updateTable();
+      break;
+    }
+    case Messages.POPUP_REDIRECT: {
+      console.debug("BG: popup redirect: " + request.url);
+      const url = request.url;
+      if (url) chrome.tabs.create({ url });
+      break;
+    }
+    case Messages.REPORT_ISSUE: {
+      console.debug("BG: report issue");
+      const message =
+        "Issue: " + new Date().toISOString() + " Version: " + version;
+      const url = `mailto:oenu.dev@gmail.com?subject=YouTube%20Nebula%20Extension%20Issue&body=${message}`;
+      chrome.tabs.create({ url });
+      break;
+    }
+    default: {
+      console.log("Unknown message type");
+      break;
+    }
+  }
+});
+
+/**
+ * Listener Tasks:
+ * 1. On first install, set default preferences
+ * 1.1 Set pref for opening Nebula links in a new tab
+ * 1.2 Set pref for showing the channel button
+ * 1.3 Set pref for showing the video button
+ * 1.4 Set pref for time to wait before refreshing the lookup table
+ * 2. On first install, set whether the extension is in development mode
+ * 3. On first install or update, trigger a refresh of the lookup table
+ */
+chrome.runtime.onInstalled.addListener(async function () {
+  // 1.1
+  const storage = await chrome.storage.sync.get("preferNewTab");
+  if (storage.preferNewTab === undefined) {
+    // Set default preference
+    chrome.storage.sync.set({ preferNewTab: defaults.preferNewTab });
+  }
+
+  // 1.2
+  const showChannelButton = await chrome.storage.sync.get("showChannelButton");
+  if (showChannelButton.showChannelButton === undefined) {
+    // Set default preference
+    chrome.storage.sync.set({ showChannelButton: defaults.showChannelButton });
+  }
+
+  // 1.3
+  const showVideoButton = await chrome.storage.sync.get("showVideoButton");
+  if (showVideoButton.showVideoButton === undefined) {
+    // Set default preference
+    chrome.storage.sync.set({ showVideoButton: defaults.showVideoButton });
+  }
+
+  // 1.4
+  const updateInterval = await chrome.storage.sync.get("updateInterval");
+  if (updateInterval.updateInterval === undefined) {
+    // Set default preference
+    chrome.storage.sync.set({ updateInterval: defaults.updateInterval });
+  }
+
+  // 2
+  const devMode =
+    (await chrome.management.getSelf()).installType === "development";
+  chrome.storage.sync.set({ devMode });
+
+  // 3
+  await updateTable();
+});
+
+/**
+ * Listener Tasks:
+ * 1. On startup, check if the lookup table is out of date
+ * 1.1 If the table has already been updated in the last 6 hours, do nothing
+ * 1.2 If the table has not been updated in the last 6 hours, update the table
+ * 1.3 If the table has never been updated, update the table
+ */
+chrome.runtime.onStartup.addListener(async function () {
+  // 1
+  chrome.storage.local.get("lastUpdate"),
+    async (result: { lastUpdate: number }): Promise<void> => {
+      if (result.lastUpdate) {
+        const lastUpdated = new Date(result.lastUpdate);
+        const now = new Date();
+        const diff = now.getTime() - lastUpdated.getTime();
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        if (hours > 6) {
+          console.debug("BG: last updated more than 6 hours ago");
+          await updateTable();
+        }
+      } else {
+        console.debug("BG: last updated never");
+        await updateTable();
+      }
+    };
+});
+
+/**
+ * Alarm Tasks:
+ * 1. If the alarm is to refresh the lookup table, refresh the lookup table
+ */
+chrome.alarms.get(Alarms.UPDATE_LOOKUP_TABLE, (alarm) => {
+  if (alarm) {
+    console.debug("BG: alarm exists");
+  } else {
+    console.debug("BG: alarm does not exist");
+    setUpdateTableAlarm();
+  }
+});
+
+/**
+ * Helper Function Tasks:
+ * 1. If the update table alarm already exists, clear it
+ * 2. Get the update interval preference
+ * 3. Set the update table alarm
+ * 3.1. If the update interval is 0, do not set the alarm
+ */
+const setUpdateTableAlarm = async (interval?: number): Promise<void> => {
+  // 1
+  chrome.alarms.clear(Alarms.UPDATE_LOOKUP_TABLE);
+
+  // 2
+  const updateInterval = await chrome.storage.sync.get("updateInterval");
+  const updateIntervalMinutes =
+    updateInterval.updateInterval ?? defaults.updateInterval;
+
+  // 3
+  if (updateIntervalMinutes > 0) {
+    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
+      delayInMinutes: interval ?? updateIntervalMinutes,
+      periodInMinutes: updateIntervalMinutes,
+    });
+  }
+};
+
+/**
+ * Alarm Tasks:
+ * 1. If the alarm is to refresh the lookup table, refresh the lookup table
+ */
 chrome.alarms.onAlarm.addListener(async function (alarm) {
-  console.debug("background.js: alarm triggered: " + alarm.name);
+  console.debug("BG: alarm triggered: " + alarm.name);
+  // 1
   switch (alarm.name) {
     case Alarms.UPDATE_LOOKUP_TABLE:
-      await refreshTable();
+      await updateTable();
       break;
     default:
-      console.debug("background.js: unknown alarm");
+      console.debug("BG: unknown alarm");
   }
 });

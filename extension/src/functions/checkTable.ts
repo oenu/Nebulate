@@ -1,54 +1,77 @@
 // Check the local table for the given videoId
-import { Video } from "../enums";
-import { LookupTable } from "../types";
 
-export const checkTable = async (videoId: string) => {
-  console.log("background.js: checking lookup table for video");
+import { LookupTable } from "../parent_types";
+import { Video } from "../types";
 
-  // Check matched videos (shorter set)
-  const { lookupTable } = (await chrome.storage.local.get("lookupTable")) as {
-    lookupTable: LookupTable;
-  };
+export const checkTable = async (url: string): Promise<Video | void> => {
+  try {
+    console.log("CheckTable: checking lookup table for video");
 
-  let video: Video = {
-    // Default to not known
-    videoId,
-    known: false,
-    matched: false,
-  };
+    // Check matched videos (shorter set)
+    const { lookupTable } = (await chrome.storage.local.get("lookupTable")) as {
+      lookupTable: LookupTable;
+    };
 
-  // Check each channels matched videos (shorter set)
-  for (const channel of lookupTable.channels) {
-    for (const matchedVideo of channel.matched) {
-      if (videoId.includes(matchedVideo.id)) {
-        video.known = true;
-        video.matched = true;
-        video.videoSlug = matchedVideo.slug;
-        video.channelSlug = channel.slug;
-        console.debug("background.js: video is known and matched");
-        return video;
-      } else {
-        video.matched = false;
+    // Check if the lookup table exists
+    if (!lookupTable) {
+      console.warn("CheckTable: lookup table not found");
+      return;
+    }
+
+    // Extract only the video ID using regex /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
+    const videoId = url.match(
+      // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
+      /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
+    )?.[0];
+
+    // Check if the video ID exists
+    if (!videoId) {
+      console.debug(`CheckTable: could not extract video ID from URL ${url}`);
+      return;
+    }
+
+    // Structure the video object
+    const video: Video = {
+      videoId,
+      known: false,
+      matched: false,
+    };
+
+    // Check each channels matched videos (shorter set)
+    for (const channel of lookupTable.channels) {
+      for (const matchedVideo of channel.matched) {
+        if (videoId.includes(matchedVideo.id)) {
+          video.known = true;
+          video.matched = true;
+          video.videoSlug = matchedVideo.slug;
+          video.channelSlug = channel.slug;
+          console.debug("CheckTable: video is known and matched");
+          return video;
+        } else {
+          video.matched = false;
+        }
       }
     }
-  }
 
-  console.debug("background.js: video is not matched");
+    console.debug("CheckTable: video is not matched");
 
-  // Check unmatched videos (longer set)
-  for (const channel of lookupTable.channels) {
-    for (const unmatchedVideo of channel.not_matched) {
-      if (videoId.includes(unmatchedVideo)) {
-        video.known = true;
-        video.matched = false;
-        video.channelSlug = channel.slug;
-        console.debug("background.js: video is known but not matched");
-        return video;
-      } else {
-        video.known = false;
+    // Check unmatched videos (longer set)
+    for (const channel of lookupTable.channels) {
+      for (const unmatchedVideo of channel.not_matched) {
+        if (videoId.includes(unmatchedVideo)) {
+          video.known = true;
+          video.matched = false;
+          video.channelSlug = channel.slug;
+          console.debug("CheckTable: video is known but not matched");
+          return video;
+        } else {
+          video.known = false;
+        }
       }
     }
-  }
 
-  return video;
+    return video;
+  } catch (error) {
+    console.error(error);
+  }
 };

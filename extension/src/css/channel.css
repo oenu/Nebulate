@@ -3,7 +3,7 @@
   box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209);
 }
 
-.nebulate-creator-redirect {
+#nebulate-creator-redirect {
   max-height: 100%;
   height: 36px;
   max-width: 100%;
@@ -12,7 +12,7 @@
   cursor: pointer;
 }
 
-.nebulate-creator-redirect:hover {
+#nebulate-creator-redirect:hover {
   /* Indicate that the button is clickable */
   cursor: pointer;
   color: rgb(255, 255, 255);

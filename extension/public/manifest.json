@@ -19,14 +19,13 @@
       "js": ["js/content_script.js"]
     }
   ],
-
   "background": {
     "service_worker": "js/background.js"
   },
   "web_accessible_resources": [
     {
-      "resources": ["assets/icon.png"],
-      "matches": ["https://*.youtube.com/*"]
+      "matches": ["https://*.youtube.com/*"],
+      "resources": ["assets/icon.png", "css/video.css", "css/channel.css"]
     }
   ],
 

@@ -1,160 +1,295 @@
+import { CSS_CLASSES, Messages } from "./enums";
+import { Channel, Video } from "./types";
+
 console.debug("CS: init");
-// Runs in the context of the youtube tab
+// // Runs in the context of the youtube tab
 
-import { CSS, MessageParams, Messages, Video } from "./enums";
+// Local Variables:
+let localChannel: Channel | undefined;
+let localVideo: Video | undefined;
 
-import {
-  addCreatorRedirect,
-  addNebulaControls,
-  loadCSS,
-  removeCreatorRedirect,
-  removeNebulaControls,
-  unloadCSS,
-  // addChannelButton,
-  // removeChannelButton,
-} from "./functions/domMethods";
-
-// Store the current video
-let localVideo: Video;
-
-// Listen for messages from the background script
+/**
+ * Handle Messages from the background script
+ * 1. Handle a clear message
+ * 2. Handle an add channel button message
+ * 3. Handle a remove channel button message
+ * 4. Handle an add video button message
+ * 5. Handle a remove video button message
+ */
 chrome.runtime.onMessage.addListener((message) => {
-  const { type } = message;
+  try {
+    console.debug("CS: message received", message);
+    switch (message.type) {
+      // 1.
+      // Handle a clear message
+      case Messages.CLEAR:
+        console.debug("CS: clear");
+        break;
 
-  // Check if the message is in one of the message types we expect
-  if (Object.values(Messages).includes(type)) {
-    console.debug(message.videoId);
-
-    switch (type) {
-      case Messages.NEW_VIDEO: // A new video has been loaded into the page
-        console.debug(
-          "CS: New video loaded, known: %s, matched: %s",
-          message.known,
-          message.matched
-        );
-
-        // Set the type of the message for intellisense
-        const payload = message as MessageParams[Messages.NEW_VIDEO];
-
-        // Check if a video was included in the message
-        if (!payload.video) {
-          console.error("CS: No video object in NEW_VIDEO message");
-          clearPage();
-          return;
+      // 2.
+      // Handle an add channel button message
+      case Messages.ADD_CHANNEL_BUTTON: {
+        console.debug("CS: add channel button");
+        const { channel } = message.channel;
+        if (channel) {
+          localChannel = channel;
+          addChannelButton();
+        } else {
+          console.error("CS: Add_Channel_Button: no channel provided");
         }
-
-        // Set the local video storage to the new video
-        localVideo = message.video;
-
-        // Add the Nebula controls to the page
-        newVideoLoaded(payload.video);
         break;
+      }
 
-      case Messages.CLEAR: // A video is no longer on the page, clear the page
-        clearPage();
+      // 3.
+      // Handle a remove channel button message
+      case Messages.REMOVE_CHANNEL_BUTTON: {
+        console.debug("CS: remove channel button");
+        removeChannelButton();
+        localChannel = undefined;
         break;
+      }
 
+      // 4.
+      // Handle an add video button message
+      case Messages.ADD_VIDEO_BUTTON: {
+        console.debug("CS: add video button");
+        const { video } = message.video;
+        if (video) {
+          localVideo = video;
+          addVideoButton();
+        } else {
+          console.error("CS: Add_Video_Button: no video provided");
+        }
+        break;
+      }
+
+      // 5.
+      // Handle a remove video button message
+      case Messages.REMOVE_VIDEO_BUTTON: {
+        console.debug("CS: remove video button");
+        removeVideoButton();
+        localVideo = undefined;
+        break;
+      }
       default:
-        console.debug("CS: Unknown message type");
+        console.debug("CS: unknown message");
         break;
     }
+  } catch (e) {
+    console.error("CS: error handling message", e);
   }
 });
 
 /**
- * Clears the page of all Nebula controls and styling
- * @description Removes the Nebula controls and styling from the page
- * @returns
- * @todo Add a transition to the removal of the controls and styling
+ * AddChannelButton
+ * 1. Check if the button already exists
+ * 1.1 If it does, remove it and add a new one
+ * 2. Create the button
+ * 3. Add the button to the page
+ * 4. Add the click event listener
  */
-export const clearPage = () => {
-  console.debug("CS: Clearing all styling");
-  unloadCSS(CSS.NEBULA_VIDEO);
-  unloadCSS(CSS.CREATOR);
-  removeNebulaControls();
+const addChannelButton = (): Promise<void> => {
+  try {
+    console.debug("addChannelButton: Adding redirect button");
+
+    // 1.
+    // Check if button already exists
+    const button = document.getElementById("nebulate-creator-redirect");
+    if (button) {
+      console.debug("addChannelButton: Button already exists");
+      return Promise.resolve();
+    }
+
+    // 2.
+    // Create the button
+    // eslint-disable-next-line no-undef
+    const nebulate_logo = document.createElement("img");
+    nebulate_logo.src = chrome.runtime.getURL("assets/icon.png");
+    nebulate_logo.id = "nebulate-creator-redirect";
+    nebulate_logo.style.cursor = "pointer";
+
+    nebulate_logo.addEventListener("click", () => {
+      console.debug("ChannelButton: Clicked");
+      if (localChannel) {
+        console.debug("addChannelButton: Redirecting to channel");
+        chrome.runtime.sendMessage({
+          type: Messages.CHANNEL_REDIRECT,
+          channel: localChannel,
+        });
+      } else {
+        console.error("addChannelButton: No channel found");
+      }
+    });
+
+    // 3.
+    // Add the button to the page
+    // eslint-disable-next-line no-undef
+    const subscribe_button = document.querySelector(
+      "#subscribe-button:not(.skeleton-bg-color)"
+    );
+    if (subscribe_button) {
+      console.debug("addChannelButton: Adding button to DOM");
+      subscribe_button.insertAdjacentElement("afterend", nebulate_logo);
+    } else {
+      console.error("ChannelButton: No subscribe button found");
+    }
+
+    return Promise.resolve();
+  } catch (e) {
+    console.error("addChannelButton: Error adding button", e);
+    return Promise.reject();
+  }
 };
 
 /**
- *  Handles a request to redirect to the Nebula website
- * @description Messages the background script to redirect to the Nebula website
- *  @param videoId The youtube video id that is being redirected
- * @returns
+ * AddVideoButton
+ * 1. Check if the button already exists
+ * 1.1 If it does, remove it and add a new one
+ * 2. Create the button
+ * 3. Add the button to the page
+ * 4. Add the click event listener
  */
-export const redirectHandler = async (message: Messages) => {
-  // Request redirect address for current video
-  console.debug("Requesting redirect address for current video");
+const addVideoButton = (): Promise<void> => {
+  try {
+    console.debug("addVideoButton: Adding redirect button");
 
-  // Check if the local video is set
-  if (!localVideo) {
-    console.error("CS: No local video set");
-    return;
-  }
+    // 1.
+    // Check if button already exists
+    // eslint-disable-next-line no-undef
+    const button = document.getElementById("nebulate-video-redirect");
+    if (button) {
+      console.debug("addVideoButton: Button already exists");
 
-  // Send a message to the background script to trigger the redirect
-  switch (message) {
-    case Messages.VIDEO_REDIRECT: // Redirect to Nebula video
-      if (!localVideo.videoSlug) {
-        console.error("CS: Redirect: No video slug set");
-        return;
-      } else {
-        const videoRedirect: MessageParams[Messages.VIDEO_REDIRECT] = {
+      // 1.1
+      button.remove();
+    }
+
+    // 2.
+    // Create the button
+    // eslint-disable-next-line no-undef
+    const nebulate_button = document.createElement("img");
+    nebulate_button.src = chrome.runtime.getURL("assets/icon.png");
+    nebulate_button.className = "ytp-button " + CSS_CLASSES.NEBULA_VIDEO_BTN;
+    nebulate_button.id = CSS_CLASSES.NEBULA_VIDEO_BTN;
+    nebulate_button.title = "View this video on Nebula";
+    const youtube_right_controls =
+      // eslint-disable-next-line no-undef
+      document.getElementsByClassName("ytp-right-controls")[0];
+    if (!youtube_right_controls) {
+      console.error("addVideoButton: No right controls found");
+      return Promise.reject();
+    }
+
+    // 3.
+    // Add the button to the page
+    youtube_right_controls.prepend(nebulate_button);
+
+    // 4.
+    // Add the click event listener
+    nebulate_button.addEventListener("click", () => {
+      console.debug("VideoButton: Clicked");
+      if (localVideo) {
+        chrome.runtime.sendMessage({
           type: Messages.VIDEO_REDIRECT,
-          videoSlug: localVideo.videoSlug,
-        };
-        chrome.runtime.sendMessage(videoRedirect);
-      }
-      break;
-
-    case Messages.CREATOR_REDIRECT: // Redirect to Nebula creator
-      if (!localVideo.channelSlug) {
-        console.error("CS: Redirect: No channel slug set");
-        return;
+          video: localVideo,
+        });
       } else {
-        const creatorRedirect: MessageParams[Messages.CREATOR_REDIRECT] = {
-          type: Messages.CREATOR_REDIRECT,
-          channelSlug: localVideo.channelSlug,
-        };
-        chrome.runtime.sendMessage(creatorRedirect);
+        console.error("VideoButton: No video found");
       }
-      break;
+    });
+
+    return Promise.resolve();
+  } catch (e) {
+    console.error("addVideoButton: Error adding button", e);
+    return Promise.reject();
   }
 };
 
 /**
- * Handles the loading of a new video
- * @description Adds the Nebula controls and styling to the page
- * @param video The video object to use for the new video
- * @returns
+ * RemoveChannelButton
+ * 1. Check if the button exists
+ * 2. Remove the click event listener (useful for older browsers)
+ * 3. Remove the button from the page
  */
-const newVideoLoaded = async (video: Video) => {
-  // Remove nebula styling to enable animation
-  unloadCSS(CSS.NEBULA_VIDEO);
-  unloadCSS(CSS.CREATOR);
-  removeCreatorRedirect();
+const removeChannelButton = (): Promise<void> => {
+  try {
+    console.debug("removeChannelButton: Removing redirect button");
 
-  // Check if the the page already has the Nebula controls
-  const video_styling_exists =
-    document.getElementsByClassName("nebulate-extension")[0];
+    // 1.
+    // Check if button already exists
+    // eslint-disable-next-line no-undef
+    const button = document.getElementById("nebulate-creator-redirect");
+    if (!button) {
+      console.debug("removeChannelButton: No button found");
+      return Promise.resolve();
+    }
 
-  // If the video is not known then it is also not matched, remove the styling and controls
-  if (!video.known) {
-    unloadCSS(CSS.NEBULA_VIDEO);
-    unloadCSS(CSS.CREATOR);
-    removeCreatorRedirect();
-    removeNebulaControls();
-    return;
+    // 2.
+    // Remove the click event listener
+    button.removeEventListener("click", () => {
+      console.debug("ChannelButton: Clicked");
+      if (localChannel) {
+        console.debug("removeChannelButton: Redirecting to channel");
+        chrome.runtime.sendMessage({
+          type: Messages.CHANNEL_REDIRECT,
+          channel: localChannel,
+        });
+      } else {
+        console.error("removeChannelButton: No channel found");
+      }
+    });
+
+    // 3.
+    // Remove the button from the DOM
+    button.remove();
+
+    return Promise.resolve();
+  } catch (e) {
+    console.error("removeChannelButton: Error removing button", e);
+    return Promise.reject();
   }
+};
 
-  // If the video is known to be from a nebula creator, add the creator highlight
-  loadCSS(CSS.CREATOR);
-  addCreatorRedirect();
+/**
+ * RemoveVideoButton
+ * 1. Check if the button exists
+ * 2. Remove the click event listener (useful for older browsers)
+ * 3. Remove the button from the page
+ */
+const removeVideoButton = (): Promise<void> => {
+  try {
+    console.debug("removeVideoButton: Removing redirect button");
 
-  if (video.matched) {
-    // If the video is matched, add the nebula video highlight and controls
-    if (!video_styling_exists) loadCSS(CSS.NEBULA_VIDEO);
-    addNebulaControls();
-  } else {
-    // If the video is not matched, remove the controls
-    removeNebulaControls();
+    // 1.
+    // Check if button already exists
+    // eslint-disable-next-line no-undef
+    const button = document.getElementById("nebulate-video-redirect");
+    if (!button) {
+      console.debug("removeVideoButton: No button found");
+      return Promise.resolve();
+    }
+
+    // 2.
+    // Remove the click event listener
+    button.removeEventListener("click", () => {
+      console.debug("VideoButton: Clicked");
+      if (localVideo) {
+        chrome.runtime.sendMessage({
+          type: Messages.VIDEO_REDIRECT,
+          video: localVideo,
+        });
+      } else {
+        console.error("VideoButton: No video found");
+      }
+    });
+
+    // 3.
+    // Remove the button from the DOM
+    button.remove();
+
+    return Promise.resolve();
+  } catch (e) {
+    console.error("removeVideoButton: Error removing button", e);
+    return Promise.reject();
   }
 };

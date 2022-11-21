@@ -1,9 +1,12 @@
 // Placeholder
 import React from "react";
 import ReactDOM from "react-dom";
-import { MessageParams, Messages } from "./enums";
+import { Messages } from "./enums";
+
+// eslint-disable-next-line no-undef
 ReactDOM.render(<Popup />, document.getElementById("root"));
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function Popup() {
   return (
     <div
@@ -14,22 +17,27 @@ function Popup() {
       }}
     >
       A graduate project by @oenu, this is in beta, im looking for work!
-      <button onClick={() => popupRedirect("https://nebula.app")}>
+      <button onClick={(): void => popupRedirect("https://nebula.app")}>
         Nebula
       </button>
-      <button onClick={() => popupRedirect("https://github.com/oenu/Nebulate")}>
+      <button
+        onClick={(): void => popupRedirect("https://github.com/oenu/Nebulate")}
+      >
         About
       </button>
-      <button onClick={() => popupRedirect("https://twitter.com/_a_nb")}>
+      <button onClick={(): void => popupRedirect("https://twitter.com/_a_nb")}>
         Contact
       </button>
-      <button onClick={() => refreshTable()}>Refresh Table</button>
-      <button onClick={() => reportIssue()}>Report Issue</button>
+      <button onClick={(): Promise<void> => refreshTable()}>
+        Refresh Table
+      </button>
+      <button onClick={(): void => reportIssue()}>Report Issue</button>
       <button
-        onClick={() => {
+        onClick={(): void => {
           if (chrome.runtime.openOptionsPage) {
             chrome.runtime.openOptionsPage();
           } else {
+            // eslint-disable-next-line no-undef
             window.open(chrome.runtime.getURL("options.html"));
           }
         }}
@@ -39,54 +47,57 @@ function Popup() {
     </div>
   );
 }
-// Popup Redirect - Redirect to provided URL
-const popupRedirect = (url: string) => {
+/**
+ * PopupRedirect
+ * 1. Send a message to the background script to open a new tab with the given URL
+ */
+const popupRedirect = (url: string): void => {
   console.debug("Redirecting to url " + url);
-
-  const message: MessageParams[Messages.POPUP_REDIRECT] = {
+  // 1.
+  chrome.runtime.sendMessage({
     type: Messages.POPUP_REDIRECT,
-    url: url,
-  };
-
-  chrome.runtime.sendMessage(message);
+    url,
+  });
 };
 
-// Report Issue - Report an issue with the extension / table
-const reportIssue = () => {
+/**
+ * ReportIssue
+ * 1. Send a message to the background script to open a new tab with a mailto link
+ */
+const reportIssue = (): void => {
   console.debug("Reporting issue");
-
-  const message: MessageParams[Messages.REPORT_ISSUE] = {
-    message: "Report issue",
+  // 1.
+  chrome.runtime.sendMessage({
     type: Messages.REPORT_ISSUE,
-  };
-
-  chrome.runtime.sendMessage(message);
+  });
 };
 
-// Refresh Table - Refresh the table of videos
-const refreshTable = async () => {
+/**
+ * RefreshTable
+ * 1. Check when the last time the table was refreshed
+ * 2. If it was less than 5 minutes ago, show an error message (prevent spamming)
+ * 3. If it was more than 5 minutes ago, send a message to the background script to refresh the table
+ */
+const refreshTable = async (): Promise<void> => {
   console.log("Manually Refreshing table");
 
-  // Check when the last time the table was manually refreshed
-  const lastRefresh = (await chrome.storage.local.get("lastRefresh")) as {
-    lastRefresh: number;
+  // 1.
+  // Check when the last time the table was refreshed
+  const lastUpdate = (await chrome.storage.local.get("lastUpdate")) as {
+    lastUpdate: number;
   };
 
-  // If the last refresh was less than 5 minutes ago, don't refresh
-  if (Date.now() - lastRefresh.lastRefresh < 300000) {
-    console.log("Last manual refresh was less than 5 minutes ago, aborting");
+  // 2.
+  // If it was less than 5 minutes ago, show an error message (prevent spamming)
+  if (lastUpdate.lastUpdate && Date.now() - lastUpdate.lastUpdate < 300000) {
+    // eslint-disable-next-line no-undef
+    // alert("Please wait 5 minutes before refreshing again");
     return;
-  } else {
-    // Otherwise, refresh the table
-    console.log("Last manual refresh was more than 5 minutes ago, refreshing");
   }
 
-  // If the last refresh was more than 5 minutes ago, refresh the table
-  const message: MessageParams[Messages.REFRESH_TABLE] = {
+  // 3.
+  // If it was more than 5 minutes ago, send a message to the background script to refresh the table
+  chrome.runtime.sendMessage({
     type: Messages.REFRESH_TABLE,
-  };
-
-  // Store the current time as the last refresh time
-  chrome.storage.local.set({ lastRefresh: new Date().getTime() });
-  chrome.runtime.sendMessage(message);
+  });
 };

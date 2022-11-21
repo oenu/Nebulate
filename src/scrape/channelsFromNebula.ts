@@ -38,12 +38,15 @@ type MatchedChannelPair = {
  * @function channelsFromNebula
  * @description Generate a list of channels that need to be mapped to youtube channels
  */
-export const channelsFromNebula = async () => {
+export const channelsFromNebula = async (): Promise<{
+  message: string;
+  output?: any;
+}> => {
   try {
     const channels = await (
       await scrapeChannels()
     ).filter((channel) => !slugIgnoreList.includes(channel.slug));
-    let unmappedChannels = [] as ShortChannel[];
+    const unmappedChannels = [] as ShortChannel[];
 
     logger.info(`ChannelsFromNebula : Found ${channels.length} channels`);
 
@@ -149,7 +152,7 @@ export const channelsFromNebula = async () => {
     // ========================= MERCH COLLECTIONS =========================
     // Check if the unmapped channels share a merch collection with a mapped channel
 
-    let merch_matches = [] as MatchedChannelPair[];
+    const merch_matches = [] as MatchedChannelPair[];
     for await (const mappedChannel of mappedChannels) {
       const { merch_collection } = mappedChannel;
 
@@ -193,7 +196,7 @@ export const channelsFromNebula = async () => {
     // ========================= WEBSITE =========================
     // Check if the unmapped channels share a website with a mapped channel
 
-    let website_matches = [] as MatchedChannelPair[];
+    const website_matches = [] as MatchedChannelPair[];
     for await (const mappedChannel of mappedChannels) {
       const { website } = mappedChannel;
 
@@ -255,7 +258,7 @@ export const channelsFromNebula = async () => {
 
     // ========================= PATREON =========================
     // Check if the unmapped channels share a patreon with a mapped channel
-    let patreon_matches = [] as MatchedChannelPair[];
+    const patreon_matches = [] as MatchedChannelPair[];
     for await (const mappedChannel of mappedChannels) {
       const { patreon } = mappedChannel;
 
@@ -403,14 +406,14 @@ export const channelsFromNebula = async () => {
 
     // Check if any video is still unmapped or has a match of any kind
     if (still_unmapped.length > 0 || allMatches.length > 0) {
-      return output;
+      return { message: "ChannelsFromNebula: Found matches", output };
     } else {
       logger.info("ChannelsFromNebula: All channels have been mapped!");
-      return "All channels have been mapped!";
+      return { message: "All channels have been mapped!" };
     }
   } catch (error) {
     logger.error(error);
-    return error;
+    throw error;
   }
 };
 
@@ -420,9 +423,18 @@ export const channelsFromNebula = async () => {
  */
 // @returns {ChannelInterface[]} - The channels scraped from the Nebula creators page
 
-export const scrapeChannels = async () => {
+export const scrapeChannels = async (): Promise<
+  {
+    slug: string;
+    title: string;
+    merch_collection: string;
+    patreon: string;
+    website: string;
+    id: string;
+  }[]
+> => {
   let urlBuffer = "";
-  let creatorBuffer = [];
+  const creatorBuffer = [];
 
   const channelScrapeLimit = 1000;
 

@@ -11,7 +11,7 @@ import { channelSchema } from "../channel";
  */
 export default channelSchema.methods.getNebulaVideos = async function (
   nebula_slugs?: string[]
-) {
+): Promise<typeof NebulaVideo[]> {
   if (!nebula_slugs) {
     return await NebulaVideo.find({
       _id: {

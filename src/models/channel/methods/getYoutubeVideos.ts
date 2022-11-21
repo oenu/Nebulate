@@ -12,7 +12,7 @@ import { channelSchema } from "../channel";
  */
 export default channelSchema.methods.getYoutubeVideos = async function (
   youtube_ids?: string[]
-) {
+): Promise<typeof YoutubeVideo[]> {
   if (!youtube_ids) {
     return await YoutubeVideo.find({
       _id: {

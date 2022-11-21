@@ -12,6 +12,7 @@ import { channelSchema } from "../channel";
  * @throws {Error} - If the channel has no slug or videos
  * @async
  */
-export default channelSchema.methods.matchVideos = async function () {
-  return await matchVideos(this.slug);
-};
+export default channelSchema.methods.matchVideos =
+  async function (): Promise<void> {
+    return await matchVideos(this.slug);
+  };

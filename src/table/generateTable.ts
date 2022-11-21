@@ -55,7 +55,9 @@ export interface LookupTable {
 
 // rewrite the following to be more clear and efficient
 
-export const generateTable = async (maximumMatchDistance?: number) => {
+export const generateTable = async (
+  maximumMatchDistance?: number
+): Promise<LookupTable> => {
   const matchLimit = maximumMatchDistance || 2;
 
   // Find all the nebula videos in the database

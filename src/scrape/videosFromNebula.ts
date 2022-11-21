@@ -4,10 +4,7 @@ import axios from "axios";
 import logger from "../utils/logger";
 
 // Types
-import type {
-  NebulaVideoInterface,
-  // NebulaVideoType,
-} from "../models/nebulaVideo/nebulaVideo";
+import type { NebulaVideoInterface } from "../models/nebulaVideo/nebulaVideo";
 
 // Mongo Models
 import { Channel } from "../models/channel/channel";
@@ -26,7 +23,8 @@ export const videosFromNebula = async (
   channelSlug: string,
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
-) => {
+): Promise<any[] | undefined> => {
+  // TODO: Fix this type, it might need to get changed in the other functions too
   try {
     // Default scrape limit if none is provided
     if (!videoScrapeLimit) videoScrapeLimit = 20;
@@ -92,7 +90,7 @@ export const scrapeNebula = async (
   onlyScrapeNew: boolean
 ): Promise<NebulaVideoInterface[]> => {
   let urlBuffer = "";
-  let videoBuffer = [];
+  const videoBuffer = [];
 
   // Get the channels object id
   const channel = await Channel.findOne({ slug: channelSlug });

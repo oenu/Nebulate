@@ -1,14 +1,10 @@
-#owner {
-  /* border: 1px solid rgb(62, 187, 243); */
-  background-color: rgb(62, 187, 243);
-  opacity: 0.2;
+#player {
+  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
 }
 
-#img {
-  border: 1px solid rgb(62, 187, 243);
-}
-
-#avatar {
-  outline: 3px solid rgb(62, 187, 243);
-  outline-offset: 1px;
+#movie_player > div.html5-video-container > video {
+  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: -10px 0 10vw rgb(62, 187, 243), 10px 0 10vw rgb(88, 80, 209);
+  clip-path: inset(0px -100vw 0px -100vw);
 }

@@ -11,7 +11,7 @@ export const reqAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   // Check if the request is authenticated
   if (req.headers.authorization === `Bearer ${process.env.AUTH_SECRET}`) {
     // Request is authenticated, continue

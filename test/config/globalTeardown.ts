@@ -6,7 +6,7 @@ const config = {
   Port: "27017",
   Database: "testing",
 };
-export const globalTeardown = async () => {
+export const globalTeardown = async (): Promise<void> => {
   console.log("Teardown");
   if (config.Memory) {
     // Config to decided if an mongodb-memory-server instance should be used

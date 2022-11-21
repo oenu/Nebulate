@@ -8,7 +8,7 @@ const config = {
   Port: "27017",
   Database: "testing",
 };
-export const globalSetup = async () => {
+export const globalSetup = async (): Promise<void> => {
   if (config.Memory) {
     // Config to decided if an mongodb-memory-server instance should be used
     // it's needed in global space, because we don't want to create a new instance every test-suite

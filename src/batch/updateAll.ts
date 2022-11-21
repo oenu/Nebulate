@@ -15,7 +15,7 @@ const matchInterval = 7 * 24 * 60 * 60 * 1000; // 7 days
  * @see {@link scrapeNebula} {@link scrapeYoutube} {@link matchVideos}
  */
 
-const updateAll = async () => {
+const updateAll = async (): Promise<void> => {
   console.time("updateAll");
   // Get all channels
   const channels = await Channel.find({}).select(
@@ -83,7 +83,7 @@ const updateAll = async () => {
 
   // For each channel, check if it needs to be updated
   for await (const [index, channel] of channels.entries()) {
-    let status = {
+    const status = {
       needsYoutubeScrape: false, // If the channel needs to be scraped from youtube
       needsNebulaScrape: false, // If the channel needs to be scraped from nebula
       needsMatch: false, // If the channel needs to be matched

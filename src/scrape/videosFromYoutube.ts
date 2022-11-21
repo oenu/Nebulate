@@ -111,7 +111,7 @@ export const scrapeYoutube = async (
   videoScrapeLimit: number,
   onlyScrapeNew: boolean
 ): Promise<YoutubeVideoInterface[]> => {
-  let videoBuffer: any = [];
+  const videoBuffer: any = [];
   let pagetokenBuffer = "";
 
   // Get the channels object id
@@ -261,7 +261,7 @@ export const removeYoutubeDuplicates = async (
  */
 export const youtubeVideosToDb = async (
   youtube_videos: YoutubeVideoInterface[]
-) => {
+): Promise<void> => {
   // Insert the nonConflictingVideos into the database
   const mongoResponse = await VideoModel.insertMany(youtube_videos);
   logger.debug(`YtScrape: ${youtube_videos.length} videos inserted`);

@@ -28,7 +28,7 @@ function Popup() {
       <button onClick={(): void => popupRedirect("https://twitter.com/_a_nb")}>
         Contact
       </button>
-      <button onClick={(): Promise<void> => refreshTable()}>
+      <button onClick={async (): Promise<void> => await refreshTable()}>
         Refresh Table
       </button>
       <button onClick={(): void => reportIssue()}>Report Issue</button>
@@ -83,21 +83,21 @@ const refreshTable = async (): Promise<void> => {
 
   // 1.
   // Check when the last time the table was refreshed
-  const lastUpdate = (await chrome.storage.local.get("lastUpdate")) as {
-    lastUpdate: number;
-  };
+  chrome.storage.local.get("lastUpdate", (result) => {
+    const lastUpdate = result.lastUpdate;
 
-  // 2.
-  // If it was less than 5 minutes ago, show an error message (prevent spamming)
-  if (lastUpdate.lastUpdate && Date.now() - lastUpdate.lastUpdate < 300000) {
-    // eslint-disable-next-line no-undef
-    // alert("Please wait 5 minutes before refreshing again");
-    return;
-  }
+    // 2.
+    // If it was less than 5 minutes ago, show an error message (prevent spamming)
+    if (lastUpdate.lastUpdate && Date.now() - lastUpdate.lastUpdate < 300000) {
+      // eslint-disable-next-line no-undef
+      // alert("Please wait 5 minutes before refreshing again");
+      return;
+    }
 
-  // 3.
-  // If it was more than 5 minutes ago, send a message to the background script to refresh the table
-  chrome.runtime.sendMessage({
-    type: Messages.REFRESH_TABLE,
+    // 3.
+    // If it was more than 5 minutes ago, send a message to the background script to refresh the table
+    chrome.runtime.sendMessage({
+      type: Messages.REFRESH_TABLE,
+    });
   });
 };

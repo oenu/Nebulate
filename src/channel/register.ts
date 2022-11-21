@@ -22,7 +22,7 @@ import { Channel } from "../models/channel/channel";
  * @throws {Error} - If the channel already exists in the DB or if the channel does not have a youtube upload id
  * @async
  */
-const register = async (channelSlug: string) => {
+const register = async (channelSlug: string): Promise<void> => {
   // Check if channel exists in DB
   try {
     if (await Channel.exists({ slug: channelSlug })) {
@@ -87,12 +87,12 @@ const register = async (channelSlug: string) => {
  * @throws {Error} - If the channel does not exist in Nebula
  * @async
  */
-export const channelFromNebula = async (channelSlug: string) => {
+export const channelFromNebula = async (channelSlug: string): Promise<any> => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channelSlug}/`;
     const response = await axios.get(url, {
       data: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${global.token}`,
       },
     });
     return response;
@@ -137,7 +137,13 @@ export const idFromYoutube = async (
  * @throws {Error} - If the channel does not exist in Youtube or the lookup fails
  * @async
  */
-export const channelFromYoutube = async (channelYtId: string) => {
+export const channelFromYoutube = async (
+  channelYtId: string
+): Promise<{
+  upload_playlist_id: string;
+  channelTitle: string;
+  custom_url: string;
+}> => {
   const response = await yt.channels.list({
     id: [channelYtId],
     auth: process.env.YOUTUBE_API_KEY as string,
@@ -151,6 +157,17 @@ export const channelFromYoutube = async (channelYtId: string) => {
   const upload_playlist_id = channel.contentDetails?.relatedPlaylists?.uploads;
   const channelTitle = channel.snippet?.title;
   const custom_url = channel.snippet?.customUrl;
+
+  if (!upload_playlist_id)
+    throw new Error(
+      "Register: Could not get upload playlist id from youtube API"
+    );
+  if (!channelTitle)
+    throw new Error("Register: Could not get channel title from youtube API");
+  if (!custom_url)
+    throw new Error(
+      "Register: Could not get channel custom url from youtube API"
+    );
 
   return { upload_playlist_id, channelTitle, custom_url };
 };

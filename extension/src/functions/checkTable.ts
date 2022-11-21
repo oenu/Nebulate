@@ -24,6 +24,8 @@ export const checkTable = async (url: string): Promise<Video | void> => {
       /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
     )?.[0];
 
+    console.log("CheckTable: videoId", videoId);
+
     // Check if the video ID exists
     if (!videoId) {
       console.debug(`CheckTable: could not extract video ID from URL ${url}`);

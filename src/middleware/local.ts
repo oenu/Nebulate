@@ -12,7 +12,7 @@ export const local = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   // Check if the request is from localhost
   if (req.ip.split(":").at(-1) === "127.0.0.1") {
     // Request is from localhost, continue

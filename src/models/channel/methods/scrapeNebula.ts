@@ -1,5 +1,6 @@
 // Methods
 import videosFromNebula from "../../../scrape/videosFromNebula";
+import type { NebulaVideo } from "../../nebulaVideo/nebulaVideo";
 
 // Models
 import { channelSchema } from "../channel";
@@ -15,7 +16,7 @@ import { channelSchema } from "../channel";
  */
 export default channelSchema.methods.scrapeNebula = async function (
   onlyScrapeNew?: boolean
-) {
+): Promise<typeof NebulaVideo[] | undefined> {
   if (onlyScrapeNew === undefined) onlyScrapeNew = true;
   return await videosFromNebula(this.slug, onlyScrapeNew);
 };

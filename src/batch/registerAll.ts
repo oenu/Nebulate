@@ -13,7 +13,7 @@ import logger from "../utils/logger";
  * @async
  * @see {@link registerChannelInDB} {@link mappedSlugs}
  */
-const registerAll = async () => {
+const registerAll = async (): Promise<void> => {
   console.time("registerAll");
 
   const sleepDuration = 1000 * 30; // 30 seconds

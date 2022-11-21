@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import "dotenv/config";
 import express from "express";
 const app = express();
@@ -23,7 +24,9 @@ const port = process.env.PORT || 3000;
 
 // Types
 declare global {
+  // eslint-disable-next-line no-var
   var token: string;
+  // eslint-disable-next-line no-var
   var key: string;
 }
 

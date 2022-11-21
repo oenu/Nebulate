@@ -94,6 +94,7 @@ const addChannelButton = (): Promise<void> => {
 
     // 1.
     // Check if button already exists
+    // eslint-disable-next-line no-undef
     const button = document.getElementById("nebulate-creator-redirect");
     if (button) {
       console.debug("addChannelButton: Button already exists");

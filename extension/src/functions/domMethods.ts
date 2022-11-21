@@ -1,8 +1,11 @@
 import { redirectHandler } from "../content_script";
 import { CSS, CSS_CLASSES, Messages } from "../enums";
 
+// Fix document not being defined in chrome extension file
+const document = window.document;
+
 // Load the CSS for Videos or Creator depending on the message
-export const loadCSS = (css: CSS) => {
+export const loadCSS = (css: CSS): void => {
   if (css === CSS.NEBULA_VIDEO) {
     const head = document.head || document.getElementsByTagName("head")[0];
     const style = document.createElement("style");
@@ -32,14 +35,14 @@ export const unloadCSS = (css: CSS) => {
   try {
     switch (css) {
       case CSS.NEBULA_VIDEO:
-        for (let element of document.getElementsByClassName(
+        for (const element of document.getElementsByClassName(
           CSS_CLASSES.NEBULA
         )) {
           element.remove();
         }
         break;
       case CSS.CREATOR:
-        for (let element of document.getElementsByClassName(
+        for (const element of document.getElementsByClassName(
           "nebulate-channel-css"
         )) {
           element.remove();
@@ -53,17 +56,17 @@ export const unloadCSS = (css: CSS) => {
 };
 
 // Add a background glow to the video player to indicate that the video is on Nebula
-export const generateNebulaStyling = () => {
-  let default_css = `#player {
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
-}
+export const generateNebulaStyling = (): string => {
+  //   const default_css = `#player {
+  //   transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  //   box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
+  // }
 
-#movie_player > div.html5-video-container > video {
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 10vw rgb(62, 187, 243), 10px 0 10vw rgb(88, 80, 209);
-  clip-path: inset(0px -100vw 0px -100vw);
-}`;
+  // #movie_player > div.html5-video-container > video {
+  //   transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  //   box-shadow: -10px 0 10vw rgb(62, 187, 243), 10px 0 10vw rgb(88, 80, 209);
+  //   clip-path: inset(0px -100vw 0px -100vw);
+  // }`; -- moved to video.css
 
   // Check aspect ratio of video
   const player = document.querySelector(
@@ -79,49 +82,37 @@ export const generateNebulaStyling = () => {
 };
 
 // Add a blue border to the channel icon and name box to indicate that the channel is on Nebula
-export const generateChannelStyling = () => {
-  let channel_css = `
-  #avatar {
-    transition: outline 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-    outline: 3px solid rgb(62, 187, 243);
-    outline-offset: 1px;
-  }
-
-  #owner {
-    transition: border 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-     border: 1px solid rgb(62, 187, 243) !important; 
-    /* background-color: rgb(62, 187, 243); */
-  }
-}`;
-  return channel_css;
-};
+// export const generateChannelStyling = (): string => {
+//   const channel_css = `
+//   #owner {
+//     transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+//     box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209);
+//   }}`;
+//   return channel_css;
+// }; -- Moved to own file
 
 let youtube_right_controls: Element | null = null;
 
 // Generate Creator redirect button styling
-export const generateCreatorRedirectStyling = () => {
-  const creator_redirect_css = `
-  .nebulate-creator-redirect {
-    max-height: 100%;
-    max-width: 100%;
+// export const generateCreatorRedirectStyling = (): string => {
+//   const creator_redirect_css = `
+//   .nebulate-creator-redirect {
+//     max-height: 100%;
+//     height: 36px;
+//     max-width: 100%;
+//     line-height: 36px;
+//     // Indicate that the button is clickable
+//     cursor: pointer;
 
-    // Indicate that the button is clickable
-    cursor: pointer;
-    
+//     // Add on-hover styling
+//     &:hover {
+//       color: rgb(255, 255, 255);
+//   }`;
 
-// Add on-hover styling
-    &:hover {
+//   return creator_redirect_css;
+// }; -- Moved to own file
 
-      color: rgb(255, 255, 255);
-
-
-
-  }`;
-
-  return creator_redirect_css;
-};
-
-export const addCreatorRedirect = () => {
+export const addCreatorRedirect = (): void => {
   console.debug("addCreatorRedirect: Adding redirect button");
 
   // Check if button already exists
@@ -161,7 +152,7 @@ export const addCreatorRedirect = () => {
     // Add the button to the DOM
     console.log(subscribe_button);
     console.debug("addCreatorRedirect: Adding button to DOM");
-    subscribe_button.insertAdjacentElement("beforebegin", nebulate_logo);
+    subscribe_button.insertAdjacentElement("afterend", nebulate_logo);
   } else {
     console.warn(
       "addCreatorRedirect: Could not find subscribe button, waiting"
@@ -176,19 +167,24 @@ export const addCreatorRedirect = () => {
 };
 
 // Remove creator redirect button
-export const removeCreatorRedirect = () => {
-  const creator_redirect = document.getElementById("nebulate-creator-redirect");
+export const removeCreatorRedirect = (): void => {
+  const creator_redirect = document.getElementsByClassName(
+    "nebulate-creator-redirect"
+  );
   if (!creator_redirect) {
     console.warn(
       "removeCreatorRedirect: Could not find creator redirect button"
     );
     return;
   }
-  creator_redirect.remove();
+  // Remove all creator redirect buttons
+  for (const element of creator_redirect) {
+    element.remove();
+  }
 };
 
 // Add a button to the YouTube player to redirect to the Nebula video
-export const addNebulaControls = () => {
+export const addNebulaControls = (): void => {
   // Add nebula controls
   const nebulate_button_exists = document.getElementById(
     CSS_CLASSES.NEBULA_VIDEO_BTN
@@ -217,7 +213,7 @@ export const addNebulaControls = () => {
 };
 
 // Remove the Nebula button from the YouTube player
-export const removeNebulaControls = () => {
+export const removeNebulaControls = (): void => {
   const nebulate_button = document.getElementById(CSS_CLASSES.NEBULA_VIDEO_BTN);
   if (nebulate_button) nebulate_button.remove();
 };

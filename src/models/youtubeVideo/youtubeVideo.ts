@@ -22,12 +22,17 @@ export interface YoutubeVideoInterface {
 interface YoutubeVideoDocument
   extends YoutubeVideoInterface,
     mongoose.Document {
+  // eslint-disable-next-line no-unused-vars
   setMatch: (nebulaVideo: NebulaVideoType, strength: number) => Promise<void>;
   updateMatch: (
+    // eslint-disable-next-line no-unused-vars
     nebulaVideo: NebulaVideoType,
+    // eslint-disable-next-line no-unused-vars
     strength: number
   ) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   removeMatch: (replacementVideo?: YoutubeVideoType) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   findByYoutubeVideoId: (youtubeVideoId: string) => Promise<YoutubeVideoType>;
 }
 

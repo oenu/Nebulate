@@ -9,7 +9,7 @@ declare let process: { env: { [key: string]: string } };
  * @throws {Error} If the database connection fails
  * @async
  */
-export const connectDB = async () => {
+export const connectDB = async (): Promise<void> => {
   try {
     // Connect to the database in development environment
     if (process.env.NODE_ENV === "dev") {

@@ -1,5 +1,6 @@
 // Methods
 import videosFromYoutube from "../../../scrape/videosFromYoutube";
+import type { YoutubeVideoType } from "../../youtubeVideo/youtubeVideo";
 
 // Models
 import { channelSchema } from "../channel";
@@ -15,7 +16,7 @@ import { channelSchema } from "../channel";
  */
 export default channelSchema.methods.scrapeYoutube = async function (
   onlyScrapeNew?: boolean
-) {
+): Promise<YoutubeVideoType[] | undefined> {
   if (onlyScrapeNew === undefined) onlyScrapeNew = true;
   return await videosFromYoutube(this.slug, onlyScrapeNew);
 };

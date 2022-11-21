@@ -12,7 +12,7 @@ const hourMatchInterval = 6;
  * @see {@link matchVideos}
  */
 
-const matchAll = async () => {
+const matchAll = async (): Promise<void> => {
   logger.warn("matchAll: Matching videos");
   console.time("matchAll");
 

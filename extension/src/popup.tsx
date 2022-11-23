@@ -3,6 +3,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Messages } from "./enums";
 
+// Popup Message Types
+export type PopupRedirectMessage = {
+  type: Messages.POPUP_REDIRECT;
+  url: string;
+};
+
 // eslint-disable-next-line no-undef
 ReactDOM.render(<Popup />, document.getElementById("root"));
 
@@ -54,10 +60,13 @@ function Popup() {
 const popupRedirect = (url: string): void => {
   console.debug("Redirecting to url " + url);
   // 1.
-  chrome.runtime.sendMessage({
+
+  const message: PopupRedirectMessage = {
     type: Messages.POPUP_REDIRECT,
     url,
-  });
+  };
+
+  chrome.runtime.sendMessage(message);
 };
 
 /**

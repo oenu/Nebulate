@@ -2,7 +2,11 @@ import { Messages, Alarms } from "./enums";
 import { checkTable } from "./functions/checkTable";
 import { updateTable } from "./functions/updateTable";
 
-import { Channel, Video } from "./types";
+import { Video } from "./types";
+
+// Content Script Messages
+import { VideoRedirectMessage, ChannelRedirectMessage } from "./content_script";
+import { PopupRedirectMessage } from "./popup";
 
 console.log("Background script running");
 // Config Variables
@@ -36,9 +40,12 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === "complete") {
       if (tab.url?.includes("youtube.com/watch")) {
         const url = tab.url;
+        console.log("Video Detected");
         if (url !== urlCache) {
           urlCache = url;
           handleNewVideo(url, tabId);
+        } else {
+          console.log("Video is has already been processed");
         }
       } else {
         // Not a video page
@@ -54,9 +61,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 const handleNewVideo = async (url: string, tabId: number): Promise<void> => {
   try {
-    const response = await checkTable(url);
-    if (response) {
-      handleVideo(response, tabId);
+    const video = await checkTable(url);
+    if (video) {
+      handleVideo(video, tabId);
     } else {
       chrome.tabs.sendMessage(tabId, {
         type: Messages.CLEAR,
@@ -121,7 +128,10 @@ const handleVideo = (video: Video, tabId: number): void => {
       });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.ADD_CHANNEL_BUTTON,
-        channelSlug: video.channelSlug,
+        channel: {
+          known: true,
+          slug: video.channelSlug,
+        },
       });
     } else {
       chrome.scripting.removeCSS({
@@ -175,7 +185,8 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
     const preferNewTab = newTab.preferNewTab ?? defaults.preferNewTab;
     switch (request.type) {
       case Messages.VIDEO_REDIRECT: {
-        const video = request as Video;
+        const message = request as VideoRedirectMessage;
+        const video = message.video;
         if (video.matched) {
           console.debug("BG: known video redirect: " + video.videoSlug);
           const url = `https://nebula.app/videos/${video.videoSlug}`;
@@ -190,7 +201,8 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
         break;
       }
       case Messages.CHANNEL_REDIRECT: {
-        const channel = request as Channel;
+        const message = request as ChannelRedirectMessage;
+        const channel = message.channel;
         console.debug("BG: channel redirect: " + channel.slug);
         if (channel.known) {
           const url = `https://nebula.app/${channel.slug}`;
@@ -208,8 +220,10 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
         break;
       }
       case Messages.POPUP_REDIRECT: {
+        const message = request as PopupRedirectMessage;
+        const url = message.url;
+
         console.debug("BG: popup redirect: " + request.url);
-        const url = request.url;
         if (url) chrome.tabs.create({ url });
         break;
       }

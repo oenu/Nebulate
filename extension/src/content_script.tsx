@@ -8,6 +8,17 @@ console.debug("CS: init");
 let localChannel: Channel | undefined;
 let localVideo: Video | undefined;
 
+// Local Message Types
+export type VideoRedirectMessage = {
+  type: Messages.VIDEO_REDIRECT;
+  video: Video;
+};
+
+export type ChannelRedirectMessage = {
+  type: Messages.CHANNEL_REDIRECT;
+  channel: Channel;
+};
+
 /**
  * Handle Messages from the background script
  * 1. Handle a clear message
@@ -30,7 +41,7 @@ chrome.runtime.onMessage.addListener((message) => {
       // Handle an add channel button message
       case Messages.ADD_CHANNEL_BUTTON: {
         console.debug("CS: add channel button");
-        const { channel } = message.channel;
+        const { channel } = message;
         if (channel) {
           localChannel = channel;
           addChannelButton();
@@ -53,7 +64,7 @@ chrome.runtime.onMessage.addListener((message) => {
       // Handle an add video button message
       case Messages.ADD_VIDEO_BUTTON: {
         console.debug("CS: add video button");
-        const { video } = message.video;
+        const { video } = message;
         if (video) {
           localVideo = video;
           addVideoButton();
@@ -85,10 +96,12 @@ chrome.runtime.onMessage.addListener((message) => {
  * 1. Check if the button already exists
  * 1.1 If it does, remove it and add a new one
  * 2. Create the button
- * 3. Add the button to the page
- * 4. Add the click event listener
+ * 3. Add the click event listener
+ * 4. Add the button to the page
+ * 4.1 Wait for the subscribe button to load
+ * 4.2 Add the button to the page
  */
-const addChannelButton = (): Promise<void> => {
+const addChannelButton = async (): Promise<void> => {
   try {
     console.debug("addChannelButton: Adding redirect button");
 
@@ -109,33 +122,61 @@ const addChannelButton = (): Promise<void> => {
     nebulate_logo.id = "nebulate-creator-redirect";
     nebulate_logo.style.cursor = "pointer";
 
+    // 3.
+    // Add the click event listener
     nebulate_logo.addEventListener("click", () => {
       console.debug("ChannelButton: Clicked");
       if (localChannel) {
         console.debug("addChannelButton: Redirecting to channel");
-        chrome.runtime.sendMessage({
+        const message: ChannelRedirectMessage = {
           type: Messages.CHANNEL_REDIRECT,
           channel: localChannel,
-        });
+        };
+        chrome.runtime.sendMessage(message);
       } else {
         console.error("addChannelButton: No channel found");
       }
     });
 
-    // 3.
+    // 4.
     // Add the button to the page
-    // eslint-disable-next-line no-undef
-    const subscribe_button = document.querySelector(
-      "#subscribe-button:not(.skeleton-bg-color)"
-    );
-    if (subscribe_button) {
-      console.debug("addChannelButton: Adding button to DOM");
-      subscribe_button.insertAdjacentElement("afterend", nebulate_logo);
-    } else {
-      console.error("ChannelButton: No subscribe button found");
-    }
 
-    return Promise.resolve();
+    // 4.1
+    // Wait for the subscribe button to load
+    // eslint-disable-next-line no-undef
+    const waitForSubscribeButton = (): Promise<Element | null> => {
+      return new Promise((resolve) => {
+        const interval = setInterval(() => {
+          // eslint-disable-next-line no-undef
+          const subscribeButton = document.querySelector(
+            "#subscribe-button:not(.skeleton-bg-color)"
+          );
+          if (subscribeButton) {
+            console.debug("addChannelButton: Subscribe button found");
+            clearInterval(interval);
+            console.log(subscribeButton);
+            resolve(subscribeButton);
+          } else {
+            console.debug(
+              "addChannelButton: Subscribe button not found, retrying"
+            );
+          }
+        }, 1000);
+      });
+    };
+
+    // eslint-disable-next-line no-undef
+    const subscribeButton = await waitForSubscribeButton();
+    // const subscribe_button = document.querySelector(
+    //   "#subscribe-button:not(.skeleton-bg-color)"
+    // );
+
+    if (subscribeButton) {
+      console.debug("addChannelButton: Adding button to DOM");
+      subscribeButton.insertAdjacentElement("afterend", nebulate_logo);
+    } else {
+      console.warn("ChannelButton: No subscribe button found");
+    }
   } catch (e) {
     console.error("addChannelButton: Error adding button", e);
     return Promise.reject();
@@ -157,7 +198,7 @@ const addVideoButton = (): Promise<void> => {
     // 1.
     // Check if button already exists
     // eslint-disable-next-line no-undef
-    const button = document.getElementById("nebulate-video-redirect");
+    const button = document.getElementById("nebulate-video-btn");
     if (button) {
       console.debug("addVideoButton: Button already exists");
 
@@ -190,10 +231,11 @@ const addVideoButton = (): Promise<void> => {
     nebulate_button.addEventListener("click", () => {
       console.debug("VideoButton: Clicked");
       if (localVideo) {
-        chrome.runtime.sendMessage({
+        const message: VideoRedirectMessage = {
           type: Messages.VIDEO_REDIRECT,
           video: localVideo,
-        });
+        };
+        chrome.runtime.sendMessage(message);
       } else {
         console.error("VideoButton: No video found");
       }
@@ -264,7 +306,7 @@ const removeVideoButton = (): Promise<void> => {
     // 1.
     // Check if button already exists
     // eslint-disable-next-line no-undef
-    const button = document.getElementById("nebulate-video-redirect");
+    const button = document.getElementById("nebulate-video-btn");
     if (!button) {
       console.debug("removeVideoButton: No button found");
       return Promise.resolve();

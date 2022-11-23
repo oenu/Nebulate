@@ -19,6 +19,7 @@ export enum Messages {
   POPUP_REDIRECT = "POPUP_REDIRECT", // Sent from the popup to request a redirect to a social media page for the developer.
   REFRESH_TABLE = "REFRESH_TABLE", // Sent from the popup to request a refresh of the table.
   REPORT_ISSUE = "REPORT_ISSUE", // Sent from the popup to send a report issue email.
+  SUMMARIZE_TABLE = "SUMMARIZE_TABLE", // Sent from the popup to request a summary of the table.
 }
 
 // Message parameters for each message

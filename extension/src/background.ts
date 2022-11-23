@@ -81,51 +81,11 @@ const handleNewVideo = async (url: string, tabId: number): Promise<void> => {
  * 2. If the video is on Nebula, send a message to the content script to load the video button
  * 2.1 If the video is not on Nebula, send a message to the content script to unload the video button
  */
-
-const channelCSS = `
-#owner {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209);
-}
-
-#nebulate-creator-redirect {
-  max-height: 100%;
-  height: 36px;
-  max-width: 100%;
-  line-height: 36px;
-  /* Indicate that the button is clickable */
-  cursor: pointer;
-}
-
-#nebulate-creator-redirect:hover {
-  /* Indicate that the button is clickable */
-  cursor: pointer;
-  color: rgb(255, 255, 255);
-}`;
-
-const videoCSS = `#player {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
-}
-
-#movie_player > div.html5-video-container > video {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 10vw rgb(62, 187, 243), 10px 0 10vw rgb(88, 80, 209);
-  clip-path: inset(0px -100vw 0px -100vw);
-}`;
-
 const handleVideo = (video: Video, tabId: number): void => {
   console.log("BG: Video is on Nebula");
   try {
     // Channel is on Nebula?
     if (video.known) {
-      chrome.scripting.insertCSS({
-        target: { tabId: tabId },
-        css: channelCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.ADD_CHANNEL_BUTTON,
         channel: {
@@ -134,10 +94,6 @@ const handleVideo = (video: Video, tabId: number): void => {
         },
       });
     } else {
-      chrome.scripting.removeCSS({
-        target: { tabId: tabId },
-        css: channelCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.REMOVE_CHANNEL_BUTTON,
       });
@@ -145,19 +101,11 @@ const handleVideo = (video: Video, tabId: number): void => {
 
     // Video is on Nebula?
     if (video.matched) {
-      chrome.scripting.insertCSS({
-        target: { tabId: tabId },
-        css: videoCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.ADD_VIDEO_BUTTON,
         video,
       });
     } else {
-      chrome.scripting.removeCSS({
-        target: { tabId: tabId },
-        css: videoCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.REMOVE_VIDEO_BUTTON,
       });

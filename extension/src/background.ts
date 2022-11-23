@@ -2,7 +2,12 @@ import { Messages, Alarms } from "./enums";
 import { checkTable } from "./functions/checkTable";
 import { updateTable } from "./functions/updateTable";
 
-import { Channel, Video } from "./types";
+import { Video } from "./types";
+
+// Content Script Messages
+import { VideoRedirectMessage, ChannelRedirectMessage } from "./content_script";
+import { PopupRedirectMessage } from "./popup";
+import { summarizeTable } from "./functions/summarizeTable";
 
 console.log("Background script running");
 // Config Variables
@@ -36,9 +41,12 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === "complete") {
       if (tab.url?.includes("youtube.com/watch")) {
         const url = tab.url;
+        console.log("Video Detected");
         if (url !== urlCache) {
           urlCache = url;
           handleNewVideo(url, tabId);
+        } else {
+          console.log("Video is has already been processed");
         }
       } else {
         // Not a video page
@@ -54,9 +62,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 const handleNewVideo = async (url: string, tabId: number): Promise<void> => {
   try {
-    const response = await checkTable(url);
-    if (response) {
-      handleVideo(response, tabId);
+    const video = await checkTable(url);
+    if (video) {
+      handleVideo(video, tabId);
     } else {
       chrome.tabs.sendMessage(tabId, {
         type: Messages.CLEAR,
@@ -74,60 +82,19 @@ const handleNewVideo = async (url: string, tabId: number): Promise<void> => {
  * 2. If the video is on Nebula, send a message to the content script to load the video button
  * 2.1 If the video is not on Nebula, send a message to the content script to unload the video button
  */
-
-const channelCSS = `
-#owner {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209);
-}
-
-#nebulate-creator-redirect {
-  max-height: 100%;
-  height: 36px;
-  max-width: 100%;
-  line-height: 36px;
-  /* Indicate that the button is clickable */
-  cursor: pointer;
-}
-
-#nebulate-creator-redirect:hover {
-  /* Indicate that the button is clickable */
-  cursor: pointer;
-  color: rgb(255, 255, 255);
-}`;
-
-const videoCSS = `#player {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
-}
-
-#movie_player > div.html5-video-container > video {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 10vw rgb(62, 187, 243), 10px 0 10vw rgb(88, 80, 209);
-  clip-path: inset(0px -100vw 0px -100vw);
-}`;
-
 const handleVideo = (video: Video, tabId: number): void => {
   console.log("BG: Video is on Nebula");
   try {
     // Channel is on Nebula?
     if (video.known) {
-      chrome.scripting.insertCSS({
-        target: { tabId: tabId },
-        css: channelCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.ADD_CHANNEL_BUTTON,
-        channelSlug: video.channelSlug,
+        channel: {
+          known: true,
+          slug: video.channelSlug,
+        },
       });
     } else {
-      chrome.scripting.removeCSS({
-        target: { tabId: tabId },
-        css: channelCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.REMOVE_CHANNEL_BUTTON,
       });
@@ -135,19 +102,11 @@ const handleVideo = (video: Video, tabId: number): void => {
 
     // Video is on Nebula?
     if (video.matched) {
-      chrome.scripting.insertCSS({
-        target: { tabId: tabId },
-        css: videoCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.ADD_VIDEO_BUTTON,
         video,
       });
     } else {
-      chrome.scripting.removeCSS({
-        target: { tabId: tabId },
-        css: videoCSS,
-      });
       chrome.tabs.sendMessage(tabId, {
         type: Messages.REMOVE_VIDEO_BUTTON,
       });
@@ -158,7 +117,7 @@ const handleVideo = (video: Video, tabId: number): void => {
 };
 
 /**
- * Listener Tasks:
+ * Listener Tasks
  * 1. If a content script sends a message to the background script, handle it
  * 1.1 If the message is to open the Nebula page for a video, open the Nebula page for that video
  * 1.2 If the message is to open the Nebula page for a channel, open the Nebula page for that channel
@@ -167,68 +126,106 @@ const handleVideo = (video: Video, tabId: number): void => {
  * 2.1 If the message is to open a url, open the url in a new tab
  * 2.2 If the message is to refresh the lookup table, refresh the lookup table
  * 2.3 If the message is to report an error, open a mailto link to report the error
+ * 2.4 If the message is to summarize the lookup table, summarize the lookup table
  */
-chrome.runtime.onMessage.addListener(async (request, sender) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   try {
-    // Get redirect preference
-    const newTab = await chrome.storage.sync.get("preferNewTab");
-    const preferNewTab = newTab.preferNewTab ?? defaults.preferNewTab;
-    switch (request.type) {
-      case Messages.VIDEO_REDIRECT: {
-        const video = request as Video;
-        if (video.matched) {
-          console.debug("BG: known video redirect: " + video.videoSlug);
-          const url = `https://nebula.app/videos/${video.videoSlug}`;
-          if (preferNewTab || sender.tab === undefined) {
-            chrome.tabs.create({ url });
+    chrome.storage.sync.get("preferNewTab").then((result) => {
+      const preferNewTab = result.preferNewTab ?? defaults.preferNewTab;
+      switch (request.type) {
+        // 1.
+        // Content Script Messages
+
+        // 1.1
+        // Open the Nebula page for a video
+        case Messages.VIDEO_REDIRECT: {
+          const message = request as VideoRedirectMessage;
+          const video = message.video;
+          if (video.matched) {
+            console.debug("BG: known video redirect: " + video.videoSlug);
+            const url = `https://nebula.app/videos/${video.videoSlug}`;
+            if (preferNewTab || sender.tab === undefined) {
+              chrome.tabs.create({ url });
+            } else {
+              chrome.tabs.update(request.tabId, { url });
+            }
           } else {
-            chrome.tabs.update(request.tabId, { url });
+            console.debug("BG: unknown video redirect: " + video.videoSlug);
           }
-        } else {
-          console.debug("BG: unknown video redirect: " + video.videoSlug);
+          break;
         }
-        break;
-      }
-      case Messages.CHANNEL_REDIRECT: {
-        const channel = request as Channel;
-        console.debug("BG: channel redirect: " + channel.slug);
-        if (channel.known) {
-          const url = `https://nebula.app/${channel.slug}`;
-          if (preferNewTab || sender.tab === undefined) {
-            chrome.tabs.create({ url });
-          } else {
-            chrome.tabs.update(request.tabId, { url });
+
+        // 1.2
+        // Open the Nebula page for a channel
+        case Messages.CHANNEL_REDIRECT: {
+          const message = request as ChannelRedirectMessage;
+          const channel = message.channel;
+          console.debug("BG: channel redirect: " + channel.slug);
+          if (channel.known) {
+            const url = `https://nebula.app/${channel.slug}`;
+            if (preferNewTab || sender.tab === undefined) {
+              chrome.tabs.create({ url });
+            } else {
+              chrome.tabs.update(request.tabId, { url });
+            }
           }
+          break;
         }
-        break;
+
+        // 2.
+        // Popup Script Messages
+
+        // 2.1
+        // Open a url
+        case Messages.POPUP_REDIRECT: {
+          const message = request as PopupRedirectMessage;
+          const url = message.url;
+
+          console.debug("BG: popup redirect: " + request.url);
+          if (url) chrome.tabs.create({ url });
+          break;
+        }
+
+        // 2.2
+        // Refresh the lookup table
+        case Messages.REFRESH_TABLE: {
+          console.debug("BG: refresh table");
+          updateTable();
+          break;
+        }
+
+        // 2.3
+        // Report an error
+        case Messages.REPORT_ISSUE: {
+          console.debug("BG: report issue");
+          const message =
+            "Issue: " + new Date().toISOString() + " Version: " + version;
+          const url = `mailto:oenu.dev@gmail.com?subject=YouTube%20Nebula%20Extension%20Issue&body=${message}`;
+          chrome.tabs.create({ url });
+          break;
+        }
+
+        // 2.4
+        // Summarize the lookup table
+        case Messages.SUMMARIZE_TABLE: {
+          console.debug("BG: summarize table");
+          summarizeTable().then((summary) => {
+            sendResponse(summary);
+          });
+          break;
+        }
+
+        default: {
+          console.log("Unknown message type");
+          break;
+        }
       }
-      case Messages.REFRESH_TABLE: {
-        console.debug("BG: refresh table");
-        await updateTable();
-        break;
-      }
-      case Messages.POPUP_REDIRECT: {
-        console.debug("BG: popup redirect: " + request.url);
-        const url = request.url;
-        if (url) chrome.tabs.create({ url });
-        break;
-      }
-      case Messages.REPORT_ISSUE: {
-        console.debug("BG: report issue");
-        const message =
-          "Issue: " + new Date().toISOString() + " Version: " + version;
-        const url = `mailto:oenu.dev@gmail.com?subject=YouTube%20Nebula%20Extension%20Issue&body=${message}`;
-        chrome.tabs.create({ url });
-        break;
-      }
-      default: {
-        console.log("Unknown message type");
-        break;
-      }
-    }
+    });
   } catch (e) {
     console.log("BG: Error in chrome.runtime.onMessage.addListener: ", e);
   }
+
+  return true;
 });
 
 /**
@@ -242,40 +239,49 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
  * 3. On first install or update, trigger a refresh of the lookup table
  */
 chrome.runtime.onInstalled.addListener(async function () {
+  // 1.
+  // Set default preferences
   try {
     // 1.1
+    // Set pref for opening Nebula links in a new tab
     const storage = await chrome.storage.sync.get("preferNewTab");
     if (storage.preferNewTab === undefined) {
-      // Set default preference
       chrome.storage.sync.set({ preferNewTab: defaults.preferNewTab });
     }
+
     // 1.2
+    // Set pref for showing the channel button
     const showChannelButton = await chrome.storage.sync.get(
       "showChannelButton"
     );
     if (showChannelButton.showChannelButton === undefined) {
-      // Set default preference
       chrome.storage.sync.set({
         showChannelButton: defaults.showChannelButton,
       });
     }
+
     // 1.3
+    // Set pref for showing the video button
     const showVideoButton = await chrome.storage.sync.get("showVideoButton");
     if (showVideoButton.showVideoButton === undefined) {
-      // Set default preference
       chrome.storage.sync.set({ showVideoButton: defaults.showVideoButton });
     }
+
     // 1.4
+    // Set pref for time to wait before refreshing the lookup table
     const updateInterval = await chrome.storage.sync.get("updateInterval");
     if (updateInterval.updateInterval === undefined) {
-      // Set default preference
       chrome.storage.sync.set({ updateInterval: defaults.updateInterval });
     }
+
     // 2
+    // Set whether the extension is in development mode
     const devMode =
       (await chrome.management.getSelf()).installType === "development";
     chrome.storage.local.set({ devMode });
+
     // 3
+    // Trigger a refresh of the lookup table
     await updateTable();
   } catch (e) {
     console.log("BG: Error in chrome.runtime.onInstalled.addListener: ", e);
@@ -284,30 +290,45 @@ chrome.runtime.onInstalled.addListener(async function () {
 
 /**
  * Listener Tasks:
- * 1. On startup, check if the lookup table is out of date
- * 1.1 If the table has already been updated in the last 6 hours, do nothing
- * 1.2 If the table has not been updated in the last 6 hours, update the table
- * 1.3 If the table has never been updated, update the table
+ * 1. On startup, check if the extension is in development mode
+ * 1.1 If the extension is in development mode, update the lookup table
+ * 2. On startup in production, check if the lookup table needs to be updated
+ * 2.1 If the lookup table has never been fetched, fetch it
+ * 2.2 If the lookup table is out of date, fetch it
  */
 chrome.runtime.onStartup.addListener(async function () {
   try {
     // 1
-    chrome.storage.local.get("lastUpdate"),
-      async (result: { lastUpdate: number }): Promise<void> => {
-        if (result.lastUpdate) {
-          const lastUpdated = new Date(result.lastUpdate);
-          const now = new Date();
-          const diff = now.getTime() - lastUpdated.getTime();
-          const hours = Math.floor(diff / (1000 * 60 * 60));
-          if (hours > 6) {
-            console.debug("BG: last updated more than 6 hours ago");
-            await updateTable();
-          }
-        } else {
-          console.debug("BG: last updated never");
+    // Check if the extension is in development mode
+    const devMode =
+      (await chrome.management.getSelf()).installType === "development";
+
+    // 1.1
+    // If the extension is in development mode, update the lookup table
+    if (devMode) {
+      await updateTable();
+    } else {
+      // 2
+      // On startup in production, check if the lookup table needs to be updated
+      const lastUpdated = await chrome.storage.local.get("lastUpdated");
+      const lastUpdatedDate = new Date(lastUpdated.lastUpdated);
+      const now = new Date();
+
+      // 2.1
+      // If the lookup table has never been fetched, fetch it
+      if (lastUpdated.lastUpdated === undefined) {
+        await updateTable();
+      } else {
+        // 2.2
+        // If the lookup table is out of date, fetch it
+        const updateInterval = await chrome.storage.sync.get("updateInterval");
+        const interval =
+          updateInterval.updateInterval ?? defaults.updateInterval;
+        if (now.getTime() - lastUpdatedDate.getTime() >= interval) {
           await updateTable();
         }
-      };
+      }
+    }
   } catch (e) {
     console.log("BG: Error in chrome.runtime.onStartup.addListener: ", e);
   }

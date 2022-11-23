@@ -19,6 +19,7 @@ export enum Messages {
   POPUP_REDIRECT = "POPUP_REDIRECT", // Sent from the popup to request a redirect to a social media page for the developer.
   REFRESH_TABLE = "REFRESH_TABLE", // Sent from the popup to request a refresh of the table.
   REPORT_ISSUE = "REPORT_ISSUE", // Sent from the popup to send a report issue email.
+  SUMMARIZE_TABLE = "SUMMARIZE_TABLE", // Sent from the popup to request a summary of the table.
 }
 
 // Message parameters for each message
@@ -28,12 +29,22 @@ export enum Alarms {
 
 export enum CSS {
   NEBULA_VIDEO = "NEBULA_VIDEO",
-  CREATOR = "CREATOR",
+  CHANNEL = "CHANNEL",
+}
+
+export enum CSS_IDS {
+  VIDEO = "nebulate-video-css",
+  CHANNEL = "nebulate-channel-css",
+  NEBULA_VIDEO_BTN = "nebulate-video-btn",
+  CHANNEL_BUTTON = "nebulate-channel-btn",
 }
 
 export enum CSS_CLASSES {
-  NEBULA = "nebulate-video-css",
-  CREATOR = "nebulate-channel-css",
-  NEBULA_VIDEO_BTN = "nebulate-video-btn",
-  CREATOR_BUTTON = "nebulate-channel-btn",
+  VIDEO_BUTTON = "nebulate-video-btn",
+  CHANNEL_BUTTON = "nebulate-channel-btn",
+}
+
+export enum BUTTON_IDS {
+  VIDEO = "nebulate-video-btn",
+  CHANNEL = "nebulate-channel-btn",
 }

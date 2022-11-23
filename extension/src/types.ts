@@ -49,6 +49,10 @@ export type MessageTypes = {
     // Sent from the popup to request a refresh of the lookup table.
     params: void;
   };
+  [Messages.SUMMARIZE_TABLE]: {
+    // Sent from the popup to request a summary of the lookup table.
+    params: void;
+  };
   [Messages.REPORT_ISSUE]: {
     // Sent from the popup to send a report issue email.
     params: void;

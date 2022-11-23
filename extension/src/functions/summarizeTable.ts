@@ -80,6 +80,12 @@ export const summarizeTable = async (
     // Add unmatched videos to channel
     tableSummary.channelMatchedVideos[channel.slug].numberOfUnmatchedVideos +=
       channel.not_matched.length;
+
+    // Add matched videos to total videos
+    tableSummary.totalVideos += channel.matched.length;
+
+    // Add unmatched videos to total videos
+    tableSummary.totalVideos += channel.not_matched.length;
   });
 
   // 4.

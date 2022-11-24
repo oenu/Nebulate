@@ -31,7 +31,7 @@ import {
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Messages } from "./enums";
-import { TableSummary } from "./functions/summarizeTable";
+import { TableSummary } from "./backgroundFunctions/summarizeTable";
 import { PopupRedirectMessage } from "./popup";
 
 const optionRedirect = (url: string): void => {

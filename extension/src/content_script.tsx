@@ -8,29 +8,17 @@ console.debug("CS: init");
 let localChannel: Channel | undefined; // The nebula channel that matches the current url
 let localVideo: Video | undefined; // The nebula video that matches the current url
 let pageIntervalId: number; // The id of the interval that checks for new videos on the page
+
 // eslint-disable-next-line no-undef
 let styleElement: HTMLStyleElement | undefined; // The style element that is used to highlight videos on the page
 
 // Local Video Cache:
 let pageVideos: {
   // A cache of video links/thumbnails on the page and their corresponding nebula video
-  [exactHref: exactHref]: VideoWithExactHref;
+  [key: string]: Video;
 };
 
-// Local Message Types
-export type exactHref = string; // The href as it appears in the href attribute of the <a> tag - /watch?v=${videoId} or /watch?v=${videoId}&otherStuff
-
-export type VideoWithExactHref = {
-  // Used to store videos in the pageVideos object
-  video: Video;
-  exactHref: exactHref;
-};
-
-export type VideoIDWithExactHref = {
-  // Used to pass between functions without losing the exact href
-  videoId: string;
-  exactHref: exactHref;
-};
+export type videoId = Video["videoId"];
 
 export type VideoRedirectMessage = {
   // Sent from the content script to the background script to redirect the user to a video
@@ -200,57 +188,37 @@ chrome.runtime.onMessage.addListener(async (message) => {
  * HandleNewVideos: Match videos, update pageVideos, trigger style updates
  * 1. Pass the video ids to the background script
  * 2. Handle the response
- * 2.1 Add href's to the videos
- * 2.2 Update the pageVideos object
+ * 2.1 Update the pageVideos object
  * 3. Use styleUpdater to update the styling for all videos in the pageVideos object
  */
-const handleNewVideos = async (
-  newVideos: VideoIDWithExactHref[]
-): Promise<void> => {
+const handleNewVideos = async (newVideos: videoId[]): Promise<void> => {
   // 1.
   // Pass the video ids to the background script
   const message: CheckVideoMessage = {
     type: Messages.CHECK_VIDEO,
-    url: newVideos.map((video) => video.videoId),
+    url: newVideos,
   };
   chrome.runtime.sendMessage(message, (response) => {
     // 2.
     // Handle the response
-    console.debug("handleNewVideos: CheckVideoMessage response", response);
     if (response) {
       const { videos, type } = response as CheckVideoMessageResponse;
+
       if (type !== Messages.CHECK_VIDEO_RESPONSE)
         throw new Error("CS: handleNewVideos: invalid response type");
-
       if (videos) {
         // 2.1
-        // Add href's to the videos
-        const checkedVideosWithExactHref = videos.map((v) => {
-          const exactHref = newVideos.find(
-            (nv) => nv.videoId === v.videoId
-          )?.exactHref;
-          if (!exactHref)
-            throw new Error("CS: handleNewVideos: exactHref not found");
-          return { video: v, exactHref };
-        });
-
-        // 2.2
         // Update the pageVideos object
         console.debug("CS: handleNewVideos: updating pageVideos");
-        checkedVideosWithExactHref.forEach((v) => {
-          pageVideos[v.exactHref] = {
-            video: v.video,
-            exactHref: v.exactHref,
-          };
+        videos.forEach((video) => {
+          pageVideos[video.videoId] = video;
         });
 
         // 3.
         // Use styleUpdater to update the styling for all videos in the pageVideos object
-        styleUpdater(
-          Object.values(pageVideos).map((v) => {
-            return { video: v.video, exactHref: v.exactHref };
-          })
-        );
+        styleUpdater(Object.values(pageVideos));
+      } else {
+        console.warn("CS: handleNewVideos: no videos found");
       }
     }
   });
@@ -277,7 +245,7 @@ const handleNewVideos = async (
  * Note: videoId's are in the form of /watch?v=${videoId} or /watch?v=${videoId}&otherStuff or others
  */
 const styleUpdater = async (
-  videos: VideoWithExactHref[],
+  videos: Video[],
   options: {
     // Known
     highlightKnown?: boolean; // Whether to highlight known videos
@@ -331,27 +299,24 @@ const styleUpdater = async (
   const matchedSelectors: string[] = [];
   const knownVideoIds = new Set<string>();
   const matchedVideoIds = new Set<string>();
-  const matchedVideoIdsWithExactHref = new Set<string>();
   videos.forEach((video) => {
-    const { video: v, exactHref } = video;
-
     // 2.1
     // If the video is matched (from a channel on nebula, and has a matching video on nebula) add to the matched selector
-    if (v.matched) {
-      matchedSelectors.push(`a[href*="${exactHref}"]`);
-      matchedVideoIds.add(v.videoId);
-      matchedVideoIdsWithExactHref.add(exactHref);
+    if (video.matched) {
+      matchedVideoIds.add(video.videoId);
+      matchedSelectors.push(`[href*="/watch?v=${video.videoId}"]`);
     }
 
     // 2.2
     // If the video is known (is from a channel that is on nebula) add to the known selector
-    if (v.known) {
-      knownSelectors.push(`a[href*="${exactHref}"]`);
-      knownVideoIds.add(v.videoId);
+    if (video.known) {
+      knownVideoIds.add(video.videoId);
+      knownSelectors.push(`[href*="/watch?v=${video.videoId}"]`);
     }
 
     // 2.3
     // If the video is unknown (is not from a channel that is on nebula) do nothing
+    // Note: Unknown videos will not have a selector
   });
 
   // 3.
@@ -431,7 +396,7 @@ const urlUpdateHandler = async (url: string): Promise<void> => {
 
   // 2.
   // Check for new videos using newVideosFromPage after 2 seconds
-  const newVideos = await new Promise<VideoIDWithExactHref[]>((resolve) => {
+  const newVideos = await new Promise<videoId[]>((resolve) => {
     setTimeout(() => {
       resolve(newVideosFromPage());
     }, 2000);
@@ -468,7 +433,7 @@ const urlUpdateHandler = async (url: string): Promise<void> => {
 
 // // eslint-disable-next-line no-undef
 // pageIntervalId = window.setInterval(async () => {
-//   const newVideos = await new Promise<VideoIDWithExactHref[]>((resolve) => {
+//   const newVideos = await new Promise<videoId[]>((resolve) => {
 //     setTimeout(() => {
 //       resolve(newVideosFromPage());
 //     }, 2000);
@@ -479,77 +444,65 @@ const urlUpdateHandler = async (url: string): Promise<void> => {
 // }, 10000);
 // }
 
+// TODO: Add a new videos from subscription page handler
 /**
- * New Videos From Page
- * 1. Get all the thumbnails on the page
- * 2. Check if the page has youtube thumbnails
- * 2.1 If it does, get the video ids from the thumbnails
- * 2.2 Remove duplicates (multiple thumbnails for the same video)
- * 3. If it does, store the urls of the thumbnails to prevent duplicate checks
- * 4. Return the urls of the thumbnails
+ * New Videos From Player Page
+ * This should find all recommended videos on the youtube player page
+ * 1. Get all the recommended video elements that are not in the pageVideos cache
+ * 1.1. Filter out any playlists (called radio) - check if the class contains "radio"
+ * 2. Create promises to get the videoId for each video element
+ * 2.1 Recursively get the videoId from the video element parent elements (until we find the videoId) (max 5 levels)
+ * 3. Filter out any videos that are already in the pageVideos cache
+ * 4. Return the new videoIds
  */
-
-// TODO: Replace this with using the #video-title element (no need to check for duplicates and persists across page changes)
-const newVideosFromPage = async (): Promise<VideoIDWithExactHref[]> => {
-  const newVideoUrls: VideoIDWithExactHref[] = [];
-  console.log("newVideosFromPage: pageVideos", pageVideos);
-
+const newVideosFromPage = async (): Promise<videoId[]> => {
   // 1.
-  // Get all the thumbnails on the page
-  // eslint-disable-next-line no-undef
-  const thumbnails = document.getElementsByClassName("ytd-thumbnail");
+  // Get all the recommended video elements that are not in the pageVideos cache
+  const newVideos = Array.from(
+    // eslint-disable-next-line no-undef
+    document.querySelectorAll("span#video-title")
+  ).filter((video) => {
+    // 1.1
+    // Filter out any playlists (called radio) - check if the class contains "radio"
+    return !video.classList.contains("radio");
+  });
 
   // 2.
-  // Check if the page has youtube thumbnails
-  if (thumbnails && thumbnails.length > 0) {
-    console.debug(
-      "newVideosFromPage: found " +
-        thumbnails.length +
-        " thumbnails (including duplicates)"
-    );
-
+  // Create promises to get the videoId for each video element
+  const videoIdPromises = newVideos.map((video) => {
     // 2.1
-    // If it does, get the video ids from the thumbnails
-    for (let i = 0; i < thumbnails.length; i += 1) {
-      const thumbnail = thumbnails[i];
-      // eslint-disable-next-line no-undef
-      const href = thumbnail.getAttribute("href");
-
-      if (href) {
-        const videoId = href.match(
-          // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
-          /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
-        )?.[0];
-
-        if (videoId) {
-          // 2.2
-          // Remove duplicates (multiple thumbnails for the same video)
-          if (pageVideos[href]) continue;
-
-          if (videoId && videoId.length !== 11) {
-            console.warn(
-              "newVideosFromPage: potentially invalid videoId (wrong length)",
-              videoId
-            );
-          }
-
-          if (videoId && !pageVideos[href]) {
-            newVideoUrls.push({
-              videoId,
-              exactHref: href,
-            });
-          }
-        }
-      }
+    // Recursively get the href from the video element parent elements (until we find the videoId) (max 5 levels)
+    let videoId: string | undefined;
+    let parent = video.parentElement;
+    let count = 0;
+    while (!videoId && parent && count < 5) {
+      videoId = parent.getAttribute("href") || undefined;
+      parent = parent.parentElement;
+      count++;
     }
-  }
+    return videoId?.match(
+      // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/ - Youtube videoId regex
+      /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
+    )?.[0];
+  });
 
-  console.debug("newVideosFromPage: new videos", newVideoUrls.length);
-  console.debug("newVideosFromPage: page videos", pageVideos.length);
+  // 3.
+  // Filter out any videos that are already in the pageVideos cache
+  const newVideoIds = (await Promise.all(videoIdPromises))
+    .filter((videoId): videoId is videoId => videoId !== undefined)
+    .filter((videoId) => {
+      return !pageVideos[videoId];
+    });
+
+  console.debug(
+    `newVideosFromPage: pageVideosLength: ${
+      Object.keys(pageVideos).length
+    } newVideoIdsLength: ${newVideoIds.length}`
+  );
 
   // 4.
-  // Return the urls of the thumbnails and their exact href's
-  return newVideoUrls;
+  // Return the new videoIds
+  return newVideoIds;
 };
 
 // ========================= Channel Methods =========================

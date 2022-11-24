@@ -7,6 +7,11 @@ console.debug("CS: init");
 // Local Variables:
 let localChannel: Channel | undefined;
 let localVideo: Video | undefined;
+let pageVideos: {
+  [videoId: string]: Video;
+};
+
+let pageIntervalId: number;
 
 // Local Message Types
 export type VideoRedirectMessage = {
@@ -17,6 +22,16 @@ export type VideoRedirectMessage = {
 export type ChannelRedirectMessage = {
   type: Messages.CHANNEL_REDIRECT;
   channel: Channel;
+};
+
+export type CheckVideoMessage = {
+  type: Messages.CHECK_VIDEO;
+  url: string;
+};
+
+export type UrlUpdateMessage = {
+  type: Messages.URL_UPDATE;
+  url: string;
 };
 
 /**
@@ -36,8 +51,10 @@ export type ChannelRedirectMessage = {
  * 5. Handle a remove video button message
  *  5.1 Remove the video button
  *  5.2 Remove the video styling
+ * 6. Pass to url update handler
+ 
  */
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener(async (message) => {
   try {
     console.debug("CS: message received", message);
     switch (message.type) {
@@ -131,14 +148,174 @@ chrome.runtime.onMessage.addListener((message) => {
         localVideo = undefined;
         break;
       }
-      default:
-        console.debug("CS: unknown message");
+
+      // 6.
+      // Handle a url change message
+      case Messages.URL_UPDATE: {
+        console.debug("CS: url update");
+        const { url } = message;
+        if (!url) {
+          console.error("CS: Url_Update: no url provided");
+          return;
+        }
+        urlUpdateHandler(url);
         break;
+      }
     }
-  } catch (e) {
-    console.error("CS: error handling message", e);
+  } catch (error) {
+    console.error("CS: error", error);
   }
 });
+
+// ========================= Page Load Methods =========================
+/**
+ * Handle adding styling to new videos
+ * 1. Pass the video ids to the background script
+ * 2. Wait for the background script to respond with the videos
+ * 3. Update the page videos with whether they are known or matched
+ */
+
+const handleNewVideos = async (newVideos: string[]): Promise<void> => {
+  // 1.
+  // Pass the video ids to the background script
+  const checkVideoPromises = newVideos.map((video) => {
+    return new Promise<Video>((resolve, reject) => {
+      const message: CheckVideoMessage = {
+        type: Messages.CHECK_VIDEO,
+        url: video,
+      };
+      chrome.runtime.sendMessage(message, (response: Video) => {
+        !response ? reject() : resolve(response);
+      });
+    });
+  });
+
+  // 2.
+  // Wait for the background script to respond with the videos
+  const checkVideoResponses = await Promise.allSettled(checkVideoPromises);
+
+  // 3.
+  // Update the page videos with whether they are known or matched
+  checkVideoResponses.forEach((response) => {
+    if (response.status === "fulfilled") {
+      const video = response.value;
+      pageVideos[video.videoId] = video;
+    }
+  });
+};
+
+/**
+ * Handle a new url being loaded
+ * This should find all the links on the page that are known or matched videos and highlight them using css
+ * 1. Clear the pageVideos cache
+ * 2. Check for new videos using newVideosFromPage after 2 seconds (to allow the page to load)
+ * 3. Pass the new videos to handleNewVideos
+ * 4. Check for new videos every 10 seconds (to handle infinite scroll)
+ */
+const urlUpdateHandler = async (url: string): Promise<void> => {
+  console.debug("urlUpdateHandler: url update handler", url);
+
+  // 1.
+  // Clear the pageVideos cache
+  pageVideos = {};
+
+  // 2.
+  // Check for new videos using newVideosFromPage after 2 seconds
+  const newVideos = await new Promise<string[]>((resolve) => {
+    setTimeout(() => {
+      resolve(newVideosFromPage());
+    }, 2000);
+  });
+
+  // 3.
+  // Pass the new videos to handleNewVideos
+  console.debug("urlUpdateHandler: Passing new videos to HandleNewVideos");
+  await handleNewVideos(newVideos);
+
+  // 4.
+  // Check for new videos every 10 seconds (to handle infinite scroll)
+  if (pageIntervalId) {
+    clearInterval(pageIntervalId);
+  }
+  // eslint-disable-next-line no-undef
+  pageIntervalId = window.setInterval(async () => {
+    const newVideos = await new Promise<string[]>((resolve) => {
+      setTimeout(() => {
+        resolve(newVideosFromPage());
+      }, 2000);
+    });
+    if (newVideos.length > 0) {
+      handleNewVideos(newVideos);
+    }
+  }, 10000);
+};
+
+/**
+ * New Videos From Page
+ * 1. Get all the thumbnails on the page
+ * 2. Check if the page has youtube thumbnails
+ * 2.1 If it does, get the video ids from the thumbnails
+ * 2.2 Remove duplicates (multiple thumbnails for the same video)
+ * 3. If it does, store the urls of the thumbnails to prevent duplicate checks
+ * 4. Return the urls of the thumbnails
+ */
+const newVideosFromPage = async (): Promise<string[]> => {
+  const newVideoUrls: string[] = [];
+
+  // 1.
+  // Get all the thumbnails on the page
+  // eslint-disable-next-line no-undef
+  const thumbnails = document.getElementsByClassName("ytd-thumbnail");
+
+  // 2.
+  // Check if the page has youtube thumbnails
+  if (thumbnails && thumbnails.length > 0) {
+    console.debug(
+      "newVideosFromPage: found " +
+        thumbnails.length +
+        " thumbnails (including duplicates)"
+    );
+
+    // 2.1
+    // If it does, get the video ids from the thumbnails
+    for (let i = 0; i < thumbnails.length; i += 1) {
+      const thumbnail = thumbnails[i];
+      // eslint-disable-next-line no-undef
+      const href = thumbnail.getAttribute("href");
+
+      if (href) {
+        const videoId = href.match(
+          // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
+          /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
+        )?.[0];
+
+        if (videoId) {
+          // 2.2
+          // Remove duplicates (multiple thumbnails for the same video)
+          if (pageVideos[videoId]) continue;
+
+          if (videoId && videoId.length !== 11) {
+            console.warn(
+              "newVideosFromPage: potentially invalid videoId (wrong length)",
+              videoId
+            );
+          }
+
+          if (videoId && !pageVideos[videoId]) {
+            newVideoUrls.push(videoId);
+          }
+        }
+      }
+    }
+  }
+
+  console.debug("newVideosFromPage: new videos", newVideoUrls.length);
+  console.debug("newVideosFromPage: page videos", pageVideos.length);
+
+  // 4.
+  // Return the urls of the thumbnails
+  return newVideoUrls;
+};
 
 // ========================= Channel Methods =========================
 /**
@@ -510,3 +687,172 @@ const removeVideoCSS = (): Promise<void> => {
 
   return Promise.resolve();
 };
+// ========================= Bulk Methods =========================
+/**
+ * checkVideo
+ * 1. Send a message to the background script to check if the video is on Nebula
+ * 2. Return the response formatted as { known: boolean, match: boolean }
+ */
+// const checkVideo = (
+//   url: string
+// ): Promise<{
+//   known: boolean;
+//   matched: boolean;
+// }> => {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       console.debug("checkVideo: Checking video");
+
+//       // 1.
+//       // Send a message to the background script to check if the video is on Nebula
+//       const message: CheckVideoMessage = {
+//         type: Messages.CHECK_VIDEO,
+//         url,
+//       };
+
+//       chrome.runtime.sendMessage(message, (video: Video | null) => {
+//         if (video?.matched) {
+//           resolve({ known: true, matched: true });
+//         } else if (video?.known) {
+//           resolve({ known: true, matched: false });
+//         } else {
+//           resolve({ known: false, matched: false });
+//         }
+//       });
+//     } catch (e) {
+//       console.error("checkVideo: Error checking video", e);
+//       reject(e);
+//     }
+//   });
+// };
+
+// // eslint-disable-next-line no-undef
+// const observer = new MutationObserver(function (mutations) {
+//   mutations.forEach(function (mutation) {
+//     if (mutation.addedNodes.length) {
+//       if (mutation.type == "childList") {
+//         mutation.addedNodes.forEach((node) => {
+//           console.debug("MutationObserver: Added node", node);
+//         });
+//       }
+//     }
+//   });
+// });
+
+// ==== Notes for identifying all videos ====
+// When new video loads (from background script or maybe from the page itself), wait for 2 seconds, get all thumbnails, and check if they are on Nebula
+// After checking store all the videos we checked in a variable that gets wiped when a new video loads
+// Every 10 seconds or so, get all the thumbnails and check if they are on Nebula (excluding the ones we already checked)
+// Repeat the above
+
+// Also: Maybe check just the number of thumbnails and if it changes, check all of them
+
+//Pros:
+// 1. We can check all the videos on the page
+// 2. We can check all the videos on the page even if the user doesn't click on them
+// 3. If a user loads more videos or changes the SSR page we can check those videos too
+
+//Cons:
+// 1. We have to check all the videos on the page
+// 2. We have to store all the videos we checked in a variable that gets wiped when a new video loads
+
+// // Identify all videos on the page
+// const identifyVideos = (): Promise<void> => {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       console.debug("identifyVideos: Identifying videos");
+
+//       // 1.
+//       // Get all the thumbnails
+//       // eslint-disable-next-line no-undef
+//       const thumbnails = document.getElementsByTagName("ytd-thumbnail");
+//       console.debug("identifyVideos: Thumbnails", thumbnails);
+
+//       // 2.
+//       // Check if the video is on Nebula
+//       // eslint-disable-next-line no-undef
+//       const videos = Array.from(thumbnails).map((thumbnail) => {
+//         const video = thumbnail.querySelector("a")?.href;
+//         if (video) {
+//           const videoId = video.match(
+//             // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
+//             /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
+//           )?.[0];
+//           console.debug(`identifyVideos: Video ID: ${videoId}`);
+//           return videoId;
+//         }
+//       });
+
+//       // 3.
+//       // Send a message to the background script to check if the video is on Nebula and wait using Promise.all
+
+//       //   const message: CheckVideosMessage = {
+//       //     type: Messages.CHECK_VIDEOS,
+//       //     videos,
+//       //   };
+//       //   chrome.runtime.sendMessage(message, (videos: Video[]) => {
+//       //     console.debug("identifyVideos: Videos", videos);
+
+//       //     // 4.
+//       //     // Add the video status to the thumbnail
+//       //     // eslint-disable-next-line no-undef
+//       //     Array.from(thumbnails).forEach((thumbnail) => {
+//       //       // 4.1
+//       //       // Get the video id
+//       //       const video = thumbnail.querySelector("a")?.href;
+//       //       if (video) {
+//       //         const videoId = video.match(
+//       //           // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
+//       //           /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
+//       //         )?.[0];
+//       //         console.debug(`identifyVideos: Video ID: ${videoId}`);
+
+//       //         // 4.2
+//       //         // Get the video status
+//       //         const videoStatus = videos.find((v) => v.id === videoId);
+
+//       //         // 4.3
+//       //         // Add the video status to the thumbnail
+//       //         if (videoStatus?.matched) {
+//       //           thumbnail.classList.add("nebula-video");
+//       //         } else if (videoStatus?.known) {
+//       //           thumbnail.classList.add("nebula-video-known");
+//       //         }
+//       //       }
+//       //     });
+
+//       //     resolve();
+//       //   });
+//       // }
+
+//       videos.forEach((video) => {
+//         if (video) {
+//           const message: CheckVideoMessage = {
+//             type: Messages.CHECK_VIDEO,
+//             url: video,
+//           };
+
+//           chrome.runtime.sendMessage(message, (video: Video | null) => {
+//             console.debug("identifyVideos: Video Response From BG:", video);
+//             if (video?.matched) {
+//               console.debug("identifyVideos: Video Matched!", video);
+//             } else if (video?.known) {
+//               console.debug("identifyVideos: Video Known!", video);
+//             } else {
+//               console.debug("identifyVideos: Video is not known", video);
+//             }
+//           });
+//         }
+//       });
+
+//       resolve();
+//     } catch (e) {
+//       console.error("identifyVideos: Error identifying videos", e);
+//       reject(e);
+//     }
+//   });
+// };
+
+// setTimeout(() => {
+//   identifyVideos();
+// }, 3000);

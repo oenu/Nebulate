@@ -16,46 +16,6 @@ export let pageVideos: {
 
 export let pageIntervalId: number; // The id of the interval that checks for new videos on the page
 /**
- * HandleNewVideos: Match videos, update pageVideos, trigger style updates
- * 1. Pass the video ids to the background script
- * 2. Handle the response
- * 2.1 Update the pageVideos object
- * 3. Use styleUpdater to update the styling for all videos in the pageVideos object
- */
-export const handleNewVideos = async (newVideos: videoId[]): Promise<void> => {
-  // 1.
-  // Pass the video ids to the background script
-  const message: CheckVideoMessage = {
-    type: Messages.CHECK_VIDEO,
-    url: newVideos,
-  };
-  chrome.runtime.sendMessage(message, (response) => {
-    // 2.
-    // Handle the response
-    if (response) {
-      const { videos, type } = response as CheckVideoMessageResponse;
-
-      if (type !== Messages.CHECK_VIDEO_RESPONSE)
-        throw new Error("CS: handleNewVideos: invalid response type");
-      if (videos) {
-        // 2.1
-        // Update the pageVideos object
-        console.debug("CS: handleNewVideos: updating pageVideos");
-        videos.forEach((video) => {
-          pageVideos[video.videoId] = video;
-        });
-
-        // 3.
-        // Use styleUpdater to update the styling for all videos in the pageVideos object
-        styleUpdater(Object.values(pageVideos));
-      } else {
-        console.warn("CS: handleNewVideos: no videos found");
-      }
-    }
-  });
-};
-
-/**
  * Handle a new url being loaded
  * This should find all the links on the page that are known or matched videos and highlight them using css
  * 1. Clear the pageVideos cache
@@ -105,4 +65,44 @@ export const urlUpdateHandler = async (url: string): Promise<void> => {
       clearInterval(pageIntervalId);
     }
   }, 10000);
+};
+
+/**
+ * HandleNewVideos: Match videos, update pageVideos, trigger style updates
+ * 1. Pass the video ids to the background script
+ * 2. Handle the response
+ * 2.1 Update the pageVideos object
+ * 3. Use styleUpdater to update the styling for all videos in the pageVideos object
+ */
+export const handleNewVideos = async (newVideos: videoId[]): Promise<void> => {
+  // 1.
+  // Pass the video ids to the background script
+  const message: CheckVideoMessage = {
+    type: Messages.CHECK_VIDEO,
+    url: newVideos,
+  };
+  chrome.runtime.sendMessage(message, (response) => {
+    // 2.
+    // Handle the response
+    if (response) {
+      const { videos, type } = response as CheckVideoMessageResponse;
+
+      if (type !== Messages.CHECK_VIDEO_RESPONSE)
+        throw new Error("CS: handleNewVideos: invalid response type");
+      if (videos) {
+        // 2.1
+        // Update the pageVideos object
+        console.debug("CS: handleNewVideos: updating pageVideos");
+        videos.forEach((video) => {
+          pageVideos[video.videoId] = video;
+        });
+
+        // 3.
+        // Use styleUpdater to update the styling for all videos in the pageVideos object
+        styleUpdater(Object.values(pageVideos));
+      } else {
+        console.warn("CS: handleNewVideos: no videos found");
+      }
+    }
+  });
 };

@@ -5,31 +5,59 @@ console.debug("CS: init");
 // // Runs in the context of the youtube tab
 
 // Local Variables:
-let localChannel: Channel | undefined;
-let localVideo: Video | undefined;
+let localChannel: Channel | undefined; // The nebula channel that matches the current url
+let localVideo: Video | undefined; // The nebula video that matches the current url
+let pageIntervalId: number; // The id of the interval that checks for new videos on the page
+// eslint-disable-next-line no-undef
+let styleElement: HTMLStyleElement | undefined; // The style element that is used to highlight videos on the page
+
+// Local Video Cache:
 let pageVideos: {
-  [videoId: string]: Video;
+  // A cache of video links/thumbnails on the page and their corresponding nebula video
+  [exactHref: exactHref]: VideoWithExactHref;
 };
 
-let pageIntervalId: number;
-
 // Local Message Types
+export type exactHref = string; // The href as it appears in the href attribute of the <a> tag - /watch?v=${videoId} or /watch?v=${videoId}&otherStuff
+
+export type VideoWithExactHref = {
+  // Used to store videos in the pageVideos object
+  video: Video;
+  exactHref: exactHref;
+};
+
+export type VideoIDWithExactHref = {
+  // Used to pass between functions without losing the exact href
+  videoId: string;
+  exactHref: exactHref;
+};
+
 export type VideoRedirectMessage = {
+  // Sent from the content script to the background script to redirect the user to a video
   type: Messages.VIDEO_REDIRECT;
   video: Video;
 };
 
 export type ChannelRedirectMessage = {
+  // Sent from the content script to the background script to redirect the user to a channel
   type: Messages.CHANNEL_REDIRECT;
   channel: Channel;
 };
 
 export type CheckVideoMessage = {
+  // Sent from the content script to the background script to check if a video or array of videos exist on nebula
   type: Messages.CHECK_VIDEO;
-  url: string;
+  url: string[];
+};
+
+export type CheckVideoMessageResponse = {
+  // Sent from the background script to the content script in response to a CheckVideoMessage
+  type: Messages.CHECK_VIDEO_RESPONSE;
+  videos: Video[] | undefined;
 };
 
 export type UrlUpdateMessage = {
+  // Sent from the background script to the content script when the page url changes
   type: Messages.URL_UPDATE;
   url: string;
 };
@@ -169,39 +197,221 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 // ========================= Page Load Methods =========================
 /**
- * Handle adding styling to new videos
+ * HandleNewVideos: Match videos, update pageVideos, trigger style updates
  * 1. Pass the video ids to the background script
- * 2. Wait for the background script to respond with the videos
- * 3. Update the page videos with whether they are known or matched
+ * 2. Handle the response
+ * 2.1 Add href's to the videos
+ * 2.2 Update the pageVideos object
+ * 3. Use styleUpdater to update the styling for all videos in the pageVideos object
  */
-
-const handleNewVideos = async (newVideos: string[]): Promise<void> => {
+const handleNewVideos = async (
+  newVideos: VideoIDWithExactHref[]
+): Promise<void> => {
   // 1.
   // Pass the video ids to the background script
-  const checkVideoPromises = newVideos.map((video) => {
-    return new Promise<Video>((resolve, reject) => {
-      const message: CheckVideoMessage = {
-        type: Messages.CHECK_VIDEO,
-        url: video,
-      };
-      chrome.runtime.sendMessage(message, (response: Video) => {
-        !response ? reject() : resolve(response);
-      });
-    });
-  });
+  const message: CheckVideoMessage = {
+    type: Messages.CHECK_VIDEO,
+    url: newVideos.map((video) => video.videoId),
+  };
+  chrome.runtime.sendMessage(message, (response) => {
+    // 2.
+    // Handle the response
+    console.debug("handleNewVideos: CheckVideoMessage response", response);
+    if (response) {
+      const { videos, type } = response as CheckVideoMessageResponse;
+      if (type !== Messages.CHECK_VIDEO_RESPONSE)
+        throw new Error("CS: handleNewVideos: invalid response type");
 
-  // 2.
-  // Wait for the background script to respond with the videos
-  const checkVideoResponses = await Promise.allSettled(checkVideoPromises);
+      if (videos) {
+        // 2.1
+        // Add href's to the videos
+        const checkedVideosWithExactHref = videos.map((v) => {
+          const exactHref = newVideos.find(
+            (nv) => nv.videoId === v.videoId
+          )?.exactHref;
+          if (!exactHref)
+            throw new Error("CS: handleNewVideos: exactHref not found");
+          return { video: v, exactHref };
+        });
 
-  // 3.
-  // Update the page videos with whether they are known or matched
-  checkVideoResponses.forEach((response) => {
-    if (response.status === "fulfilled") {
-      const video = response.value;
-      pageVideos[video.videoId] = video;
+        // 2.2
+        // Update the pageVideos object
+        console.debug("CS: handleNewVideos: updating pageVideos");
+        checkedVideosWithExactHref.forEach((v) => {
+          pageVideos[v.exactHref] = {
+            video: v.video,
+            exactHref: v.exactHref,
+          };
+        });
+
+        // 3.
+        // Use styleUpdater to update the styling for all videos in the pageVideos object
+        styleUpdater(
+          Object.values(pageVideos).map((v) => {
+            return { video: v.video, exactHref: v.exactHref };
+          })
+        );
+      }
     }
   });
+};
+
+/**
+ * styleUpdater: Create a style element and add it to the page with selectors for every video in the pageVideos object
+ * 1. Create a style element if it doesn't exist
+ * 1.1 Check the DOM for a style element, if it already exists, use that
+ * 2. Create a selector for each videoId in the pageVideos object (use *= matching) (remove duplicates)
+ * 2.1 If the video is matched (from a channel on nebula, and has a matching video on nebula) add to the matched selector
+ * 2.2 If the video is known (is from a channel that is on nebula) add to the known selector
+ * 2.3 If the video is unknown (is not from a channel that is on nebula) do nothing
+ * 3. Add the selectors to the style element
+ * 3.1 Matched Videos
+ * Note: known selector (if option for known highlighting is enabled) also includes matched videos
+ * 3.1.1 Add matched video styling - glow and add a nebulate icon in the top left corner
+ * 3.2 Known Videos
+ * 3.2.1 Combine Known video selectors
+ * 3.2.1 Add known video styling - glow effect around the video card/div
+ * Note: Known videos should have a glow effect, matched videos should have a glow effect
+ * 4. Add the style element to the page
+ * Note: we cant use ids because they are not unique (thanks google)
+ * Note: videoId's are in the form of /watch?v=${videoId} or /watch?v=${videoId}&otherStuff or others
+ */
+const styleUpdater = async (
+  videos: VideoWithExactHref[],
+  options: {
+    // Known
+    highlightKnown?: boolean; // Whether to highlight known videos
+    knownColor?: string; // The color to use for known videos
+
+    // Matched
+    highlightMatched?: boolean; // Whether to highlight matched videos
+    matchedColor?: string; // The color to use for matched videos
+
+    // Matched Icon
+    showMatchedIcon?: boolean; // Whether to show the nebulate icon on matched videos
+    matchedIcon?: string; // The icon to use for matched videos
+    matchedIconSize?: number; // The size of the icon to use for matched videos (in percentage height of the video thumbnail)
+    matchedIconPosition?: "tl" | "tr" | "bl" | "br"; // The position of the icon to use for matched videos
+    matchedIconColor?: string; // The hex color of the icon to use for matched videos
+  } = {
+    highlightKnown: true,
+    knownColor: "#AFE1AF", // Celadon
+    highlightMatched: true,
+    matchedColor: " #FFD700", // Gold
+    matchedIcon: "https://via.placeholder.com/50",
+    matchedIconSize: 20,
+    matchedIconPosition: "tl",
+    matchedIconColor: "#000000",
+  }
+): Promise<void> => {
+  console.time("CS: styleUpdater");
+
+  // 1.
+  // Create a style element if it doesn't exist
+  if (!styleElement) {
+    // 1.1
+    // Check the DOM for a style element, if it already exists, use that
+    // eslint-disable-next-line no-undef
+    styleElement = document.querySelector(
+      `#${CSS_IDS.BULK_VIDEO}`
+      // eslint-disable-next-line no-undef
+    ) as HTMLStyleElement;
+    if (!styleElement) {
+      // eslint-disable-next-line no-undef
+      styleElement = document.createElement("style");
+      styleElement.id = CSS_IDS.BULK_VIDEO;
+      // eslint-disable-next-line no-undef
+      document.head.append(styleElement);
+    }
+  }
+
+  // 2.
+  // Create a selector for each videoId in the pageVideos object (use *= matching) (remove duplicates)
+  const knownSelectors: string[] = [];
+  const matchedSelectors: string[] = [];
+  const knownVideoIds = new Set<string>();
+  const matchedVideoIds = new Set<string>();
+  const matchedVideoIdsWithExactHref = new Set<string>();
+  videos.forEach((video) => {
+    const { video: v, exactHref } = video;
+
+    // 2.1
+    // If the video is matched (from a channel on nebula, and has a matching video on nebula) add to the matched selector
+    if (v.matched) {
+      matchedSelectors.push(`a[href*="${exactHref}"]`);
+      matchedVideoIds.add(v.videoId);
+      matchedVideoIdsWithExactHref.add(exactHref);
+    }
+
+    // 2.2
+    // If the video is known (is from a channel that is on nebula) add to the known selector
+    if (v.known) {
+      knownSelectors.push(`a[href*="${exactHref}"]`);
+      knownVideoIds.add(v.videoId);
+    }
+
+    // 2.3
+    // If the video is unknown (is not from a channel that is on nebula) do nothing
+  });
+
+  // 3.
+  // Add the selectors to the style element
+  const styleText: string[] = [];
+
+  // 3.1
+  // Matched Videos
+  if (options.highlightMatched && matchedSelectors.length > 0) {
+    // Note: known selector (if option for known highlighting is enabled) also includes matched videos
+    // 3.1.1
+    // Add matched video styling - glow and add a nebulate icon in the top left corner
+    styleText.push(`
+      ${matchedSelectors.join(",")} {
+        ${
+          options.showMatchedIcon
+            ? `background-image: url(${options.matchedIcon});`
+            : ""
+        }
+        ${
+          options.showMatchedIcon
+            ? `background-position: ${options.matchedIconPosition};`
+            : ""
+        }
+        ${options.showMatchedIcon ? `background-repeat: no-repeat;` : ""}
+        ${
+          options.showMatchedIcon
+            ? `background-size: ${options.matchedIconSize}%;`
+            : ""
+        }
+        ${
+          options.showMatchedIcon
+            ? `background-color: ${options.matchedIconColor};`
+            : ""
+        }
+        box-shadow: 0 0 5px ${options.matchedColor};
+      }
+    `);
+  }
+
+  // 3.2
+  // Known Videos
+  if (options.highlightKnown && knownSelectors.length > 0) {
+    // 3.2.1
+    // Add known video styling - glow effect around the video card/div
+    styleText.push(`
+      ${knownSelectors.join(",")} {
+        box-shadow: 0 0 5px ${options.knownColor};
+      }
+    `);
+  }
+
+  // 4.
+  // Add the style element to the page
+  styleElement.innerHTML = styleText.join("");
+
+  // Note: we cant use ids because they are not unique (thanks google)
+  // Note: videoId's are in the form of /watch?v=${videoId} or /watch?v=${videoId}&otherStuff or others
+  console.timeEnd("CS: styleUpdater");
+  return;
 };
 
 /**
@@ -221,7 +431,7 @@ const urlUpdateHandler = async (url: string): Promise<void> => {
 
   // 2.
   // Check for new videos using newVideosFromPage after 2 seconds
-  const newVideos = await new Promise<string[]>((resolve) => {
+  const newVideos = await new Promise<VideoIDWithExactHref[]>((resolve) => {
     setTimeout(() => {
       resolve(newVideosFromPage());
     }, 2000);
@@ -237,18 +447,37 @@ const urlUpdateHandler = async (url: string): Promise<void> => {
   if (pageIntervalId) {
     clearInterval(pageIntervalId);
   }
+
+  // HACK: for now max 2 times (for development purposes)
+  let count = 0;
   // eslint-disable-next-line no-undef
   pageIntervalId = window.setInterval(async () => {
-    const newVideos = await new Promise<string[]>((resolve) => {
-      setTimeout(() => {
-        resolve(newVideosFromPage());
-      }, 2000);
-    });
+    console.debug("urlUpdateHandler: Checking for new videos");
+    const newVideos = await newVideosFromPage();
     if (newVideos.length > 0) {
-      handleNewVideos(newVideos);
+      console.debug("urlUpdateHandler: New videos found");
+      await handleNewVideos(newVideos);
+    }
+    count++;
+    if (count > 2) {
+      console.debug("urlUpdateHandler: Stopping interval");
+      clearInterval(pageIntervalId);
     }
   }, 10000);
 };
+
+// // eslint-disable-next-line no-undef
+// pageIntervalId = window.setInterval(async () => {
+//   const newVideos = await new Promise<VideoIDWithExactHref[]>((resolve) => {
+//     setTimeout(() => {
+//       resolve(newVideosFromPage());
+//     }, 2000);
+//   });
+//   if (newVideos.length > 0) {
+//     handleNewVideos(newVideos);
+//   }
+// }, 10000);
+// }
 
 /**
  * New Videos From Page
@@ -259,8 +488,11 @@ const urlUpdateHandler = async (url: string): Promise<void> => {
  * 3. If it does, store the urls of the thumbnails to prevent duplicate checks
  * 4. Return the urls of the thumbnails
  */
-const newVideosFromPage = async (): Promise<string[]> => {
-  const newVideoUrls: string[] = [];
+
+// TODO: Replace this with using the #video-title element (no need to check for duplicates and persists across page changes)
+const newVideosFromPage = async (): Promise<VideoIDWithExactHref[]> => {
+  const newVideoUrls: VideoIDWithExactHref[] = [];
+  console.log("newVideosFromPage: pageVideos", pageVideos);
 
   // 1.
   // Get all the thumbnails on the page
@@ -292,7 +524,7 @@ const newVideosFromPage = async (): Promise<string[]> => {
         if (videoId) {
           // 2.2
           // Remove duplicates (multiple thumbnails for the same video)
-          if (pageVideos[videoId]) continue;
+          if (pageVideos[href]) continue;
 
           if (videoId && videoId.length !== 11) {
             console.warn(
@@ -301,8 +533,11 @@ const newVideosFromPage = async (): Promise<string[]> => {
             );
           }
 
-          if (videoId && !pageVideos[videoId]) {
-            newVideoUrls.push(videoId);
+          if (videoId && !pageVideos[href]) {
+            newVideoUrls.push({
+              videoId,
+              exactHref: href,
+            });
           }
         }
       }
@@ -313,11 +548,12 @@ const newVideosFromPage = async (): Promise<string[]> => {
   console.debug("newVideosFromPage: page videos", pageVideos.length);
 
   // 4.
-  // Return the urls of the thumbnails
+  // Return the urls of the thumbnails and their exact href's
   return newVideoUrls;
 };
 
 // ========================= Channel Methods =========================
+// #region Channel Methods
 /**
  * AddChannelButton
  * 1. Check if the button already exists
@@ -521,7 +757,10 @@ const removeChannelCSS = (): Promise<void> => {
   return Promise.resolve();
 };
 
+//#endregion
+
 // ========================= Video Methods =========================
+// #region Video Methods
 /**
  * AddVideoButton
  * 1. Check if the button already exists
@@ -687,172 +926,90 @@ const removeVideoCSS = (): Promise<void> => {
 
   return Promise.resolve();
 };
-// ========================= Bulk Methods =========================
-/**
- * checkVideo
- * 1. Send a message to the background script to check if the video is on Nebula
- * 2. Return the response formatted as { known: boolean, match: boolean }
- */
-// const checkVideo = (
-//   url: string
-// ): Promise<{
-//   known: boolean;
-//   matched: boolean;
-// }> => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       console.debug("checkVideo: Checking video");
 
-//       // 1.
-//       // Send a message to the background script to check if the video is on Nebula
-//       const message: CheckVideoMessage = {
-//         type: Messages.CHECK_VIDEO,
-//         url,
-//       };
+// #endregion
 
-//       chrome.runtime.sendMessage(message, (video: Video | null) => {
-//         if (video?.matched) {
-//           resolve({ known: true, matched: true });
-//         } else if (video?.known) {
-//           resolve({ known: true, matched: false });
-//         } else {
-//           resolve({ known: false, matched: false });
-//         }
-//       });
-//     } catch (e) {
-//       console.error("checkVideo: Error checking video", e);
-//       reject(e);
-//     }
-//   });
-// };
+{
+  /* <div id="dismissible" class="style-scope ytd-compact-video-renderer">
+  <ytd-thumbnail use-hovered-property="" class="style-scope ytd-compact-video-renderer" loaded=""><!--css-build:shady--><a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" aria-hidden="true" tabindex="-1" rel="nofollow" href="/watch?v=OCXHvP78CS8&amp;t=763s">
+  <yt-image alt="" ftl-eligible="" notify-on-loaded="" notify-on-unloaded="" class="style-scope ytd-thumbnail"><img alt="" style="background-color: transparent;" class="yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image yt-core-image--content-mode-scale-aspect-fill yt-core-image--loaded" src="https://i.ytimg.com/vi/OCXHvP78CS8/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&amp;rs=AOn4CLC6eHdplBHECZpgJd-ApwEWjmh52A"></yt-image>
+  <yt-img-shadow ftl-eligible="" class="style-scope ytd-thumbnail" disable-upgrade="" hidden="">
+  </yt-img-shadow>
+  
+  <div id="overlays" class="style-scope ytd-thumbnail"><ytd-thumbnail-overlay-resume-playback-renderer class="style-scope ytd-thumbnail"><!--css-build:shady--><div id="progress" class="style-scope ytd-thumbnail-overlay-resume-playback-renderer" style="width: 55%;"></div></ytd-thumbnail-overlay-resume-playback-renderer><ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail" overlay-style="DEFAULT"><!--css-build:shady--><yt-icon size="16" class="style-scope ytd-thumbnail-overlay-time-status-renderer" disable-upgrade="" hidden=""></yt-icon><span id="text" class="style-scope ytd-thumbnail-overlay-time-status-renderer" aria-label="22 minutes, 48 seconds">
+  22:48
+</span></ytd-thumbnail-overlay-time-status-renderer><ytd-thumbnail-overlay-now-playing-renderer class="style-scope ytd-thumbnail"><!--css-build:shady--><span id="overlay-text" class="style-scope ytd-thumbnail-overlay-now-playing-renderer">Now playing</span>
+<ytd-thumbnail-overlay-equalizer class="style-scope ytd-thumbnail-overlay-now-playing-renderer"><!--css-build:shady--><svg xmlns="http://www.w3.org/2000/svg" id="equalizer" viewBox="0 0 55 95" class="style-scope ytd-thumbnail-overlay-equalizer">
+  <g class="style-scope ytd-thumbnail-overlay-equalizer">
+    <rect class="bar style-scope ytd-thumbnail-overlay-equalizer" x="0"></rect>
+    <rect class="bar style-scope ytd-thumbnail-overlay-equalizer" x="20"></rect>
+    <rect class="bar style-scope ytd-thumbnail-overlay-equalizer" x="40"></rect>
+  </g>
+</svg>
+</ytd-thumbnail-overlay-equalizer>
+</ytd-thumbnail-overlay-now-playing-renderer></div>
+  <div id="mouseover-overlay" class="style-scope ytd-thumbnail"></div>
+  <div id="hover-overlays" class="style-scope ytd-thumbnail"></div>
+</a>
+</ytd-thumbnail>
+  <div class="details style-scope ytd-compact-video-renderer">
+    <div class="metadata style-scope ytd-compact-video-renderer">
+      <a class="yt-simple-endpoint style-scope ytd-compact-video-renderer" rel="nofollow" href="/watch?v=OCXHvP78CS8&amp;t=763s">
+        <h3 class="style-scope ytd-compact-video-renderer">
+          
+          <ytd-badge-supported-renderer class="top-badge style-scope ytd-compact-video-renderer" collection-truncate="" disable-upgrade="" hidden="">
+          </ytd-badge-supported-renderer>
+          <span id="video-title" class=" style-scope ytd-compact-video-renderer" aria-label="Real Lawyer Reacts to Law &amp; Order by LegalEagle 6 months ago 22 minutes 711,838 views" title="Real Lawyer Reacts to Law &amp; Order">
+            Real Lawyer Reacts to Law &amp; Order
+          </span>
+        </h3>
+        <div class="secondary-metadata style-scope ytd-compact-video-renderer">
+          
+          <ytd-video-meta-block class="compact style-scope ytd-compact-video-renderer" inline-badges="" no-endpoints="" truncate-metadata-line=""><!--css-build:shady-->
+<div id="metadata" class="style-scope ytd-video-meta-block">
+  <div id="byline-container" class="style-scope ytd-video-meta-block">
+    <ytd-channel-name id="channel-name" class=" style-scope ytd-video-meta-block"><!--css-build:shady--><div id="container" class="style-scope ytd-channel-name">
+  <div id="text-container" class="style-scope ytd-channel-name">
+    <yt-formatted-string id="text" link-inherit-color="" title="" class="style-scope ytd-channel-name" ellipsis-truncate="" ellipsis-truncate-styling="">LegalEagle</yt-formatted-string>
+  </div>
+  <tp-yt-paper-tooltip fit-to-visible-bounds="" class="style-scope ytd-channel-name" role="tooltip" tabindex="-1"><!--css-build:shady--><div id="tooltip" class="hidden style-scope tp-yt-paper-tooltip" style-target="tooltip">
+  
+    LegalEagle
+  
+</div>
+</tp-yt-paper-tooltip>
+</div>
+<ytd-badge-supported-renderer class="style-scope ytd-channel-name" system-icons=""><!--css-build:shady--><div class="badge badge-style-type-verified style-scope ytd-badge-supported-renderer" aria-label="Verified"><yt-icon class="style-scope ytd-badge-supported-renderer"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 100%; height: 100%;"><g class="style-scope yt-icon"><path d="M12,2C6.5,2,2,6.5,2,12c0,5.5,4.5,10,10,10s10-4.5,10-10C22,6.5,17.5,2,12,2z M9.8,17.3l-4.2-4.1L7,11.8l2.8,2.7L17,7.4 l1.4,1.4L9.8,17.3z" class="style-scope yt-icon"></path></g></svg><!--css-build:shady--></yt-icon><span class="style-scope ytd-badge-supported-renderer"></span><tp-yt-paper-tooltip position="top" class="style-scope ytd-badge-supported-renderer" role="tooltip" tabindex="-1"><!--css-build:shady--><div id="tooltip" class="hidden style-scope tp-yt-paper-tooltip" style-target="tooltip">
+  Verified
+</div>
+</tp-yt-paper-tooltip></div><dom-repeat id="repeat" as="badge" class="style-scope ytd-badge-supported-renderer"><template is="dom-repeat"></template></dom-repeat></ytd-badge-supported-renderer>
+</ytd-channel-name>
+    <div id="separator" class="style-scope ytd-video-meta-block">•</div>
+    <yt-formatted-string id="video-info" class="style-scope ytd-video-meta-block" is-empty="" hidden=""><!--css-build:shady--><yt-attributed-string class="style-scope yt-formatted-string"></yt-attributed-string></yt-formatted-string>
+  </div>
+  <div id="metadata-line" class="style-scope ytd-video-meta-block">
+    
+    <ytd-badge-supported-renderer class="inline-metadata-badge style-scope ytd-video-meta-block" hidden="" system-icons=""><!--css-build:shady--><dom-repeat id="repeat" as="badge" class="style-scope ytd-badge-supported-renderer"><template is="dom-repeat"></template></dom-repeat></ytd-badge-supported-renderer>
+    
+      <span class="inline-metadata-item style-scope ytd-video-meta-block">711K views</span>
+    
+      <span class="inline-metadata-item style-scope ytd-video-meta-block">6 months ago</span>
+    <dom-repeat strip-whitespace="" class="style-scope ytd-video-meta-block"><template is="dom-repeat"></template></dom-repeat>
+  </div>
+</div>
+<div id="additional-metadata-line" class="style-scope ytd-video-meta-block">
+  <dom-repeat class="style-scope ytd-video-meta-block"><template is="dom-repeat"></template></dom-repeat>
+</div>
 
-// // eslint-disable-next-line no-undef
-// const observer = new MutationObserver(function (mutations) {
-//   mutations.forEach(function (mutation) {
-//     if (mutation.addedNodes.length) {
-//       if (mutation.type == "childList") {
-//         mutation.addedNodes.forEach((node) => {
-//           console.debug("MutationObserver: Added node", node);
-//         });
-//       }
-//     }
-//   });
-// });
-
-// ==== Notes for identifying all videos ====
-// When new video loads (from background script or maybe from the page itself), wait for 2 seconds, get all thumbnails, and check if they are on Nebula
-// After checking store all the videos we checked in a variable that gets wiped when a new video loads
-// Every 10 seconds or so, get all the thumbnails and check if they are on Nebula (excluding the ones we already checked)
-// Repeat the above
-
-// Also: Maybe check just the number of thumbnails and if it changes, check all of them
-
-//Pros:
-// 1. We can check all the videos on the page
-// 2. We can check all the videos on the page even if the user doesn't click on them
-// 3. If a user loads more videos or changes the SSR page we can check those videos too
-
-//Cons:
-// 1. We have to check all the videos on the page
-// 2. We have to store all the videos we checked in a variable that gets wiped when a new video loads
-
-// // Identify all videos on the page
-// const identifyVideos = (): Promise<void> => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       console.debug("identifyVideos: Identifying videos");
-
-//       // 1.
-//       // Get all the thumbnails
-//       // eslint-disable-next-line no-undef
-//       const thumbnails = document.getElementsByTagName("ytd-thumbnail");
-//       console.debug("identifyVideos: Thumbnails", thumbnails);
-
-//       // 2.
-//       // Check if the video is on Nebula
-//       // eslint-disable-next-line no-undef
-//       const videos = Array.from(thumbnails).map((thumbnail) => {
-//         const video = thumbnail.querySelector("a")?.href;
-//         if (video) {
-//           const videoId = video.match(
-//             // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
-//             /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
-//           )?.[0];
-//           console.debug(`identifyVideos: Video ID: ${videoId}`);
-//           return videoId;
-//         }
-//       });
-
-//       // 3.
-//       // Send a message to the background script to check if the video is on Nebula and wait using Promise.all
-
-//       //   const message: CheckVideosMessage = {
-//       //     type: Messages.CHECK_VIDEOS,
-//       //     videos,
-//       //   };
-//       //   chrome.runtime.sendMessage(message, (videos: Video[]) => {
-//       //     console.debug("identifyVideos: Videos", videos);
-
-//       //     // 4.
-//       //     // Add the video status to the thumbnail
-//       //     // eslint-disable-next-line no-undef
-//       //     Array.from(thumbnails).forEach((thumbnail) => {
-//       //       // 4.1
-//       //       // Get the video id
-//       //       const video = thumbnail.querySelector("a")?.href;
-//       //       if (video) {
-//       //         const videoId = video.match(
-//       //           // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
-//       //           /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
-//       //         )?.[0];
-//       //         console.debug(`identifyVideos: Video ID: ${videoId}`);
-
-//       //         // 4.2
-//       //         // Get the video status
-//       //         const videoStatus = videos.find((v) => v.id === videoId);
-
-//       //         // 4.3
-//       //         // Add the video status to the thumbnail
-//       //         if (videoStatus?.matched) {
-//       //           thumbnail.classList.add("nebula-video");
-//       //         } else if (videoStatus?.known) {
-//       //           thumbnail.classList.add("nebula-video-known");
-//       //         }
-//       //       }
-//       //     });
-
-//       //     resolve();
-//       //   });
-//       // }
-
-//       videos.forEach((video) => {
-//         if (video) {
-//           const message: CheckVideoMessage = {
-//             type: Messages.CHECK_VIDEO,
-//             url: video,
-//           };
-
-//           chrome.runtime.sendMessage(message, (video: Video | null) => {
-//             console.debug("identifyVideos: Video Response From BG:", video);
-//             if (video?.matched) {
-//               console.debug("identifyVideos: Video Matched!", video);
-//             } else if (video?.known) {
-//               console.debug("identifyVideos: Video Known!", video);
-//             } else {
-//               console.debug("identifyVideos: Video is not known", video);
-//             }
-//           });
-//         }
-//       });
-
-//       resolve();
-//     } catch (e) {
-//       console.error("identifyVideos: Error identifying videos", e);
-//       reject(e);
-//     }
-//   });
-// };
-
-// setTimeout(() => {
-//   identifyVideos();
-// }, 3000);
+</ytd-video-meta-block>
+          
+          <ytd-badge-supported-renderer class="badges style-scope ytd-compact-video-renderer" system-icons=""><!--css-build:shady--><dom-repeat id="repeat" as="badge" class="style-scope ytd-badge-supported-renderer"><template is="dom-repeat"></template></dom-repeat></ytd-badge-supported-renderer>
+        </div>
+      </a>
+      <div id="buttons" class="style-scope ytd-compact-video-renderer"></div>
+    </div>
+    <div id="menu" class="style-scope ytd-compact-video-renderer"><ytd-menu-renderer class="style-scope ytd-compact-video-renderer"><!--css-build:shady--><div id="top-level-buttons-computed" class="top-level-buttons style-scope ytd-menu-renderer"></div><div id="flexible-item-buttons" class="style-scope ytd-menu-renderer"></div><yt-icon-button id="button" class="dropdown-trigger style-scope ytd-menu-renderer" style-target="button"><!--css-build:shady--><button id="button" class="style-scope yt-icon-button" aria-label="Action menu"><yt-icon class="style-scope ytd-menu-renderer"><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 100%; height: 100%;"><g class="style-scope yt-icon"><path d="M12,16.5c0.83,0,1.5,0.67,1.5,1.5s-0.67,1.5-1.5,1.5s-1.5-0.67-1.5-1.5S11.17,16.5,12,16.5z M10.5,12 c0,0.83,0.67,1.5,1.5,1.5s1.5-0.67,1.5-1.5s-0.67-1.5-1.5-1.5S10.5,11.17,10.5,12z M10.5,6c0,0.83,0.67,1.5,1.5,1.5 s1.5-0.67,1.5-1.5S12.83,4.5,12,4.5S10.5,5.17,10.5,6z" class="style-scope yt-icon"></path></g></svg><!--css-build:shady--></yt-icon></button><yt-interaction id="interaction" class="circular style-scope yt-icon-button"><!--css-build:shady--><div class="stroke style-scope yt-interaction"></div><div class="fill style-scope yt-interaction"></div></yt-interaction></yt-icon-button><yt-button-shape id="button-shape" version="modern" class="style-scope ytd-menu-renderer" disable-upgrade="" hidden=""></yt-button-shape></ytd-menu-renderer></div>
+    <div id="queue-button" class="style-scope ytd-compact-video-renderer"></div>
+  </div>
+</div> */
+}

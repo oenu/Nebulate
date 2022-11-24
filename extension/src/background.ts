@@ -10,6 +10,7 @@ import {
   ChannelRedirectMessage,
   CheckVideoMessage,
   UrlUpdateMessage,
+  CheckVideoMessageResponse,
 } from "./content_script";
 import { PopupRedirectMessage } from "./popup";
 import { summarizeTable } from "./functions/summarizeTable";
@@ -85,7 +86,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 const handleNewVideo = async (url: string, tabId: number): Promise<void> => {
   try {
-    const video = await checkTable(url);
+    const video = await checkTable([url]).then((videos) => videos[0]);
     if (video) {
       handleVideo(video, tabId);
     } else {
@@ -201,13 +202,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           const message = request as CheckVideoMessage;
           const url = message.url;
           console.debug("BG: check video: " + url);
-          checkTable(url).then((video) => {
-            if (video) {
-              sendResponse(video);
-            } else {
-              sendResponse(null);
-            }
-          });
+          checkTable(url)
+            .then((response) => {
+              console.debug("BG: check video response: ", response);
+              const message: CheckVideoMessageResponse = {
+                type: Messages.CHECK_VIDEO_RESPONSE,
+                videos: response,
+              };
+              if (response.length > 0) sendResponse(message);
+            })
+            .catch((e) => {
+              console.error("BG: Error in checkTable: ", e);
+              const message: CheckVideoMessageResponse = {
+                type: Messages.CHECK_VIDEO_RESPONSE,
+                videos: undefined,
+              };
+              sendResponse(message);
+            });
+
           break;
         }
 

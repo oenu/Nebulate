@@ -134,6 +134,18 @@ function Options() {
     value: displayChannelRedirectButton,
     callback: setDisplayChannelRedirectButton,
   });
+
+  // TODO: Implement this
+  const [enableThumbnailGlow, setEnableThumbnailGlow] =
+    React.useState<boolean>(true);
+  options.push({
+    title: "Thumbnail Glow",
+    description:
+      "Highlights a thumbnail on YouTube when it is available on Nebula",
+    value: enableThumbnailGlow,
+    callback: setEnableThumbnailGlow,
+  });
+
   // ================== Links ==================
   const links = [
     {

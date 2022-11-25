@@ -7,7 +7,6 @@ import logger from "../utils/logger";
 import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo/youtubeVideo";
 import { youtubeIds } from "../utils/youtubeIds";
-import console = require("console");
 
 /**
  * @type {Object} MatchedVideo

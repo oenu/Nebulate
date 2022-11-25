@@ -1,6 +1,6 @@
 import { Messages, Alarms } from "./enums";
-import { checkTable } from "./functions/checkTable";
-import { updateTable } from "./functions/updateTable";
+import { checkTable } from "./backgroundFunctions/checkTable";
+import { updateTable } from "./backgroundFunctions/updateTable";
 
 import { Video } from "./types";
 
@@ -13,7 +13,7 @@ import {
   CheckVideoMessageResponse,
 } from "./content_script";
 import { PopupRedirectMessage } from "./popup";
-import { summarizeTable } from "./functions/summarizeTable";
+import { summarizeTable } from "./backgroundFunctions/summarizeTable";
 
 console.log("Background script running");
 // Config Variables

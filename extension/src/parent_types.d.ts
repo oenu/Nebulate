@@ -13,14 +13,17 @@ export type MatchedVideo = {
 
 /**
  * @type {Object} ChannelEntry
+ * @property {string} slug - The channel slug of the channel that the videos belong to
+ * @property {string} youtubeId - The youtube id of the channel
  * @property {string[]} matched - A list of youtube video ids that have been matched to a nebula video
  * @property {string[]} not_matched - A list of youtube video ids that have not been matched to a nebula video
- * @property {string} slug - The channel slug of the channel that the videos belong to
  */
+
 export interface ChannelEntry {
+  slug: string;
+  youtubeId: string;
   matched: MatchedVideo[];
   not_matched: string[];
-  slug: string;
 }
 /**
  * @type {Object} LookupTable

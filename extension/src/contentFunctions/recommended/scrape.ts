@@ -81,9 +81,8 @@ export const scrapeVideosFromPage = async (): Promise<videoId[]> => {
 
 /**
  * CurrentPage
- * This should find what kind of page we are on, the current videoId, and the current video title
+ * This should find what kind of page we are on, the current videoId etc
  * 1. Check what kind of page we are on (home, search, video, channel, playlist, etc)
- * 1.1 Check for a video element on the page
  *
  *
  *

@@ -17,18 +17,27 @@ export const addVideoCSS = (): Promise<void> => {
   style.id = CSS_IDS.VIDEO;
   // 1.2
   // Add a glow to the video box
-  style.innerHTML = `#player {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
-}
-
-#movie_player > div.html5-video-container > video {
-  transition-delay: 0.5s;
-  transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: -10px 0 10vw rgb(62, 187, 243), 10px 0 10vw rgb(88, 80, 209);
-  clip-path: inset(0px -100vw 0px -100vw);
-}`;
+  style.innerHTML = `
+  /* Mini Player */
+  .miniplayer #container:has(video) {
+    box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
+    transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    clip-path: inset(-100% -100% 0 -100%);
+  }
+  
+  /* Theatre Player */
+  #player-theater-container #container:has(video) {
+    box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
+    transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s
+    /* clip-path: inset(0px -100vw 0px -100vw); */;
+  }
+    
+  /* Normal Player */
+  :not(.ytd-page-manager[theater]) #container:has(video) {
+    transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition-delay: 0.5s;
+    box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
+    }`;
 
   // 2.
   // Add the style to the page

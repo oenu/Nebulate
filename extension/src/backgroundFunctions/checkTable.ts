@@ -31,25 +31,14 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
     // Create promises for each videoId
     const promises = urls.map(async (url) => {
       return new Promise<Video>((resolve) => {
-        let videoId: string;
-
         // 2.1
         // Check if the videoId / url is valid and extract the videoId if needed
-        if (url.includes("youtube.com")) {
-          const match = url.match(
-            // /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
-            /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
-          )?.[0];
-          if (!match) {
-            // console.warn("CheckTable: no match found for url", url);
-            throw new Error("CheckTable: no videoId found in url");
-          }
-          videoId = match;
-        } else {
-          videoId = url;
-        }
-
-        console.log("CheckTable: videoId", videoId);
+        const videoId = url.includes("youtube.com")
+          ? url.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0] ??
+            ((): void => {
+              throw new Error("CheckTable: invalid url");
+            })()
+          : url;
 
         // 2.2
         // Check if the videoId is valid
@@ -128,7 +117,6 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
     console.debug(
       `CheckTable: Provided ${urls.length} urls, got ${videoResults.length} results, ${fulfilled.length} fulfilled, ${rejected.length} rejected`
     );
-    console.debug("CheckTable: videoResults", videoResults);
 
     // 4.
     // Return the results

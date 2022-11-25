@@ -5,12 +5,14 @@ export type Video = {
   videoId: string; // The video id from the url
   matched: boolean; // If the Youtube video is matched to a Nebula Video
   channelSlug?: string; // The channel slug if the video is from a Nebula Channel
+  channelId?: string; // The youtube channel id if the video is from a Nebula Channel
   videoSlug?: string; // The video slug if the video is matched to a Nebula Video
 };
 
 export type Channel = {
   known: boolean; // If the Youtube channel is a Nebula Channel
   slug?: string; // The channel slug
+  channelId: string; // The youtube channel id
 };
 
 export type MessageTypes = {

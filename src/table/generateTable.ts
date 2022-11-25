@@ -6,6 +6,8 @@ import logger from "../utils/logger";
 // Mongoose Schema
 import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo/youtubeVideo";
+import { youtubeIds } from "../utils/youtubeIds";
+import console = require("console");
 
 /**
  * @type {Object} MatchedVideo
@@ -20,14 +22,16 @@ export type MatchedVideo = {
 
 /**
  * @type {Object} ChannelEntry
+ * @property {string} slug - The channel slug of the channel that the videos belong to
+ * @property {string} youtubeId - The youtube id of the channel
  * @property {string[]} matched - A list of youtube video ids that have been matched to a nebula video
  * @property {string[]} not_matched - A list of youtube video ids that have not been matched to a nebula video
- * @property {string} slug - The channel slug of the channel that the videos belong to
  */
 export interface ChannelEntry {
+  slug: string;
+  youtubeId: string;
   matched: MatchedVideo[];
   not_matched: string[];
-  slug: string;
 }
 
 /**
@@ -58,88 +62,110 @@ export interface LookupTable {
 export const generateTable = async (
   maximumMatchDistance?: number
 ): Promise<LookupTable> => {
-  const matchLimit = maximumMatchDistance || 2;
+  try {
+    const matchLimit = maximumMatchDistance || 2;
 
-  // Find all the nebula videos in the database
-  const nebulaVideos = await NebulaVideo.find({
-    youtubeVideoId: { $exists: true },
-    matchStrength: { $lte: matchLimit },
-  })
-    .select("youtubeVideoObjectId channelSlug slug")
-    .lean();
+    // Find all the nebula videos in the database
+    const nebulaVideos = await NebulaVideo.find({
+      youtubeVideoId: { $exists: true },
+      matchStrength: { $lte: matchLimit },
+    })
+      .select("youtubeVideoObjectId channelSlug slug")
+      .lean();
 
-  logger.debug(
-    `generateTable: Found ${nebulaVideos.length} matched nebula videos`
-  );
-  // Find all youtube videos in the database
-  const youtubeVideos = await YoutubeVideo.find({})
-    .select("youtubeVideoId channelSlug")
-    .lean();
-  logger.debug(`generateTable: Found ${youtubeVideos.length} youtube videos`);
-
-  // Get a list of all the channels that have youtube videos in the database
-  const channelSlugs = [...new Set(nebulaVideos.map((v) => v.channelSlug))];
-  logger.debug(`generateTable: Found ${channelSlugs.length} channels`);
-
-  // Create a channel entry for each channel
-  const channelEntries: ChannelEntry[] = channelSlugs.map((slug) => {
-    return {
-      matched: [],
-      not_matched: [],
-      slug,
-    };
-  });
-
-  // For each youtube video, find the matching nebula video and add it to the channel entry
-  youtubeVideos.forEach((youtubeVideo) => {
-    // Find the channel for the youtube video
-    const channelEntry = channelEntries.find(
-      (entry) => entry.slug === youtubeVideo.channelSlug
+    logger.debug(
+      `generateTable: Found ${nebulaVideos.length} matched nebula videos`
     );
-    if (!channelEntry) {
-      logger.error(
-        `generateTable: Could not find channel entry for channel ${youtubeVideo.channelSlug}`
+    // Find all youtube videos in the database
+    const youtubeVideos = await YoutubeVideo.find({})
+      .select("youtubeVideoId channelSlug")
+      .lean();
+    logger.debug(`generateTable: Found ${youtubeVideos.length} youtube videos`);
+
+    // Get a list of all the channels that have youtube videos in the database
+    const channelSlugs = [...new Set(nebulaVideos.map((v) => v.channelSlug))];
+    logger.debug(`generateTable: Found ${channelSlugs.length} channels`);
+    // Create a channel entry for each channel
+    const channelEntries: ChannelEntry[] = channelSlugs.map((slug) => {
+      // Match each channel slug to its youtube id
+      const youtubeId = youtubeIds.find(
+        (channel) => channel.slug === slug
+      )?.youtubeId;
+
+      // If the channel slug does not have a youtube id, throw an error
+      if (!youtubeId) {
+        throw new Error(
+          `generateTable: Channel ${slug} does not have a youtube id`
+        );
+      }
+
+      return {
+        matched: [],
+        not_matched: [],
+        slug,
+        youtubeId,
+      };
+    });
+
+    const channelsWithNoVideos: string[] = [];
+
+    // For each youtube video, find the matching nebula video and add it to the channel entry
+    youtubeVideos.forEach((youtubeVideo) => {
+      // Find the channel for the youtube video
+      const channelEntry = channelEntries.find(
+        (entry) => entry.slug === youtubeVideo.channelSlug
       );
-      return;
-    }
+      if (!channelEntry) {
+        // We have a youtube video that is associated with a channel that has no matched nebula videos
+        channelsWithNoVideos.push(youtubeVideo.channelSlug);
+        return;
+      }
 
-    // Find the matching nebula video for the youtube video
-    const nebulaVideo = nebulaVideos.find(
-      (video) =>
-        video.youtubeVideoObjectId?.toString() === youtubeVideo._id.toString()
+      // Find the matching nebula video for the youtube video
+      const nebulaVideo = nebulaVideos.find(
+        (video) =>
+          video.youtubeVideoObjectId?.toString() === youtubeVideo._id.toString()
+      );
+
+      // If there is a matching nebula video, add it to the channel entry as a matched video
+      if (nebulaVideo) {
+        channelEntry.matched.push({
+          id: youtubeVideo.youtubeVideoId,
+          slug: nebulaVideo.slug,
+        });
+      } else {
+        // If there is no matching nebula video, add the youtube video id to the channel entry as not matched
+        channelEntry.not_matched.push(youtubeVideo.youtubeVideoId);
+      }
+    });
+
+    logger.info(
+      `generateTable: Found ${channelsWithNoVideos.length} channels with no matched videos`
     );
 
-    // If there is a matching nebula video, add it to the channel entry as a matched video
-    if (nebulaVideo) {
-      channelEntry.matched.push({
-        id: youtubeVideo.youtubeVideoId,
-        slug: nebulaVideo.slug,
-      });
-    } else {
-      // If there is no matching nebula video, add the youtube video id to the channel entry as not matched
-      channelEntry.not_matched.push(youtubeVideo.youtubeVideoId);
-    }
-  });
+    // Generate a new id and assign it to the lookup table
+    const id = uuidv4();
+    const table: LookupTable = {
+      generatedAt: new Date(),
+      channels: channelEntries,
+      id,
+    };
 
-  // Generate a new id and assign it to the lookup table
-  const id = uuidv4();
-  const table: LookupTable = {
-    generatedAt: new Date(),
-    channels: channelEntries,
-    id,
-  };
+    // Write the lookup table to disk
+    logger.debug(`generateTable: Saving lookup table`);
+    await fs.promises.writeFile(
+      path.join(__dirname, "/lookup_table.json"),
+      JSON.stringify(table),
+      "utf-8"
+    );
 
-  // Write the lookup table to disk
-  logger.debug(`generateTable: Saving lookup table`);
-  await fs.promises.writeFile(
-    path.join(__dirname, "/lookup_table.json"),
-    JSON.stringify(table),
-    "utf-8"
-  );
-
-  logger.info("generateTable: Lookup table generated");
-  // Return the lookup table
-  return table;
+    logger.info("generateTable: Lookup table generated");
+    // Return the lookup table
+    return table;
+  } catch (error) {
+    logger.error(`generateTable: ${error}`);
+    throw error;
+  }
 };
 
 export default generateTable;

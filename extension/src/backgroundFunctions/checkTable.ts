@@ -63,27 +63,22 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
             "CheckTable: video ID " + videoId + " is not 11 characters long"
           );
 
-        const video: Video = {
-          videoId,
-          known: false,
-          matched: false,
-        };
-
         // 2.3
         // Check if the videoId is in the matched videos table (shorter)
         for (const channel of lookupTable.channels) {
           for (const matchedVideo of channel.matched) {
             if (videoId.includes(matchedVideo.id)) {
-              video.known = true;
-              video.matched = true;
-              video.videoSlug = matchedVideo.slug;
-              video.channelSlug = channel.slug;
-              console.debug("CheckTable: video is known and matched");
+              const video: Video = {
+                videoId,
+                known: true,
+                matched: true,
+                channelSlug: channel.slug,
+                channelId: channel.youtubeId,
+                videoSlug: matchedVideo.slug,
+              };
               // return video;
               resolve(video);
               return;
-            } else {
-              video.matched = false;
             }
           }
         }
@@ -93,21 +88,26 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
         for (const channel of lookupTable.channels) {
           for (const unmatchedVideo of channel.not_matched) {
             if (videoId.includes(unmatchedVideo)) {
-              video.known = true;
-              video.matched = false;
-              video.channelSlug = channel.slug;
+              const video: Video = {
+                videoId,
+                known: true,
+                matched: false,
+                channelSlug: channel.slug,
+                channelId: channel.youtubeId,
+              };
               // return video;
               resolve(video);
               return;
-            } else {
-              video.known = false;
             }
           }
         }
-
         // 2.5
         // If the video is unknown and unmatched, return a basic video object
-
+        const video: Video = {
+          videoId,
+          known: false,
+          matched: false,
+        };
         resolve(video);
         return;
       });

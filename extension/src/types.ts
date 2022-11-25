@@ -12,7 +12,7 @@ export type Video = {
 export type Channel = {
   known: boolean; // If the Youtube channel is a Nebula Channel
   slug?: string; // The channel slug
-  channelId: string; // The youtube channel id
+  channelId?: string; // The youtube channel id
 };
 
 export type MessageTypes = {

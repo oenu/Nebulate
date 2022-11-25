@@ -1,72 +1,86 @@
 import { videoId } from "../../content_script";
+import { YoutubePageType } from "../page/identify";
 import { pageVideos } from "./handler";
 
 /**
  * ScrapeVideosFromPage
- * This should find all recommended videos on the youtube player page
- * 1. Get all the recommended video elements from the page
- * Note: we have to make sure to remove any playlist or radio elements
- * 2. Create promises to get the videoId for each video element
- * 2.1 Recursively get the videoId from the video element parent elements (until we find the videoId) (max 5 levels)
- * Note: Youtube ID Regex (/(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/ )
- * 3. Trigger the promises and wait for the results
- * 4. Filter out any videos that are already in the pageVideos cache
- * 5. Return the results
+ * 1. Scrape the page based on the page type
+ * 2. Filter out any videos that are already in the pageVideos cache
+ * 3. Return the results
  */
-export const scrapeVideosFromPage = async (): Promise<videoId[]> => {
+
+export const scrapeVideosFromPage = async (
+  pageType: YoutubePageType
+): Promise<videoId[]> => {
+  let newVideos: videoId[] = [];
   // 1.
-  // Get all the recommended video elements from the page
-  const videoElements = Array.from(
-    // eslint-disable-next-line no-undef
-    document.querySelectorAll(
-      "span#video-title:not([class*='radio']):not([class*='playlist'])"
-    )
-  );
+  // Call the other scrape functions to get the new videos
+  switch (pageType) {
+    case "video":
+      console.debug("scrapeVideosFromPage: Video page");
+      newVideos = await scrapeVideoPage();
+      break;
+    case "subscriptions":
+      console.debug("scrapeVideosFromPage: Subscriptions page");
+      newVideos = await scrapeSubscriptionPage();
+      break;
+    case "search":
+      console.debug("scrapeVideosFromPage: Search page");
+      newVideos = await scrapeSearchPage();
+      break;
+    case "home":
+      console.debug("scrapeVideosFromPage: Home page");
+      newVideos = await scrapeHomePage();
+      break;
+    default:
+      console.debug("scrapeVideosFromPage: Unknown page");
+      break;
+  }
 
   // 2.
-  // Create promises to get the videoId for each video element
-  const promises = videoElements.map(async (videoElement) => {
+  // Filter out any videos that are already in the pageVideos cache
+  newVideos = newVideos.filter((videoId) => !pageVideos[videoId]);
+
+  // 3.
+  // Return the results
+  return newVideos;
+};
+
+/**
+ * ScrapeVideoPage
+ * This should find all recommended videos on the youtube video player page
+ * 1. Get all the video elements from the page
+ * 2. Create promises to get the videoId for each video element
+ * 3. Filter out any videos that are already in the pageVideos cache
+ * 4. Return the results
+ */
+export const scrapeVideoPage = async (): Promise<videoId[]> => {
+  console.debug("scrapeVideoPage: Getting new videos from video page");
+  // 1.
+  // Get all the video ids from the page
+  const promises = Array.from(
+    // eslint-disable-next-line no-undef
+    document.querySelectorAll(
+      `:not([page-subtype="subscriptions"]) a[href*="/watch?v="]:has(#video-title:not([class*='radio']):not([class*='playlist']))`
+    )
+  ).map((element) => {
     return new Promise<videoId>((resolve, reject) => {
-      let videoId: videoId | undefined;
-
-      // 2.1
-      // Recursively get the videoId from the video element parent elements (until we find the videoId) (max 5 levels)
-      let parentElement = videoElement.parentElement;
-      let level = 0;
-      while (level < 5) {
-        if (parentElement?.getAttribute("href")) {
-          const match = parentElement
-            .getAttribute("href")
-            ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
-          if (match) {
-            videoId = match;
-            break;
-          }
-        }
-        parentElement = parentElement?.parentElement ?? null;
-        level++;
-      }
-
-      if (videoId) {
-        resolve(videoId);
-      } else {
-        reject("No videoId found");
-      }
+      const id = element
+        .getAttribute("href")
+        ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
+      id ? resolve(id) : reject("No id found");
     });
   });
 
   // 3.
   // Trigger the promises and wait for the results
-  const results = await Promise.allSettled(promises);
-  const videoIds = results
-    .map((result) => {
-      if (result.status === "fulfilled") {
-        return result.value;
-      } else {
-        return null;
-      }
+  const videoIds = (await Promise.allSettled(promises))
+    .map((promise) => {
+      return promise.status === "fulfilled" ? promise.value : null;
     })
-    .filter((videoId) => videoId !== null) as videoId[];
+    .filter((videoId) => {
+      return videoId !== null;
+    }) as videoId[];
 
   // 4.
   // Filter out any videos that are already in the pageVideos cache
@@ -80,17 +94,144 @@ export const scrapeVideosFromPage = async (): Promise<videoId[]> => {
 };
 
 /**
- * CurrentPage
- * This should find what kind of page we are on, the current videoId etc
- * 1. Check what kind of page we are on (home, search, video, channel, playlist, etc)
- *
- *
- *
- *
- * 1. Work out if we are watching a video or not (eg. subscription page, search page, home page or playlist) [page-subtype] (subscription, search, home, playlist)
- *
- * 2. Get any element that has [video-id] attribute
- * 2.1. Get the videoId from the element
- * 3. Return the videoId
+ * ScrapeSubscriptionPage
+ * This should find all videos on the youtube subscription page
+ * 1. Get all the video elements from the page
+ * 2. Create promises to get the videoId for each video element
+ * 3. Filter out any videos that are already in the pageVideos cache
+ * 4. Return the results
  */
-// export const currentPage = async (): Promise<videoId | null> => {
+export const scrapeSubscriptionPage = async (): Promise<videoId[]> => {
+  console.debug(
+    "scrapeSubscriptionPage: Getting new videos from subscription page"
+  );
+  // 1.
+  // Get all the video elements from the page
+  const promises = Array.from(
+    // eslint-disable-next-line no-undef
+    document.querySelectorAll(
+      `[page-subtype="subscriptions"] #video-title:not([class*='radio']):not([class*='playlist'])`
+    )
+  ).map((element) => {
+    return new Promise<videoId>((resolve, reject) => {
+      const id = element
+        .getAttribute("href")
+        ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
+      id ? resolve(id) : reject("No id found");
+    });
+  });
+
+  // 2.
+  // Create promises to get the videoId for each video element
+  const videoIds = (await Promise.allSettled(promises))
+    .map((promise) => {
+      return promise.status === "fulfilled" ? promise.value : null;
+    })
+    .filter((videoId) => {
+      return videoId !== null;
+    }) as videoId[];
+
+  // 3.
+  // Filter out any videos that are already in the pageVideos cache
+  const newVideoIds = videoIds.filter((videoId) => {
+    return !pageVideos[videoId];
+  });
+
+  // 4.
+  // Return the results
+  return newVideoIds;
+};
+
+/**
+ * ScrapeSearchPage
+ * This should find all videos on the youtube search page
+ * 1. Get all the video elements from the page
+ * 2. Create promises to get the videoId for each video element
+ * 3. Filter out any videos that are already in the pageVideos cache
+ * 4. Return the results
+ */
+// :not([page-subtype="subscriptions"]) .ytd-search #video-title:not([class*='radio']):not([class*='playlist'])
+export const scrapeSearchPage = async (): Promise<videoId[]> => {
+  console.debug("scrapeSearchPage: Getting new videos from search page");
+  // 1.
+  // Get all the video elements from the page
+  const promises = Array.from(
+    // eslint-disable-next-line no-undef
+    document.querySelectorAll(
+      `:not([page-subtype="subscriptions"]) .ytd-search #video-title:not([class*='radio']):not([class*='playlist'])`
+    )
+  ).map((element) => {
+    return new Promise<videoId>((resolve, reject) => {
+      const id = element
+        .getAttribute("href")
+        ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
+      id ? resolve(id) : reject("No id found");
+    });
+  });
+
+  // 2.
+  // Create promises to get the videoId for each video element
+  const videoIds = (await Promise.allSettled(promises))
+    .map((promise) => {
+      return promise.status === "fulfilled" ? promise.value : null;
+    })
+    .filter((videoId) => {
+      return videoId !== null;
+    }) as videoId[];
+
+  // 3.
+  // Filter out any videos that are already in the pageVideos cache
+  const newVideoIds = videoIds.filter((videoId) => {
+    return !pageVideos[videoId];
+  });
+
+  // 4.
+  // Return the results
+  return newVideoIds;
+};
+
+/**
+ * ScrapeHomePage
+ * This should find all videos on the youtube home page
+ * 1. Get all the video elements from the page
+ * 2. Create promises to get the videoId for each video element
+ * 3. Filter out any videos that are already in the pageVideos cache
+ * 4. Return the results
+ */
+
+export const scrapeHomePage = async (): Promise<videoId[]> => {
+  console.debug("scrapeHomePage: Getting new videos from home page");
+  // 1.
+  // Get all the video elements from the page
+  const promises = Array.from(
+    // eslint-disable-next-line no-undef
+    document.querySelectorAll("#video-title:not([class*='radio'])")
+  ).map((element) => {
+    return new Promise<videoId>((resolve, reject) => {
+      const id = element
+        .getAttribute("href")
+        ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
+      id ? resolve(id) : reject("No id found");
+    });
+  });
+
+  // 2.
+  // Create promises to get the videoId for each video element
+  const videoIds = (await Promise.allSettled(promises))
+    .map((promise) => {
+      return promise.status === "fulfilled" ? promise.value : null;
+    })
+    .filter((videoId) => {
+      return videoId !== null;
+    }) as videoId[];
+
+  // 3.
+  // Filter out any videos that are already in the pageVideos cache
+  const newVideoIds = videoIds.filter((videoId) => {
+    return !pageVideos[videoId];
+  });
+
+  // 4.
+  // Return the results
+  return newVideoIds;
+};

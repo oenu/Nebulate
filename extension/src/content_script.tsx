@@ -22,7 +22,7 @@ console.debug("CS: init");
 export let localChannel: Channel | undefined; // The nebula channel that matches the current url
 export let localVideo: Video | undefined; // The nebula video that matches the current url
 
-export type videoId = Video["videoId"];
+export type videoId = string;
 
 export type VideoRedirectMessage = {
   // Sent from the content script to the background script to redirect the user to a video

@@ -1,12 +1,12 @@
-import { checkTable } from "../backgroundFunctions/checkTable";
-import { videoId } from "../content_script";
-import { Video } from "../types";
+import { checkTable } from "../../backgroundFunctions/checkTable";
+import { videoId } from "../../content_script";
+import { Video } from "../../types";
 import {
   identifyPage,
   YoutubePage,
   // YoutubePageType
-} from "./page/identify";
-import { createStyle } from "./styling/bulk";
+} from "./identify";
+import { createStyle } from "../styling/bulk";
 
 import { scrapeVideosFromPage } from "./scrape";
 

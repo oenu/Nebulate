@@ -1,5 +1,5 @@
-import { videoId } from "../content_script";
-import { YoutubePageType } from "./page/identify";
+import { videoId } from "../../content_script";
+import { YoutubePageType } from "./identify";
 import { pageVideos } from "./update";
 
 /**

@@ -6,7 +6,7 @@ import {
   addChannelCSS,
   removeChannelCSS,
 } from "./contentFunctions/styling/channel";
-import { urlUpdateHandler } from "./contentFunctions/update";
+import { urlUpdateHandler } from "./contentFunctions/page/update";
 import {
   addVideoButton,
   removeVideoButton,

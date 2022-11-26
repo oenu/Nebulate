@@ -1,17 +1,17 @@
 import {
   addChannelButton,
   removeChannelButton,
-} from "./contentFunctions/channel/button";
+} from "./contentFunctions/buttons/channel";
 import {
   addChannelCSS,
   removeChannelCSS,
-} from "./contentFunctions/channel/css";
+} from "./contentFunctions/styling/channel";
 import { urlUpdateHandler } from "./contentFunctions/recommended/handler";
 import {
   addVideoButton,
   removeVideoButton,
-} from "./contentFunctions/video/button";
-import { addVideoCSS, removeVideoCSS } from "./contentFunctions/video/css";
+} from "./contentFunctions/buttons/video";
+import { addVideoCSS, removeVideoCSS } from "./contentFunctions/styling/video";
 import { Messages } from "./enums";
 import { Channel, Video } from "./types";
 

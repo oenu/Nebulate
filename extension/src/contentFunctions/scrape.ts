@@ -1,6 +1,6 @@
-import { videoId } from "../../content_script";
-import { YoutubePageType } from "../page/identify";
-import { pageVideos } from "./handler";
+import { videoId } from "../content_script";
+import { YoutubePageType } from "./page/identify";
+import { pageVideos } from "./update";
 
 /**
  * ScrapeVideosFromPage

@@ -18,6 +18,10 @@ import { Video } from "../types";
 
 export const checkTable = async (urls: string[]): Promise<Video[]> => {
   try {
+    let matchedCount = 0;
+    let knownCount = 0;
+    let unknownCount = 0;
+
     // 1.
     // Get the lookup table
     const { lookupTable } = (await chrome.storage.local.get("lookupTable")) as {
@@ -30,25 +34,24 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
     // 2.
     // Create promises for each videoId
     const promises = urls.map(async (url) => {
-      return new Promise<Video>((resolve) => {
+      return new Promise<Video>((resolve, reject) => {
         // 2.1
         // Check if the videoId / url is valid and extract the videoId if needed
         const videoId = url.includes("youtube.com")
           ? url.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0] ??
             ((): void => {
-              throw new Error("CheckTable: invalid url");
+              reject("CheckTable: Invalid url");
             })()
           : url;
 
         // 2.2
         // Check if the videoId is valid
         if (!videoId)
-          throw new Error(
-            "CheckTable: could not extract video ID from URL " + url
+          return reject(
+            "CheckTable: Invalid videoId or url" + videoId + " " + url
           );
-
         if (videoId.length !== 11)
-          throw new Error(
+          return reject(
             "CheckTable: video ID " + videoId + " is not 11 characters long"
           );
 
@@ -65,9 +68,8 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
                 channelId: channel.youtubeId,
                 videoSlug: matchedVideo.slug,
               };
-              // return video;
-              resolve(video);
-              return;
+              matchedCount++;
+              return resolve(video);
             }
           }
         }
@@ -84,9 +86,8 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
                 channelSlug: channel.slug,
                 channelId: channel.youtubeId,
               };
-              // return video;
-              resolve(video);
-              return;
+              knownCount++;
+              return resolve(video);
             }
           }
         }
@@ -97,8 +98,8 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
           known: false,
           matched: false,
         };
-        resolve(video);
-        return;
+        unknownCount++;
+        return resolve(video);
       });
     });
 
@@ -115,7 +116,7 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
     );
 
     console.debug(
-      `CheckTable: Provided ${urls.length} urls, got ${videoResults.length} results, ${fulfilled.length} fulfilled, ${rejected.length} rejected`
+      `CheckTable: Provided with ${urls.length} urls, ${fulfilled.length} fulfilled | ${matchedCount} matched, ${knownCount} known, ${unknownCount} unknown, ${rejected.length} rejected`
     );
 
     // 4.

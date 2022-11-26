@@ -52,7 +52,7 @@ export const createStyle = async (
 
   // Create the style for known videos
   if (options.highlightKnown) {
-    const knownVideos = videos.filter((video) => video.matched && video.known);
+    const knownVideos = videos.filter((video) => !video.matched && video.known);
     const knownStyle = knownVideos
       .map((video) => {
         // Don't match the video if it is a playlist
@@ -72,18 +72,18 @@ export const createStyle = async (
     const matchedVideos = videos.filter((video) => video.matched);
     const matchedStyle = matchedVideos.map((video) => {
       // Channel Name
-
       const channelName = `
       /* Matched Channel: ${video.channelSlug} */
       /* Search for matched channel name */
-        a[href*="${video.videoId}"]:not([href*="start_radio"]) #channel-name yt-formatted-string 
-        /* Set matched video's channel name to the matched color */
-        { color: ${options.matchedColor} !important }`;
+      a[href*="${video.videoId}"]:not([href*="start_radio"]) #channel-name yt-formatted-string 
+      /* Set matched video's channel name to the matched color */
+      { color: ${options.matchedColor} !important }`;
 
       // Video Title
+      // :not(.ytd-thumbnail)
       const videoTitle = `
       /* Search for matched video title */
-        a[href*="${video.videoId}"]:not([href*="start_radio"]) #video-title
+        a[href*="${video.videoId}"]#video-title
         /* Set matched video's title to the matched color */
         { color: ${options.matchedColor} !important }`;
 

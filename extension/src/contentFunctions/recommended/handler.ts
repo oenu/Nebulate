@@ -76,7 +76,7 @@ export const urlUpdateHandler = async (url: string): Promise<void> => {
       await handleNewVideos(newVideos);
     }
     count++;
-    if (count > 2) {
+    if (count > 5) {
       console.error("urlUpdateHandler: Dev: Stopping interval");
       clearInterval(pageIntervalId);
     }

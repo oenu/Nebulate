@@ -205,7 +205,7 @@ export const scrapeHomePage = async (): Promise<videoId[]> => {
   // Get all the video elements from the page
   const promises = Array.from(
     // eslint-disable-next-line no-undef
-    document.querySelectorAll("#video-title:not([class*='radio'])")
+    document.querySelectorAll("#video-title-link:not([class*='radio'])")
   ).map((element) => {
     return new Promise<videoId>((resolve, reject) => {
       const id = element

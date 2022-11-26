@@ -1,4 +1,4 @@
-import { checkTable } from "../../backgroundFunctions/checkTable";
+import { checkTable } from "../checkTable";
 import { videoId } from "../../content_script";
 import { Video } from "../../types";
 import {

@@ -1,16 +1,16 @@
 import { Messages, Alarms } from "./enums";
-import { checkTable } from "./backgroundFunctions/checkTable";
+// import { checkTable } from "./contentFunctions/checkTable";
 import { updateTable } from "./backgroundFunctions/updateTable";
 
-import { Video } from "./types";
+// import { Video } from "./types";
 
 // Content Script Messages
 import {
   VideoRedirectMessage,
   ChannelRedirectMessage,
-  CheckVideoMessage,
+  // CheckVideoMessage,
   UrlUpdateMessage,
-  CheckVideoMessageResponse,
+  // CheckVideoMessageResponse,
 } from "./content_script";
 import { PopupRedirectMessage } from "./popup";
 import { summarizeTable } from "./backgroundFunctions/summarizeTable";
@@ -33,19 +33,12 @@ const defaults = {
 
 const version = "0.1.0";
 
-type urlCacheType = {
-  [tabId: number]: string;
-};
-
-const urlCache: urlCacheType = {};
-
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   console.log("Tab Detected");
   try {
     if (changeInfo.status === "complete") {
       // Tell the content script that the page has changed.
-      // It will then check to see if the page has a number of thumbnails, if so, it will send a periodic message to the background script to check the table.
-
+      console.log("Tab Complete", tab.url);
       if (tab.url) {
         const urlMessage: UrlUpdateMessage = {
           type: Messages.URL_UPDATE,
@@ -56,88 +49,51 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         console.debug("BG: No URL found for tab: ", tab);
         return;
       }
-
-      if (tab.url?.includes("youtube.com/watch")) {
-        const url = tab.url;
-        console.log("Video Detected");
-
-        // Check if a url is cached for this tab
-        if (!urlCache[tabId]) {
-          urlCache[tabId] = url;
-          handleNewVideo(url, tabId);
-          // Check if the url has changed
-        } else if (urlCache[tabId] !== url) {
-          urlCache[tabId] = url;
-          handleNewVideo(url, tabId);
-        } else {
-          console.log("BG: URL is the same, not checking");
-        }
-      } else {
-        console.log("BG: Not a video page, clearing");
-        chrome.tabs.sendMessage(tabId, {
-          type: Messages.CLEAR,
-        });
-      }
     }
   } catch (e) {
     console.log("BG: Error in onUpdated listener: ", e);
   }
 });
 
-const handleNewVideo = async (url: string, tabId: number): Promise<void> => {
-  try {
-    const video = await checkTable([url]).then((videos) => videos[0]);
-    if (video) {
-      handleVideo(video, tabId);
-    } else {
-      chrome.tabs.sendMessage(tabId, {
-        type: Messages.CLEAR,
-      });
-    }
-  } catch (e) {
-    console.log("BG: Error in handleNewVideo: ", e);
-  }
-};
+// /**
+//  * Handler tasks
+//  * 1. If the channel is on Nebula, send a message to the content script to load the channel button
+//  * 1.1 If the channel is not on Nebula, send a message to the content script to unload the channel button
+//  * 2. If the video is on Nebula, send a message to the content script to load the video button
+//  * 2.1 If the video is not on Nebula, send a message to the content script to unload the video button
+//  */
+// const handleVideo = (video: Video, tabId: number): void => {
+//   try {
+//     // Channel is on Nebula?
+//     if (video.known) {
+//       chrome.tabs.sendMessage(tabId, {
+//         type: Messages.ADD_CHANNEL_BUTTON,
+//         channel: {
+//           known: true,
+//           slug: video.channelSlug,
+//         },
+//       });
+//     } else {
+//       chrome.tabs.sendMessage(tabId, {
+//         type: Messages.REMOVE_CHANNEL_BUTTON,
+//       });
+//     }
 
-/**
- * Handler tasks
- * 1. If the channel is on Nebula, send a message to the content script to load the channel button
- * 1.1 If the channel is not on Nebula, send a message to the content script to unload the channel button
- * 2. If the video is on Nebula, send a message to the content script to load the video button
- * 2.1 If the video is not on Nebula, send a message to the content script to unload the video button
- */
-const handleVideo = (video: Video, tabId: number): void => {
-  try {
-    // Channel is on Nebula?
-    if (video.known) {
-      chrome.tabs.sendMessage(tabId, {
-        type: Messages.ADD_CHANNEL_BUTTON,
-        channel: {
-          known: true,
-          slug: video.channelSlug,
-        },
-      });
-    } else {
-      chrome.tabs.sendMessage(tabId, {
-        type: Messages.REMOVE_CHANNEL_BUTTON,
-      });
-    }
-
-    // Video is on Nebula?
-    if (video.matched) {
-      chrome.tabs.sendMessage(tabId, {
-        type: Messages.ADD_VIDEO_BUTTON,
-        video,
-      });
-    } else {
-      chrome.tabs.sendMessage(tabId, {
-        type: Messages.REMOVE_VIDEO_BUTTON,
-      });
-    }
-  } catch (e) {
-    console.log("BG: Error in handleVideo: ", e);
-  }
-};
+//     // Video is on Nebula?
+//     if (video.matched) {
+//       chrome.tabs.sendMessage(tabId, {
+//         type: Messages.ADD_VIDEO_BUTTON,
+//         video,
+//       });
+//     } else {
+//       chrome.tabs.sendMessage(tabId, {
+//         type: Messages.REMOVE_VIDEO_BUTTON,
+//       });
+//     }
+//   } catch (e) {
+//     console.log("BG: Error in handleVideo: ", e);
+//   }
+// };
 
 /**
  * Listener Tasks
@@ -196,32 +152,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           break;
         }
 
-        // 1.3
-        // Check if a video is on Nebula
-        case Messages.CHECK_VIDEO: {
-          const message = request as CheckVideoMessage;
-          const url = message.url;
-          console.debug("BG: check video: " + url);
-          checkTable(url)
-            .then((response) => {
-              console.debug("BG: check video response: ", response);
-              const message: CheckVideoMessageResponse = {
-                type: Messages.CHECK_VIDEO_RESPONSE,
-                videos: response,
-              };
-              if (response.length > 0) sendResponse(message);
-            })
-            .catch((e) => {
-              console.error("BG: Error in checkTable: ", e);
-              const message: CheckVideoMessageResponse = {
-                type: Messages.CHECK_VIDEO_RESPONSE,
-                videos: undefined,
-              };
-              sendResponse(message);
-            });
+        // // 1.3
+        // // Check if a video is on Nebula
+        // case Messages.CHECK_VIDEO: {
+        //   const message = request as CheckVideoMessage;
+        //   const url = message.url;
+        //   console.debug("BG: check video: " + url);
+        //   checkTable(url)
+        //     .then((response) => {
+        //       console.debug("BG: check video response: ", response);
+        //       const message: CheckVideoMessageResponse = {
+        //         type: Messages.CHECK_VIDEO_RESPONSE,
+        //         videos: response,
+        //       };
+        //       if (response.length > 0) sendResponse(message);
+        //     })
+        //     .catch((e) => {
+        //       console.error("BG: Error in checkTable: ", e);
+        //       const message: CheckVideoMessageResponse = {
+        //         type: Messages.CHECK_VIDEO_RESPONSE,
+        //         videos: undefined,
+        //       };
+        //       sendResponse(message);
+        //     });
 
-          break;
-        }
+        //   break;
+        // }
 
         // 2.
         // Popup Script Messages

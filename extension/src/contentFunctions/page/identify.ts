@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // Identify the page and return the page type (home, search, channel, video, playlist, watch-later, liked, etc)
 
-import { checkTable } from "../../backgroundFunctions/checkTable";
+import { checkTable } from "../checkTable";
 import { Channel, Video } from "../../types";
 
 /**

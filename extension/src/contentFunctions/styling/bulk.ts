@@ -14,7 +14,7 @@ let styleElement: HTMLStyleElement | undefined; // The style element that is use
 export const createStyle = async (
   videos: Video[],
   options: {
-    bulkHighlight: boolean; // Highlight all videos on the page
+    bulkHighlight?: boolean; // Highlight all videos on the page
     matchedColor?: string; // The color to use for matched videos
   } = {
     bulkHighlight: true,
@@ -31,20 +31,37 @@ export const createStyle = async (
   }
   const newStyle: string[] = [];
   // Create the style for matched videos
+
+  // HACK: we are adding all styles at the moment but might want to only add the ones that are needed in the future
   if (options.bulkHighlight) {
     const matchedVideos = videos.filter((video) => video.matched);
     const matchedStyle = matchedVideos.map((video) => {
-      // Channel Name
-      const channelName = `
-      /* Matched Channel: ${video.channelSlug} */
+      // Channel Name -- For video page
+      const videoPageChannelName = `
+      /* Matched Channel: ${video.channelSlug} (video page) */
       /* Search for matched channel name */
       a[href*="${video.videoId}"]:not([href*="start_radio"]) #channel-name yt-formatted-string 
       /* Set matched video's channel name to the matched color */
       { color: ${options.matchedColor} !important }`;
 
-      // Video Title
-      // :not(.ytd-thumbnail)
-      const videoTitle = `
+      // Video Title -- For video page
+      const videoPageVideoTitle = `
+      /* Matched Channel: ${video.channelSlug} (video page) */
+      /* Search for matched video title */
+      a[href*="${video.videoId}"]:not([href*="start_radio"]) #video-title
+      /* Set matched video's title to the matched color */
+      { color: ${options.matchedColor} !important }`;
+
+      // Channel Name -- For subscription page
+      const subscriptionPageChannelName = `
+      /* Matched Channel: ${video.channelSlug} (subscription page)*/
+      /* Search for matched channel name */
+      div#details:has(a[href*="${video.videoId}"]) ytd-channel-name#channel-name a
+      /* Set matched video's channel name to the matched color */
+      { color: ${options.matchedColor} !important }`;
+
+      // Video Title -- For subscription page
+      const subscriptionPageVideoTitle = `
       /* Search for matched video title */
         a[href*="${video.videoId}"]#video-title
         /* Set matched video's title to the matched color */
@@ -57,17 +74,15 @@ export const createStyle = async (
         /* Set matched video's border to the matched color */
         { border: 2px solid ${options.matchedColor} !important }`;
 
-      return [channelName, videoTitle, thumbnail].join("\n");
+      return [
+        videoPageChannelName,
+        subscriptionPageChannelName,
+        subscriptionPageVideoTitle,
+        videoPageVideoTitle,
+        thumbnail,
+      ].join("\n");
     });
     newStyle.push(matchedStyle.join("\n"));
   }
   styleElement.innerHTML = newStyle.join("\n");
-};
-
-// Remove the style element
-export const removeBulk = (): void => {
-  if (styleElement) {
-    styleElement.remove();
-    styleElement = undefined;
-  }
 };

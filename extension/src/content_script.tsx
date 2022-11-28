@@ -5,10 +5,6 @@ import { Channel, Video } from "./types";
 console.debug("CS: init");
 // // Runs in the context of the youtube tab
 
-// Local Variables:
-export let localChannel: Channel | undefined; // The nebula channel that matches the current url
-export let localVideo: Video | undefined; // The nebula video that matches the current url
-
 export type videoId = string;
 
 export type VideoRedirectMessage = {

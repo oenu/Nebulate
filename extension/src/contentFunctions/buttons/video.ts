@@ -1,5 +1,6 @@
-import { localVideo, VideoRedirectMessage } from "../../content_script";
+import { VideoRedirectMessage } from "../../content_script";
 import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../enums";
+import { getLocalPage } from "../page/update";
 
 /**
  * AddVideoButton
@@ -47,18 +48,19 @@ export const addVideoButton = (): Promise<void> => {
     // 4.
     // Add the click event listener
     nebulate_button.addEventListener("click", () => {
-      console.debug("VideoButton: Clicked");
-      if (localVideo) {
-        const message: VideoRedirectMessage = {
-          type: Messages.VIDEO_REDIRECT,
-          video: localVideo,
-        };
-        chrome.runtime.sendMessage(message);
-      } else {
-        console.error("VideoButton: No video found");
-      }
+      getLocalPage().then((page) => {
+        console.debug("VideoButton: Clicked");
+        if (page.video) {
+          const message: VideoRedirectMessage = {
+            type: Messages.VIDEO_REDIRECT,
+            video: page.video,
+          };
+          chrome.runtime.sendMessage(message);
+        } else {
+          console.error("VideoButton: No video found");
+        }
+      });
     });
-
     return Promise.resolve();
   } catch (e) {
     console.error("addVideoButton: Error adding button", e);
@@ -88,15 +90,17 @@ export const removeVideoButton = (): Promise<void> => {
     // 2.
     // Remove the click event listener
     button.removeEventListener("click", () => {
-      console.debug("VideoButton: Clicked");
-      if (localVideo) {
-        chrome.runtime.sendMessage({
-          type: Messages.VIDEO_REDIRECT,
-          video: localVideo,
-        });
-      } else {
-        console.error("VideoButton: No video found");
-      }
+      getLocalPage().then((page) => {
+        console.debug("VideoButton: Clicked");
+        if (page.video) {
+          chrome.runtime.sendMessage({
+            type: Messages.VIDEO_REDIRECT,
+            video: page.video,
+          });
+        } else {
+          console.error("VideoButton: No video found");
+        }
+      });
     });
 
     // 3.

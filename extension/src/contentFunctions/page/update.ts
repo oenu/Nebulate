@@ -1,5 +1,5 @@
 import { checkTable } from "../checkTable";
-import { Video } from "../../types";
+import { Channel, Video } from "../../types";
 
 // Centralized function to update the style elements
 import { createStyle } from "../styling/bulk";
@@ -8,6 +8,7 @@ import { createStyle } from "../styling/bulk";
 import { BUTTON_IDS } from "../../enums";
 import { addVideoButton } from "../buttons/video";
 import { addChannelButton } from "../buttons/channel";
+import { addActiveStyle, removeActiveStyle } from "../styling/active";
 
 // Local Video Cache:
 export let pageVideos: {
@@ -35,14 +36,22 @@ export type YoutubePageType =
   | "subscriptions"
   | "unknown";
 
-const localPage: {
+export let localPage: {
   pageType: YoutubePageType;
-  videoId?: videoId;
-  videoSlug?: string;
-  channelId?: string;
-  channelSlug?: string;
+  video: Video | undefined;
+  channel: Channel | undefined;
+  version: number;
 } = {
   pageType: "unknown",
+  video: undefined,
+  channel: undefined,
+  version: 0,
+};
+
+export const getLocalPage = (): Promise<typeof localPage> => {
+  return new Promise((resolve) => {
+    resolve(localPage);
+  });
 };
 
 export let pageIntervalId: number | undefined; // The id of the interval that checks for new videos on the
@@ -52,10 +61,11 @@ export const urlChanged = async (url: string): Promise<void> => {
   console.log(pageVideos);
 
   // 1.
-  // Call the updater
+  // Quickly handle a clear url change
+  // Get videoId from url
   console.time("urlChanged: update");
+  await fastUpdate(url);
   await updater(url);
-
   console.timeEnd("urlChanged: update");
 
   // 2.
@@ -75,7 +85,70 @@ export const urlChanged = async (url: string): Promise<void> => {
 
 // =================================================================================================
 
+const fastUpdate = async (url: string): Promise<boolean> => {
+  // Quickly handle a url change to a new video
+  // Get videoId from url using regex (/(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/ )
+  const videoId = url.match(
+    // eslint-disable-next-line no-useless-escape
+    /(?<=[=\/&])[a-zA-Z0-9_\-]{11}(?=[=\/&?#\n\r]|$)/
+  )?.[0];
+  console.debug("fastUpdate: videoId", videoId);
+  if (videoId) {
+    // 1.
+    // Check if video is already in cache
+    if (!pageVideos[videoId]) {
+      // Video is not in cache
+      console.debug("fastUpdate: video not in cache");
+
+      // Check if video is in table
+      const video = (await checkTable([videoId]))?.[0];
+      if (!video) {
+        // Video is not in table
+        console.debug("fastUpdate: video not in table");
+
+        // remove buttons and styling
+        await removeButtons();
+        await removeActiveStyle();
+
+        return false;
+      } else {
+        // Video is in table
+        console.debug("fastUpdate: video in table");
+
+        // Add video to cache
+        pageVideos[videoId] = {
+          video,
+          checked: true,
+        };
+      }
+    } else {
+      console.debug("fastUpdate: Video already in cache");
+    }
+
+    // Video is now in cache
+    // 1.1
+    // Set the local page video
+    console.log("fastUpdate: setting local page video");
+    localPage = {
+      version: localPage.version++,
+      pageType: "video",
+      video: pageVideos[videoId].video,
+      channel: {
+        channelId: pageVideos[videoId].video.channelId,
+        known: pageVideos[videoId].video.known,
+        slug: pageVideos[videoId].video.channelSlug,
+      },
+    };
+
+    // 1.3
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const updater = async (url: string): Promise<void> => {
+  const updateVersion = localPage.version;
   // 1.
   // Get the current video from the page
   const currentVideo = await GetVideoFromPage();
@@ -92,20 +165,176 @@ const updater = async (url: string): Promise<void> => {
     pageVideos = {};
   }
 
-  if (currentVideo?.videoId !== localPage.videoId) {
+  if (currentVideo?.videoId !== localPage.video?.videoId) {
     // Page has changed time to update the page
+
+    // clear the interval
+    if (pageIntervalId) {
+      // eslint-disable-next-line no-undef
+      window.clearInterval(pageIntervalId);
+      pageIntervalId = undefined;
+    }
 
     console.log("updater: video has changed, updating page");
     if (currentVideo) {
-      localPage.videoId = currentVideo.videoId;
-      localPage.videoSlug = currentVideo.videoSlug;
-      localPage.channelId = currentVideo.channelId;
-      localPage.channelSlug = currentVideo.channelSlug;
+      // Update the local video cache
+      localPage.video = currentVideo;
+      localPage.channel = {
+        channelId: currentVideo.channelId,
+        known: currentVideo.known,
+        slug: currentVideo.channelSlug,
+      };
+    }
+  } else {
+    console.debug("urlChanged: Video hasn't changed");
+  }
+
+  // Add buttons if they are needed
+  await addButtons(currentVideo);
+  await addActiveStyle(currentVideo);
+
+  // 3.
+  // If is subscription page, get the videos from the page
+  switch (pageType) {
+    case "subscriptions":
+      {
+        // Get the videos from the page
+        const videos = await scrapeSubscriptionPage();
+
+        // Filter out any videoId's that exist in the pageVideos object and have been checked
+        const filteredVideos = videos.filter(
+          (videoId) => !pageVideos[videoId]?.checked
+        );
+
+        // If there are no videos, return
+        if (filteredVideos.length === 0) {
+          console.debug("updater: Subscription page no new videos found");
+          return;
+        }
+
+        // If there are videos, check them
+        const checkedVideos = await checkTable(filteredVideos);
+
+        // If there are no matched videos, return
+        if (!checkedVideos) {
+          console.debug("updater: Subscription page: no videos found");
+          return;
+        }
+
+        // Check if any of the videos are new
+        const newVideos = checkedVideos.filter(
+          (video) => !pageVideos[video.videoId]
+        );
+
+        // Check version
+        if (updateVersion === localPage.version) {
+          // If there are new videos, add them to the pageVideos object
+          if (newVideos.length > 0) {
+            // If there are matched videos, add them to the cache
+            for (const video of checkedVideos) {
+              pageVideos[video.videoId] = {
+                video: video,
+                checked: true,
+              };
+            }
+
+            // // If there are videos, update the style with all the videos
+            // console.debug("updater: Subscription page: Updating page style");
+            // const styles = Object.values(pageVideos).map((v) => v.video);
+            // await createStyle(styles);
+          }
+        } else {
+          console.debug("updater: Page has changed, not updating");
+        }
+      }
+      break;
+
+    case "video": {
+      // 4.
+      // Get the videos from the page
+      const videos = await scrapeVideoPage();
+
+      // If there are no videos, return
+      if (!videos) {
+        console.debug("updater: Video page: No videos found on page");
+      }
+
+      // Filter out any videoId's that exist in the pageVideos object and have been checked
+      const filteredVideos = videos.filter(
+        (videoId) => !pageVideos[videoId]?.checked
+      );
+
+      // If there are no videos, return
+      if (filteredVideos.length === 0) {
+        console.debug("updater: Video page: No new videos found on page");
+        return;
+      }
+
+      // If there are videos, check them
+      const checkedVideos = await checkTable(filteredVideos);
+
+      // If there are no matched videos, return
+      if (!checkedVideos) {
+        console.debug("updater: Video page: No video page videos found");
+        return;
+      }
+
+      // Check if any of the videos are new
+      const newVideos = checkedVideos.filter(
+        (video) => !pageVideos[video.videoId]
+      );
+
+      // Check version
+      if (updateVersion === localPage.version) {
+        // If there are new videos, add them to the pageVideos object
+        if (newVideos.length > 0) {
+          // If there are matched videos, add them to the cache
+          for (const video of checkedVideos) {
+            pageVideos[video.videoId] = {
+              video: video,
+              checked: true,
+            };
+          }
+
+          // // If there are videos, update the style with all the videos
+          // const styles = Object.values(pageVideos).map((v) => v.video);
+          // console.debug("updater: Video page: Updating page style");
+          // await createStyle(styles);
+        }
+      } else {
+        console.debug("updater: Page has changed, not updating");
+      }
+
+      break;
     }
 
-    // 2.
-    // If video or channel need buttons, add them if they don't exist
-    // If a current video exists, check if it has buttons and add them if not
+    default:
+      console.debug("updater: No page type found");
+      break;
+  }
+
+  const styles = Object.values(pageVideos).map((v) => v.video);
+  console.debug("updater: Video page: Updating page style");
+  await createStyle(styles);
+
+  console.log(
+    `urlChanged: update complete, ${
+      Object.keys(pageVideos).length
+    } videos in cache, ${
+      (Object.values(pageVideos).filter((v) => v.checked).length /
+        Object.keys(pageVideos).length) *
+      100
+    }% Checked, ${
+      Object.keys(pageVideos).filter(
+        (videoId) => pageVideos[videoId].video.matched
+      ).length
+    } videos matched to Nebula`
+  );
+};
+
+// =================================================================================================
+const addButtons = async (currentVideo: Video | undefined): Promise<void> => {
+  new Promise<void>((resolve) => {
     if (currentVideo?.matched) {
       // If the video doesn't have buttons, add them
       // eslint-disable-next-line no-undef
@@ -138,131 +367,25 @@ const updater = async (url: string): Promise<void> => {
         channelRedirectBtn.remove();
       }
     }
-  } else {
-    console.debug("urlChanged: Video hasn't changed");
-  }
+    resolve();
+  });
+};
 
-  // 3.
-  // If is subscription page, get the videos from the page
-  switch (pageType) {
-    case "subscriptions":
-      {
-        // Get the videos from the page
-        const videos = await scrapeSubscriptionPage();
-
-        // Filter out any videoId's that exist in the pageVideos object and have been checked
-        const filteredVideos = videos.filter(
-          (videoId) => !pageVideos[videoId]?.checked
-        );
-
-        // If there are no videos, return
-        if (filteredVideos.length === 0) {
-          console.debug("updater: No new videos found on page");
-          return;
-        }
-
-        // If there are videos, check them
-        const checkedVideos = await checkTable(filteredVideos);
-
-        // If there are no matched videos, return
-        if (!checkedVideos) {
-          console.debug("updater: No subscription page videos found");
-          return;
-        }
-
-        // Check if any of the videos are new
-        const newVideos = checkedVideos.filter(
-          (video) => !pageVideos[video.videoId]
-        );
-
-        // If there are new videos, add them to the pageVideos object
-        if (newVideos.length > 0) {
-          // If there are matched videos, add them to the cache
-          for (const video of checkedVideos) {
-            pageVideos[video.videoId] = {
-              video: video,
-              checked: true,
-            };
-          }
-
-          // If there are videos, update the style with all the videos
-          createStyle(Object.values(pageVideos).map((v) => v.video));
-        }
-      }
-      break;
-
-    case "video": {
-      // 4.
-      // If is video page, get the recommended videos from the page
-      if (url.includes("/watch")) {
-        // Get the videos from the page
-        const videos = await scrapeVideoPage();
-
-        // If there are no videos, return
-        if (!videos) {
-          console.debug("updater: No videos found on page");
-          return;
-        }
-
-        // Filter out any videoId's that exist in the pageVideos object and have been checked
-        const filteredVideos = videos.filter(
-          (videoId) => !pageVideos[videoId]?.checked
-        );
-
-        // If there are no videos, return
-        if (filteredVideos.length === 0) {
-          console.debug("updater: No new videos found on page");
-          return;
-        }
-
-        // If there are videos, check them
-        const checkedVideos = await checkTable(filteredVideos);
-
-        // If there are no matched videos, return
-        if (!checkedVideos) {
-          console.debug("updater: No video page videos found");
-          return;
-        }
-
-        // Check if any of the videos are new
-        const newVideos = checkedVideos.filter(
-          (video) => !pageVideos[video.videoId]
-        );
-
-        // If there are new videos, add them to the pageVideos object
-        if (newVideos.length > 0) {
-          // If there are matched videos, add them to the cache
-          for (const video of checkedVideos) {
-            pageVideos[video.videoId] = {
-              video: video,
-              checked: true,
-            };
-          }
-
-          // If there are videos, update the style with all the videos
-          createStyle(Object.values(pageVideos).map((v) => v.video));
-        }
-      }
-      break;
+const removeButtons = async (): Promise<void> => {
+  new Promise<void>((resolve) => {
+    // eslint-disable-next-line no-undef
+    const videoRedirectBtn = document.getElementById(BUTTON_IDS.VIDEO);
+    if (videoRedirectBtn) {
+      videoRedirectBtn.remove();
     }
 
-    default:
-      console.debug("updater: No page type found");
-      break;
-  }
-  console.log(
-    `urlChanged: update complete, ${
-      Object.keys(pageVideos).length
-    } videos in cache, ${
-      (Object.values(pageVideos).filter((v) => v.checked).length /
-        Object.keys(pageVideos).length) *
-      100
-    }% Checked, ${
-      Object.keys(pageVideos).filter(
-        (videoId) => pageVideos[videoId].video.matched
-      ).length
-    } videos matched to Nebula`
-  );
+    // eslint-disable-next-line no-undef
+    const channelRedirectBtn = document.getElementById(BUTTON_IDS.CHANNEL);
+    if (channelRedirectBtn) {
+      channelRedirectBtn.remove();
+    }
+    resolve();
+  });
 };
 
 // =================================================================================================

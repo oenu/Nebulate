@@ -6,14 +6,19 @@ let videoStyleElement: HTMLStyleElement | undefined; // The style element that i
 // eslint-disable-next-line no-undef
 let channelStyleElement: HTMLStyleElement | undefined; // The style element that is used to highlight videos on the page
 
-export const addActiveStyle = (
-  currentVideo: Video,
+export const addActiveStyle = async (
+  currentVideo: Video | undefined,
   options: {
     videoHighlight: boolean; // Highlight current video
     channelHighlight: boolean; // Highlight the channel of the current video
-    matchedColor?: string; // The color to use for matched videos
+    matchedColor: string; // The color to use for matched videos
+  } = {
+    videoHighlight: true,
+    channelHighlight: true,
+    matchedColor: "#3EBBF3",
   }
-): void => {
+): Promise<void> => {
+  console.debug("Adding active style, currentVideo:", currentVideo);
   // Create the style elements if they don't exist
   if (!videoStyleElement) {
     // eslint-disable-next-line no-undef
@@ -33,7 +38,7 @@ export const addActiveStyle = (
   let videoStyle = "";
   let channelStyle = "";
 
-  if (options.channelHighlight && currentVideo?.channelSlug) {
+  if (options?.channelHighlight && currentVideo?.channelSlug) {
     channelStyle = `
     div#owner {
       transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
@@ -43,7 +48,7 @@ export const addActiveStyle = (
   }
 
   // Create the style for the current video
-  if (options.videoHighlight && currentVideo?.videoSlug) {
+  if (options?.videoHighlight && currentVideo?.videoSlug) {
     videoStyle = `
   /* Mini Player */
   .miniplayer #container:has(video) {
@@ -72,14 +77,15 @@ export const addActiveStyle = (
   channelStyleElement.innerHTML = channelStyle;
 };
 
-// remove the style elements
-export const removeActiveStyle = (): void => {
-  if (videoStyleElement) {
-    videoStyleElement.remove();
-    videoStyleElement = undefined;
-  }
-  if (channelStyleElement) {
-    channelStyleElement.remove();
-    channelStyleElement = undefined;
-  }
+export const removeActiveStyle = async (): Promise<void> => {
+  return new Promise<void>((resolve) => {
+    console.debug("Removing active style");
+    if (videoStyleElement) {
+      videoStyleElement.innerHTML = "";
+    }
+    if (channelStyleElement) {
+      channelStyleElement.innerHTML = "";
+    }
+    resolve();
+  });
 };

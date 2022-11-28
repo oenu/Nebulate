@@ -1,6 +1,6 @@
-import { ChannelRedirectMessage, localChannel } from "../../content_script";
+import { ChannelRedirectMessage } from "../../content_script";
 import { BUTTON_IDS, Messages } from "../../enums";
-
+import { getLocalPage } from "../page/update";
 /**
  * AddChannelButton
  * 1. Check if the button already exists
@@ -40,16 +40,18 @@ export const addChannelButton = async (): Promise<void> => {
     // Add the click event listener
     nebulate_logo.addEventListener("click", () => {
       console.debug("ChannelButton: Clicked");
-      if (localChannel) {
-        console.debug("addChannelButton: Redirecting to channel");
-        const message: ChannelRedirectMessage = {
-          type: Messages.CHANNEL_REDIRECT,
-          channel: localChannel,
-        };
-        chrome.runtime.sendMessage(message);
-      } else {
-        console.error("addChannelButton: No channel found");
-      }
+      getLocalPage().then((page) => {
+        if (page.channel) {
+          console.debug("addChannelButton: Redirecting to channel");
+          const message: ChannelRedirectMessage = {
+            type: Messages.CHANNEL_REDIRECT,
+            channel: page.channel,
+          };
+          chrome.runtime.sendMessage(message);
+        } else {
+          console.error("addChannelButton: No channel found");
+        }
+      });
     });
 
     // 4.
@@ -119,16 +121,18 @@ export const removeChannelButton = (): Promise<void> => {
     // 2.
     // Remove the click event listener
     button.removeEventListener("click", () => {
-      console.debug("ChannelButton: Clicked");
-      if (localChannel) {
-        console.debug("removeChannelButton: Redirecting to channel");
-        chrome.runtime.sendMessage({
-          type: Messages.CHANNEL_REDIRECT,
-          channel: localChannel,
-        });
-      } else {
-        console.error("removeChannelButton: No channel found");
-      }
+      getLocalPage().then((page) => {
+        console.debug("ChannelButton: Clicked");
+        if (page.channel) {
+          console.debug("removeChannelButton: Redirecting to channel");
+          chrome.runtime.sendMessage({
+            type: Messages.CHANNEL_REDIRECT,
+            channel: page.channel,
+          });
+        } else {
+          console.error("removeChannelButton: No channel found");
+        }
+      });
     });
 
     // 3.

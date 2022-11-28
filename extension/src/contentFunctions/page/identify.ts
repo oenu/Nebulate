@@ -43,10 +43,11 @@ export type YoutubePageType =
 
 export type YoutubePage = {
   type: YoutubePageType;
-  actions: {
-    videoHighlight: boolean; // Whether the page should highlight matched videos
+  options: {
+    bulkHighlight: boolean; // Whether the page should highlight bulk channels and videos
+    videoHighlight: boolean; // Whether the page should highlight matched playing video
+    videoRedirect: boolean; // Whether the page should show a redirect button on matched playing video
     channelHighlight: boolean; // Whether the page should highlight matched channels
-    videoRedirect: boolean; // Whether the page should show a redirect button on matched videos
     channelRedirect: boolean; // Whether the page should show a redirect button on matched channels
   };
   video: Video | undefined;
@@ -58,10 +59,11 @@ export type YoutubePage = {
 const pageTypes: { [key: string]: YoutubePage } = {
   home: {
     type: "home",
-    actions: {
+    options: {
+      bulkHighlight: true,
       videoHighlight: false,
-      channelHighlight: false,
       videoRedirect: false,
+      channelHighlight: true,
       channelRedirect: false,
     },
     video: undefined,
@@ -70,11 +72,12 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   search: {
     type: "search",
-    actions: {
-      videoHighlight: true,
+    options: {
+      bulkHighlight: true,
+      videoHighlight: false,
       channelHighlight: true,
-      videoRedirect: true,
-      channelRedirect: true,
+      videoRedirect: false,
+      channelRedirect: false,
     },
     video: undefined,
     channel: undefined,
@@ -82,11 +85,12 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   channel: {
     type: "channel",
-    actions: {
+    options: {
+      bulkHighlight: true,
       videoHighlight: false,
-      channelHighlight: false,
+      channelHighlight: true,
       videoRedirect: false,
-      channelRedirect: false,
+      channelRedirect: true,
     },
     video: undefined,
     channel: undefined,
@@ -94,11 +98,11 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   "channel-home": {
     type: "channel-home",
-    actions: {
+    options: {
       videoHighlight: false,
-      channelHighlight: false,
+      channelHighlight: true,
       videoRedirect: false,
-      channelRedirect: false,
+      channelRedirect: true,
     },
     video: undefined,
     channel: undefined,
@@ -106,8 +110,8 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   "channel-videos": {
     type: "channel-videos",
-    actions: {
-      videoHighlight: true,
+    options: {
+      videoHighlight: false,
       channelHighlight: true,
       videoRedirect: true,
       channelRedirect: true,
@@ -118,7 +122,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   "channel-playlists": {
     type: "channel-playlists",
-    actions: {
+    options: {
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -130,7 +134,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   "channel-about": {
     type: "channel-about",
-    actions: {
+    options: {
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -142,7 +146,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   "channel-community": {
     type: "channel-community",
-    actions: {
+    options: {
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -154,7 +158,19 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   "channel-channels": {
     type: "channel-channels",
-    actions: {
+    options: {
+      videoHighlight: false,
+      channelHighlight: false,
+      videoRedirect: false,
+      channelRedirect: false,
+    },
+    video: undefined,
+    channel: undefined,
+    miniPlayer: undefined,
+  },
+  "channel-featured": {
+    type: "channel-featured",
+    options: {
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -166,7 +182,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   video: {
     type: "video",
-    actions: {
+    options: {
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -178,8 +194,8 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   playlist: {
     type: "playlist",
-    actions: {
-      videoHighlight: true,
+    options: {
+      videoHighlight: false,
       channelHighlight: true,
       videoRedirect: true,
       channelRedirect: true,
@@ -190,8 +206,8 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   subscriptions: {
     type: "subscriptions",
-    actions: {
-      videoHighlight: true,
+    options: {
+      videoHighlight: false,
       channelHighlight: true,
       videoRedirect: true,
       channelRedirect: true,
@@ -202,7 +218,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   },
   unknown: {
     type: "unknown",
-    actions: {
+    options: {
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -231,6 +247,8 @@ const pageTypeRegex: { [key: string]: RegExp } = {
     /^\/(channel\/[a-zA-Z0-9_-]+|@[a-zA-Z0-9_-]+|user\/[a-zA-Z0-9_-]+|c\/[a-zA-Z0-9_-]+)\/community$/,
   "channel-channels":
     /^\/(channel\/[a-zA-Z0-9_-]+|@[a-zA-Z0-9_-]+|user\/[a-zA-Z0-9_-]+|c\/[a-zA-Z0-9_-]+)\/channels$/,
+  "channel-featured":
+    /^\/(channel\/[a-zA-Z0-9_-]+|@[a-zA-Z0-9_-]+|user\/[a-zA-Z0-9_-]+|c\/[a-zA-Z0-9_-]+)\/featured$/,
   video: /^\/watch\?v=[a-zA-Z0-9_-]+/,
   playlist: /^\/playlist\?list=[a-zA-Z0-9_-]+/,
   subscriptions: /^\/feed\/subscriptions/,

@@ -3,6 +3,7 @@ import {
   Affix,
   Button,
   Card,
+  ColorPicker,
   Container,
   createStyles,
   Grid,
@@ -13,6 +14,7 @@ import {
   Stack,
   Switch,
   Text,
+  TextInput,
   Title,
 } from "@mantine/core";
 import {
@@ -46,13 +48,105 @@ const optionRedirect = (url: string): void => {
   chrome.runtime.sendMessage(message);
 };
 
-type Option = {
-  title: string;
-  description: string;
-  value: string | boolean;
+// Options enum
+export enum OptionId {
   // eslint-disable-next-line no-unused-vars
-  callback: (value: boolean) => void;
+  OPEN_IN_NEW_TAB = "newTab",
+  // eslint-disable-next-line no-unused-vars
+  HIGHLIGHT_VIDEO = "videoGlow",
+  // eslint-disable-next-line no-unused-vars
+  HIGHLIGHT_CHANNEL = "channelGlow",
+  // eslint-disable-next-line no-unused-vars
+  HIGHLIGHT_ALL = "bulkGlow",
+  // eslint-disable-next-line no-unused-vars
+  GLOW_COLOR = "glowColor",
+  // eslint-disable-next-line no-unused-vars
+  ADD_VIDEO_BUTTON = "videoButton",
+  // eslint-disable-next-line no-unused-vars
+  ADD_CHANNEL_BUTTON = "channelButton",
+}
+
+export type optionUtilityType = {
+  // eslint-disable-next-line no-unused-vars
+  [key in OptionId]: {
+    title: string;
+    description: string;
+    value: string | boolean;
+    // eslint-disable-next-line no-unused-vars
+    callback: (value: string | boolean) => void;
+  };
 };
+
+const changeOption = (option: OptionId, value: string | boolean): void => {
+  console.debug("Changing option " + option + " to " + value);
+  chrome.storage.local.set({ [option]: value });
+};
+
+// Create a keyed object of options
+export const allOptions: optionUtilityType = {
+  newTab: {
+    title: "Open links in new tab",
+    description: "Open links in a new tab instead of the current tab",
+    value: false,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.OPEN_IN_NEW_TAB, value);
+    },
+  },
+  videoGlow: {
+    title: "Video Glow",
+    description: "Glow current video if it exists on Nebula",
+    value: false,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.HIGHLIGHT_VIDEO, value);
+    },
+  },
+  channelGlow: {
+    title: "Channel Glow",
+    description: "Glow channels that are on Nebula",
+    value: false,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.HIGHLIGHT_CHANNEL, value);
+    },
+  },
+  channelButton: {
+    title: "Channel Button",
+    description: "Add a button if the channel is on Nebula",
+    value: false,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.ADD_CHANNEL_BUTTON, value);
+    },
+  },
+  videoButton: {
+    title: "Video Button",
+    description: "Add a button to video player if on Nebula",
+    value: false,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.ADD_VIDEO_BUTTON, value);
+    },
+  },
+  bulkGlow: {
+    title: "Bulk Glow",
+    description: "Glow all videos on a page that are on Nebula",
+    value: false,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.HIGHLIGHT_ALL, value);
+    },
+  },
+  glowColor: {
+    title: "Glow Color",
+    description: "Color of the glow",
+    value: "#3EBBF3",
+    callback: (value: string | boolean) => {
+      if (typeof value === "string") changeOption(OptionId.GLOW_COLOR, value);
+    },
+  },
+} as const;
 
 type Link = {
   title: string;
@@ -81,70 +175,26 @@ interface StatsGridProps {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function Options() {
   const [tableSummary, setTableSummary] = React.useState<TableSummary>();
+  const [optionValues, setOptionValues] =
+    React.useState<optionUtilityType>(allOptions);
+
   useEffect(() => {
+    // Get options from storage
+    chrome.storage.local.get("options").then((result) => {
+      if (result.options) {
+        setOptionValues(result.options);
+      }
+    });
+
     getTableSummary().then((summary) => {
       setTableSummary(summary);
     });
   }, []);
 
-  const options = [] as Option[];
+  // ================== Options ==================
+  // Get options from storage
 
   // Set the options in individual state variables and defaults
-  // TODO: Get the options from the background script
-
-  // ================== Options ==================
-  const [preferNewTab, setPreferNewTab] = React.useState<boolean>(true);
-  options.push({
-    title: "Prefer New Tab",
-    description: "Open links in a new tab instead of the current tab",
-    value: preferNewTab,
-    callback: setPreferNewTab,
-  });
-
-  const [displayVideoBackgroundGlow, setDisplayVideoBackgroundGlow] =
-    React.useState<boolean>(true);
-  options.push({
-    title: "Video Glow",
-    description: "Highlights a video on YouTube when it is available on Nebula",
-    value: displayVideoBackgroundGlow,
-    callback: setDisplayVideoBackgroundGlow,
-  });
-  const [displayVideoRedirectButton, setDisplayVideoRedirectButton] =
-    React.useState<boolean>(true);
-  options.push({
-    title: "Video Button",
-    description: "Displays a redirect button for matched videos",
-    value: displayVideoRedirectButton,
-    callback: setDisplayVideoRedirectButton,
-  });
-  const [displayChannelBackgroundGlow, setDisplayChannelBackgroundGlow] =
-    React.useState<boolean>(true);
-  options.push({
-    title: "Channel Glow",
-    description:
-      "Highlight a channel on YouTube when it is available on Nebula",
-    value: displayChannelBackgroundGlow,
-    callback: setDisplayChannelBackgroundGlow,
-  });
-  const [displayChannelRedirectButton, setDisplayChannelRedirectButton] =
-    React.useState<boolean>(true);
-  options.push({
-    title: "Channel Button",
-    description: "Displays a redirect button for matched channels",
-    value: displayChannelRedirectButton,
-    callback: setDisplayChannelRedirectButton,
-  });
-
-  // TODO: Implement this
-  const [enableThumbnailGlow, setEnableThumbnailGlow] =
-    React.useState<boolean>(true);
-  options.push({
-    title: "Thumbnail Glow",
-    description:
-      "Highlights a thumbnail on YouTube when it is available on Nebula",
-    value: enableThumbnailGlow,
-    callback: setEnableThumbnailGlow,
-  });
 
   // ================== Links ==================
   const links = [
@@ -223,20 +273,72 @@ function Options() {
   ];
 
   // ================== List Constructors ==================
-  const optionsList = options.map((option) => (
-    <Card key={option.title}>
-      <Text fz={"lg"}> {option.title} </Text>
-      <Switch
-        checked={option.value as boolean}
-        onChange={(value): void => {
-          const bool = value.currentTarget.checked;
-          console.debug("Setting " + option.title + " to " + bool);
-          option.callback(bool);
-        }}
-        label={option.description}
-      />
-    </Card>
-  ));
+  const optionsList = Object.entries(allOptions).map(([key, option]) => {
+    if (typeof option.value === "boolean") {
+      const toggle = (): void => {
+        option.callback(!option.value);
+        setOptionValues({
+          ...optionValues,
+          [key]: {
+            ...option,
+            value: !option.value,
+          },
+        });
+      };
+
+      return (
+        <Card key={key}>
+          <Text fz={"lg"}> {option.title} </Text>
+          <Switch
+            checked={option.value}
+            onChange={(): void => {
+              toggle();
+            }}
+            label={option.description}
+          />
+        </Card>
+      );
+    } else if (typeof option.value === "string") {
+      const change = (value: string): void => {
+        option.callback(value);
+        setOptionValues({
+          ...optionValues,
+          [key]: {
+            ...option,
+            value,
+          },
+        });
+      };
+
+      if (key === "glowColor") {
+        return (
+          <Card key={key}>
+            <Text fz={"lg"}> {option.title} </Text>
+            <ColorPicker
+              color={option.value}
+              onChange={(color: string): void => {
+                change(color);
+              }}
+            />
+          </Card>
+        );
+      } else {
+        return (
+          <Card key={key}>
+            <Text fz={"lg"}> {option.title} </Text>
+
+            <TextInput
+              value={option.value}
+              onChange={(e): void => {
+                change(e.target.value);
+              }}
+              label={option.description}
+            />
+          </Card>
+        );
+      }
+    }
+  });
 
   const linksList = links.map((link) => (
     <Card key={link.title}>

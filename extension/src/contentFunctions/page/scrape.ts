@@ -1,36 +1,72 @@
 import { videoId } from "../../content_script";
 import { YoutubePageType } from "./identify";
 import { pageVideos } from "./update";
-
-/**
- * ScrapeVideosFromPage
- * 1. Scrape the page based on the page type
- * 2. Filter out any videos that are already in the pageVideos cache
- * 3. Return the results
- */
+console.log("scrape.ts");
 
 export const scrapeVideosFromPage = async (
   pageType: YoutubePageType
-): Promise<videoId[]> => {
-  let newVideos: videoId[] = [];
+): Promise<{
+  videoIds: string[];
+  currentVideoId?: string;
+}> => {
+  let newVideos: {
+    videoIds: string[];
+    currentVideoId?: string;
+  } = {
+    videoIds: [],
+    currentVideoId: undefined,
+  };
+
   // 1.
+  // Get the current video id if it exists
+  try {
+    newVideos.currentVideoId = await scrapeCurrentVideo();
+  } catch (error) {
+    console.error("scrapeVideosFromPage: Error scraping current video", error);
+  }
+
+  // 2.
   // Call the other scrape functions to get the new videos
   switch (pageType) {
     case "video":
       console.debug("scrapeVideosFromPage: Video page");
-      newVideos = await scrapeVideoPage();
+      try {
+        newVideos.videoIds = await scrapeVideoPage();
+      } catch (error) {
+        console.error("scrapeVideosFromPage: Error scraping video page", error);
+      }
       break;
     case "subscriptions":
       console.debug("scrapeVideosFromPage: Subscriptions page");
-      newVideos = await scrapeSubscriptionPage();
+      try {
+        newVideos.videoIds = await scrapeSubscriptionPage();
+      } catch (error) {
+        console.error(
+          "scrapeVideosFromPage: Error scraping subscriptions page",
+          error
+        );
+      }
+
       break;
     case "search":
       console.debug("scrapeVideosFromPage: Search page");
-      newVideos = await scrapeSearchPage();
+      try {
+        newVideos.videoIds = await scrapeSearchPage();
+      } catch (error) {
+        console.error(
+          "scrapeVideosFromPage: Error scraping search page",
+          error
+        );
+      }
       break;
+
     case "home":
       console.debug("scrapeVideosFromPage: Home page");
-      newVideos = await scrapeHomePage();
+      try {
+        newVideos.videoIds = await scrapeHomePage();
+      } catch (error) {
+        console.error("scrapeVideosFromPage: Error scraping home page", error);
+      }
       break;
     default:
       console.debug("scrapeVideosFromPage: Unknown page");
@@ -39,11 +75,39 @@ export const scrapeVideosFromPage = async (
 
   // 2.
   // Filter out any videos that are already in the pageVideos cache
-  newVideos = newVideos.filter((videoId) => !pageVideos[videoId]);
+  newVideos = {
+    videoIds: newVideos.videoIds.filter((videoId) => !pageVideos[videoId]),
+    currentVideoId: newVideos.currentVideoId,
+  };
 
   // 3.
-  // Return the results
+  // Return the new videos
   return newVideos;
+};
+
+/**
+ * ScrapeCurrentVideo
+ * 1. Get the video id from the page
+ * 2. Return the video id
+ */
+export const scrapeCurrentVideo = async (): Promise<videoId> => {
+  return new Promise((resolve, reject) => {
+    console.debug("scrapeCurrentVideo: Getting current video id");
+    // 1.
+    // Get the video id from the page
+    // eslint-disable-next-line no-undef
+    const id = document
+      .querySelector("ytd-watch-flexy[video-id]")
+      ?.getAttribute("video-id");
+
+    // 2.
+    // Return the video id
+    if (id) {
+      resolve(id);
+    } else {
+      reject("scrapeCurrentVideo: No id found");
+    }
+  });
 };
 
 /**
@@ -72,25 +136,23 @@ export const scrapeVideoPage = async (): Promise<videoId[]> => {
     });
   });
 
-  // 3.
+  // 2.
   // Trigger the promises and wait for the results
-  const videoIds = (await Promise.allSettled(promises))
-    .map((promise) => {
-      return promise.status === "fulfilled" ? promise.value : null;
-    })
-    .filter((videoId) => {
-      return videoId !== null;
-    }) as videoId[];
+  const allPromises = await Promise.allSettled(promises);
+
+  const videoIds = allPromises.reduce((acc, result) => {
+    if (result.status === "fulfilled") {
+      acc.push(result.value);
+    }
+    return acc;
+  }, [] as videoId[]);
+  // 3
+  // Filter out any videos that are already in the pageVideos cache
+  const newVideos = videoIds.filter((videoId) => !pageVideos[videoId]);
 
   // 4.
-  // Filter out any videos that are already in the pageVideos cache
-  const newVideoIds = videoIds.filter((videoId) => {
-    return !pageVideos[videoId];
-  });
-
-  // 5.
   // Return the results
-  return newVideoIds;
+  return newVideos;
 };
 
 /**

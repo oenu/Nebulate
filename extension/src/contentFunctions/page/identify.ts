@@ -3,7 +3,7 @@
 
 import { checkTable } from "../checkTable";
 import { Channel, Video } from "../../types";
-
+console.log("identify.ts");
 /**
  * IdentifyPage
  * This should find what kind of page we are on, the current videoId etc
@@ -36,6 +36,7 @@ export type YoutubePageType =
   | "channel-about"
   | "channel-community"
   | "channel-channels"
+  | "channel-featured"
   | "video"
   | "playlist"
   | "subscriptions"
@@ -99,6 +100,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-home": {
     type: "channel-home",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: true,
       videoRedirect: false,
@@ -111,6 +113,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-videos": {
     type: "channel-videos",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: true,
       videoRedirect: true,
@@ -123,6 +126,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-playlists": {
     type: "channel-playlists",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -135,6 +139,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-about": {
     type: "channel-about",
     options: {
+      bulkHighlight: false,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -147,6 +152,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-community": {
     type: "channel-community",
     options: {
+      bulkHighlight: false,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -159,6 +165,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-channels": {
     type: "channel-channels",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -171,6 +178,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   "channel-featured": {
     type: "channel-featured",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -183,6 +191,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   video: {
     type: "video",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -195,6 +204,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   playlist: {
     type: "playlist",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: true,
       videoRedirect: true,
@@ -207,6 +217,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   subscriptions: {
     type: "subscriptions",
     options: {
+      bulkHighlight: true,
       videoHighlight: false,
       channelHighlight: true,
       videoRedirect: true,
@@ -219,6 +230,7 @@ const pageTypes: { [key: string]: YoutubePage } = {
   unknown: {
     type: "unknown",
     options: {
+      bulkHighlight: false,
       videoHighlight: false,
       channelHighlight: false,
       videoRedirect: false,
@@ -335,6 +347,7 @@ export const identifyPage = async (): Promise<YoutubePage> => {
 
   // If we have the video, channel and page type, we can return the page
   if (page.video && page.channel && page.type !== "unknown") {
+    console.debug("identifyPage: returning page");
     return page;
   } else {
     // If we don't have the video, channel and page type, we need to identify the page further

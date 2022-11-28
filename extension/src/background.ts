@@ -55,52 +55,11 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   }
 });
 
-// /**
-//  * Handler tasks
-//  * 1. If the channel is on Nebula, send a message to the content script to load the channel button
-//  * 1.1 If the channel is not on Nebula, send a message to the content script to unload the channel button
-//  * 2. If the video is on Nebula, send a message to the content script to load the video button
-//  * 2.1 If the video is not on Nebula, send a message to the content script to unload the video button
-//  */
-// const handleVideo = (video: Video, tabId: number): void => {
-//   try {
-//     // Channel is on Nebula?
-//     if (video.known) {
-//       chrome.tabs.sendMessage(tabId, {
-//         type: Messages.ADD_CHANNEL_BUTTON,
-//         channel: {
-//           known: true,
-//           slug: video.channelSlug,
-//         },
-//       });
-//     } else {
-//       chrome.tabs.sendMessage(tabId, {
-//         type: Messages.REMOVE_CHANNEL_BUTTON,
-//       });
-//     }
-
-//     // Video is on Nebula?
-//     if (video.matched) {
-//       chrome.tabs.sendMessage(tabId, {
-//         type: Messages.ADD_VIDEO_BUTTON,
-//         video,
-//       });
-//     } else {
-//       chrome.tabs.sendMessage(tabId, {
-//         type: Messages.REMOVE_VIDEO_BUTTON,
-//       });
-//     }
-//   } catch (e) {
-//     console.log("BG: Error in handleVideo: ", e);
-//   }
-// };
-
 /**
  * Listener Tasks
  * 1. If a content script sends a message to the background script, handle it
  * 1.1 If the message is to open the Nebula page for a video, open the Nebula page for that video
  * 1.2 If the message is to open the Nebula page for a channel, open the Nebula page for that channel
- * 1.3 If the message is to check if a video is on Nebula, check if the video is on Nebula
  *
  * 2. If a popup script sends a message to the background script, handle it
  * 2.1 If the message is to open a url, open the url in a new tab
@@ -151,33 +110,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           }
           break;
         }
-
-        // // 1.3
-        // // Check if a video is on Nebula
-        // case Messages.CHECK_VIDEO: {
-        //   const message = request as CheckVideoMessage;
-        //   const url = message.url;
-        //   console.debug("BG: check video: " + url);
-        //   checkTable(url)
-        //     .then((response) => {
-        //       console.debug("BG: check video response: ", response);
-        //       const message: CheckVideoMessageResponse = {
-        //         type: Messages.CHECK_VIDEO_RESPONSE,
-        //         videos: response,
-        //       };
-        //       if (response.length > 0) sendResponse(message);
-        //     })
-        //     .catch((e) => {
-        //       console.error("BG: Error in checkTable: ", e);
-        //       const message: CheckVideoMessageResponse = {
-        //         type: Messages.CHECK_VIDEO_RESPONSE,
-        //         videos: undefined,
-        //       };
-        //       sendResponse(message);
-        //     });
-
-        //   break;
-        // }
 
         // 2.
         // Popup Script Messages

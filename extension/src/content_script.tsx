@@ -6,7 +6,7 @@ import {
   addChannelCSS,
   removeChannelCSS,
 } from "./contentFunctions/styling/channel";
-import { urlUpdateHandler } from "./contentFunctions/page/update";
+import { urlChanged } from "./contentFunctions/page/update";
 import {
   addVideoButton,
   removeVideoButton,
@@ -178,7 +178,7 @@ chrome.runtime.onMessage.addListener((message) => {
           console.error("CS: Url_Update: no url provided");
           return;
         }
-        urlUpdateHandler(url);
+        urlChanged(url);
         break;
       }
     }

@@ -31,6 +31,10 @@ export const addChannelButton = async (): Promise<void> => {
     nebulate_logo.src = chrome.runtime.getURL("assets/icon.png");
     nebulate_logo.id = BUTTON_IDS.CHANNEL;
     nebulate_logo.style.cursor = "pointer";
+    nebulate_logo.style.height = "36px";
+    nebulate_logo.style.maxWidth = "100%";
+    nebulate_logo.style.maxHeight = "100%";
+    nebulate_logo.style.lineHeight = "36px";
 
     // 3.
     // Add the click event listener

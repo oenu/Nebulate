@@ -10,13 +10,13 @@ export const videoRedirect = (
     `videoRedirect(video:${video}, preferNewTab:${preferNewTab}, tabId:${tabId})`
   );
   if (video.matched) {
-    const url = `https://nebula.app/videos/${video.videoSlug}`;
+    const url = `https://nebula.app/videos/${video.slug}`;
     if (preferNewTab || tabId === undefined) {
       chrome.tabs.create({ url });
     } else {
       chrome.tabs.update(tabId, { url });
     }
   } else {
-    console.warn("videoRedirect: unknown video redirect: " + video.videoSlug);
+    console.warn("videoRedirect: unknown video redirect: " + video.slug);
   }
 };

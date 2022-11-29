@@ -66,6 +66,7 @@ const register = async (channelSlug: string): Promise<void> => {
     zypeId,
     youtubeId: channelYtId,
     merch_collection,
+    custom_url: channel_youtube.custom_url,
     youtubeUploadId: channel_youtube.upload_playlist_id,
   });
 
@@ -133,7 +134,7 @@ export const idFromYoutube = async (
  * @function channelFromYoutube
  * @description Get channel data from Youtube
  * @param {string} channelYtId - The channel's youtube id
- * @returns {Promise<{upload_playlist_id, channelTitle, custom_url}>} - Resolves with spcific channel data
+ * @returns {Promise<{upload_playlist_id, channelTitle, custom_url}>} - Resolves with specific channel data
  * @throws {Error} - If the channel does not exist in Youtube or the lookup fails
  * @async
  */

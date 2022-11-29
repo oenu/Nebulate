@@ -41,7 +41,7 @@ export enum CSS_IDS {
   CHANNEL = "nebulate-channel-css", // The id of the channel css element.
   NEBULA_VIDEO_BTN = "nebulate-video-btn", // The id of the button that is added to the video player.
   CHANNEL_BUTTON = "nebulate-channel-btn", // The id of the button that redirects to the channel page.
-  BULK_VIDEO = "nebulate-bulk", // Used for styling many videos at once
+  MASS_VIDEO = "nebulate-many", // Used for styling many videos at once
 }
 
 export enum CSS_CLASSES {

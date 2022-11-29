@@ -7,6 +7,7 @@ import logger from "../utils/logger";
 import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo/youtubeVideo";
 import { youtubeIds } from "../utils/youtubeIds";
+import { Channel } from "../models/channel/channel";
 
 /**
  * @type {Object} MatchedVideo
@@ -23,11 +24,13 @@ export type MatchedVideo = {
  * @type {Object} ChannelEntry
  * @property {string} slug - The channel slug of the channel that the videos belong to
  * @property {string} youtubeId - The youtube id of the channel
+ * @property {string} custom_url - The custom url of the channel
  * @property {string[]} matched - A list of youtube video ids that have been matched to a nebula video
  * @property {string[]} not_matched - A list of youtube video ids that have not been matched to a nebula video
  */
 export interface ChannelEntry {
   slug: string;
+  custom_url: string;
   youtubeId: string;
   matched: MatchedVideo[];
   not_matched: string[];
@@ -63,7 +66,6 @@ export const generateTable = async (
     console.time("generateTable");
     const matchLimit = maximumMatchDistance || 2;
 
-    // 1.
     // Get all the nebula videos that are matched
     const nebulaVideos = await NebulaVideo.find({
       youtubeVideoId: { $exists: true },
@@ -75,14 +77,12 @@ export const generateTable = async (
       `generateTable: Found ${nebulaVideos.length} matched nebula videos`
     );
 
-    // 2.
     // Get all the youtube videos that are matched
     const youtubeVideos = await YoutubeVideo.find({})
       .select("youtubeVideoId channelSlug")
       .lean();
     logger.debug(`generateTable: Found ${youtubeVideos.length} youtube videos`);
 
-    // 3.
     // Create a lookup table
     const lookupTable: LookupTable = {
       channels: [],
@@ -90,9 +90,9 @@ export const generateTable = async (
       id: uuidv4(),
     };
 
-    // 4.
-    // Create a channel entry for each channel using promise.allSettled
+    const channels = await Channel.find({}).select("slug custom_url");
 
+    // Create a channel entry for each channel using promise.allSettled
     const channelPromises = youtubeIds.map(async (channel) => {
       return new Promise<ChannelEntry>((resolve, reject) => {
         try {
@@ -101,6 +101,8 @@ export const generateTable = async (
           const channelSlug = channel.slug;
           const channelEntry: ChannelEntry = {
             slug: channelSlug,
+            custom_url:
+              channels.find((c) => c.slug === channelSlug)?.custom_url || "",
             youtubeId: channel.youtubeId,
             matched: [],
             not_matched: [],

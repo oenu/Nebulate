@@ -1,18 +1,18 @@
 import { Messages } from "./enums";
 
 export type Video = {
-  known: boolean; // If the Youtube video is from a Nebula Channel
   videoId: string; // The video id from the url
+  known: boolean; // If the Youtube video is from a Nebula Channel
   matched: boolean; // If the Youtube video is matched to a Nebula Video
-  channelSlug?: string; // The channel slug if the video is from a Nebula Channel
-  channelId?: string; // The youtube channel id if the video is from a Nebula Channel
-  videoSlug?: string; // The video slug if the video is matched to a Nebula Video
+  slug: string | undefined; // The video slug if the video is matched to a Nebula Video
+  channel: Channel; // The channel object if the video is from a Nebula Channel
 };
 
 export type Channel = {
   known: boolean; // If the Youtube channel is a Nebula Channel
-  slug?: string; // The channel slug
-  channelId?: string; // The youtube channel id
+  slug: string | undefined; // The channel slug
+  custom_url: string | undefined; // The channel custom url
+  id: string | undefined; // The youtube channel id
 };
 
 export type MessageTypes = {

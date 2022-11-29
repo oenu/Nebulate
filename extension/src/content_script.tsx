@@ -1,13 +1,11 @@
-import { urlChanged } from "./contentFunctions/page/update";
-import { Messages } from "./enums";
-import { Channel, Video } from "./types";
+// import { urlChanged } from "./content/page/update";
+import { Messages } from "./common/enums";
+import { Channel, Video } from "./common/types";
+
+import "./content/listeners/onNewVideo";
 
 console.debug("CS: init");
 // // Runs in the context of the youtube tab
-
-// Local Variables:
-export let localChannel: Channel | undefined; // The nebula channel that matches the current url
-export let localVideo: Video | undefined; // The nebula video that matches the current url
 
 export type videoId = string;
 
@@ -34,29 +32,3 @@ export type UrlUpdateMessage = {
   type: Messages.URL_UPDATE;
   url: string;
 };
-
-/**
- * Handle Messages from the background script
- * 1. Handle a change of url
- */
-chrome.runtime.onMessage.addListener((message) => {
-  try {
-    console.debug("CS: message received", message);
-    switch (message.type) {
-      // 1.
-      // Handle a change of url
-      case Messages.URL_UPDATE: {
-        console.debug("CS: url update");
-        const { url } = message;
-        if (!url) {
-          console.error("CS: Url_Update: no url provided");
-          return;
-        }
-        urlChanged(url);
-        break;
-      }
-    }
-  } catch (error) {
-    console.error("CS: error", error);
-  }
-});

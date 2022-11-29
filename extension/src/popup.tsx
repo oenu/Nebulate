@@ -1,8 +1,8 @@
 // Placeholder
 import React from "react";
 import ReactDOM from "react-dom";
-import { Messages } from "./enums";
-import { TableSummary } from "./backgroundFunctions/summarizeTable";
+import { Messages } from "./common/enums";
+import { TableSummary } from "./background/table/summarizeTable";
 
 // Popup Message Types
 export type PopupRedirectMessage = {

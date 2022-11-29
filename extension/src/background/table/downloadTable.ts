@@ -1,12 +1,9 @@
-import { LookupTable } from "../parent_types";
+import { LookupTable } from "../../common/parent_types";
 
 const downloadTable = async (): Promise<LookupTable | void> => {
   let response;
   try {
     console.debug("background.js: downloading lookup table");
-
-    // Check for existing table
-    // const table = await chrome.storage.local.get("lookupTable");
 
     response = await fetch(
       `https://table.oenu.org/neb-table/lookup_table.json`

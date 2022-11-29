@@ -1,7 +1,7 @@
 // Check the local table for the given videoId
 
-import { LookupTable } from "../parent_types";
-import { Video } from "../types";
+import { LookupTable } from "./parent_types";
+import { Video } from "./types";
 
 /**
  * Check the local table for the given urls / videoIds
@@ -64,9 +64,13 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
                 videoId,
                 known: true,
                 matched: true,
-                channelSlug: channel.slug,
-                channelId: channel.youtubeId,
-                videoSlug: matchedVideo.slug,
+                slug: matchedVideo.slug,
+                channel: {
+                  id: channel.youtubeId,
+                  slug: channel.slug,
+                  known: true,
+                  custom_url: channel.custom_url,
+                },
               };
               matchedCount++;
               return resolve(video);
@@ -83,8 +87,13 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
                 videoId,
                 known: true,
                 matched: false,
-                channelSlug: channel.slug,
-                channelId: channel.youtubeId,
+                slug: undefined,
+                channel: {
+                  id: channel.youtubeId,
+                  slug: channel.slug,
+                  known: true,
+                  custom_url: channel.custom_url,
+                },
               };
               knownCount++;
               return resolve(video);
@@ -97,6 +106,13 @@ export const checkTable = async (urls: string[]): Promise<Video[]> => {
           videoId,
           known: false,
           matched: false,
+          slug: undefined,
+          channel: {
+            id: undefined,
+            slug: undefined,
+            known: false,
+            custom_url: undefined,
+          },
         };
         unknownCount++;
         return resolve(video);

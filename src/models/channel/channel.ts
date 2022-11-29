@@ -14,6 +14,7 @@ export interface ChannelInterface {
   title: string;
   description: string;
   zypeId: string;
+  custom_url: string;
   youtubeId?: string;
   youtubeTitle?: string;
   youtubeUploadId?: string;
@@ -73,6 +74,10 @@ export const channelSchema: Schema<ChannelDocument> = new Schema(
       },
     ],
     youtubeId: {
+      type: "String",
+    },
+    custom_url: {
+      // eg. "@nebula" or possibly "nebula" (legacy)
       type: "String",
     },
     youtubeTitle: {

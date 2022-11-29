@@ -32,8 +32,8 @@ import {
 } from "@tabler/icons";
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Messages } from "./enums";
-import { TableSummary } from "./backgroundFunctions/summarizeTable";
+import { Messages } from "./common/enums";
+import { TableSummary } from "./background/table/summarizeTable";
 import { PopupRedirectMessage } from "./popup";
 
 const optionRedirect = (url: string): void => {

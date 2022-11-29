@@ -11,7 +11,8 @@ export enum Messages {
   CHECK_VIDEO = "CHECK_VIDEO", // Sent to the background script to check if the current page is a video.
   CHECK_VIDEO_RESPONSE = "CHECK_VIDEO_RESPONSE", // Sent to the content script to respond to a CHECK_VIDEO message.
 
-  // Direct Messages
+  // Direct Messages to the content script
+  CHECK_URL_RESULT = "CHECK_URL_RESULT", // Sent to the content script when the URL is checked (on change)
   ADD_VIDEO_BUTTON = "ADD_VIDEO_BUTTON", // Sent to the content script to add a button to the video player.
   REMOVE_VIDEO_BUTTON = "REMOVE_VIDEO_BUTTON", // Sent to the content script to remove the button from the video player.
   ADD_CHANNEL_BUTTON = "ADD_CHANNEL_BUTTON", // Sent to the content script to add a button to the channel page.
@@ -40,7 +41,7 @@ export enum CSS_IDS {
   CHANNEL = "nebulate-channel-css", // The id of the channel css element.
   NEBULA_VIDEO_BTN = "nebulate-video-btn", // The id of the button that is added to the video player.
   CHANNEL_BUTTON = "nebulate-channel-btn", // The id of the button that redirects to the channel page.
-  BULK_VIDEO = "nebulate-bulk", // Used for styling many videos at once
+  MASS_VIDEO = "nebulate-many", // Used for styling many videos at once
 }
 
 export enum CSS_CLASSES {

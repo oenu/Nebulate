@@ -30,14 +30,14 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
     // Add the click event listener
     nebulate_logo.addEventListener("click", () => {
       if (channel.slug) {
-        console.debug("ChannelButton: redirecting to channel" + channel);
+        console.debug("ChannelButton: redirecting to channel" + channel.slug);
         const message: ChannelRedirectMessage = {
           type: Messages.CHANNEL_REDIRECT,
           channel,
         };
         chrome.runtime.sendMessage(message);
       } else {
-        console.error("addChannelButton: No channel found" + channel);
+        console.error("addChannelButton: No channel found" + channel.slug);
       }
     });
 
@@ -76,9 +76,9 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
       return Promise.reject();
     }
 
-    console.debug("addChannelButton: Adding button to DOM");
+    // console.debug("addChannelButton: Adding button to DOM");
     subscribeButton.insertAdjacentElement("afterend", nebulate_logo);
-    console.debug("addChannelButton: Button added to DOM");
+    // console.debug("addChannelButton: Button added to DOM");
     return Promise.resolve();
   } catch (error) {
     console.error("addChannelButton: " + error);
@@ -89,15 +89,10 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
 export const removeChannelButton = (): Promise<void> => {
   try {
     console.debug("removeChannelButton: Removing redirect button");
-
-    // Check if button already exists
     // eslint-disable-next-line no-undef
-    while (document.getElementById(BUTTON_IDS.CHANNEL)) {
-      // eslint-disable-next-line no-undef
-      const button = document.getElementById(BUTTON_IDS.CHANNEL);
-      if (button) {
-        button.remove();
-      }
+    const button = document.getElementById(BUTTON_IDS.CHANNEL);
+    if (button) {
+      button.remove();
     }
     return Promise.resolve();
   } catch (e) {

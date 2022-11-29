@@ -5,8 +5,16 @@ import { Video } from "../../../common/types";
 
 // TODO: Add video identifier to css selectors to avoid conflicts
 export const addVideoStyle = async (video: Video): Promise<void> => {
-  console.debug("addVideoStyle: adding video style for video: ", video);
-  const videoStyle = `
+  // Wait for the video to load
+  waitForVideo(10000)
+    .catch(() => {
+      throw new Error("Video failed to load");
+    })
+    .then(() => {
+      console.debug("addVideoStyle: adding video style for video: ", video);
+      const videoStyle = `
+      /* Nebulate Video Style ${video.videoId} */
+
   /* Mini Player */
   .miniplayer #container:has(video) {
     box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
@@ -27,21 +35,78 @@ export const addVideoStyle = async (video: Video): Promise<void> => {
     transition-delay: 0.5s;
     box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
   }`;
-  // eslint-disable-next-line no-undef
-  let videoStyleElement = document.getElementById(
-    CSS_IDS.VIDEO
-    // eslint-disable-next-line no-undef
-  ) as HTMLStyleElement;
+      // eslint-disable-next-line no-undef
+      let videoStyleElement = document.getElementById(
+        CSS_IDS.VIDEO
+        // eslint-disable-next-line no-undef
+      ) as HTMLStyleElement;
 
-  if (!videoStyleElement) {
+      if (!videoStyleElement) {
+        // eslint-disable-next-line no-undef
+        videoStyleElement = document.createElement("style");
+        videoStyleElement.id = CSS_IDS.VIDEO;
+        videoStyleElement.innerHTML = videoStyle;
+        // eslint-disable-next-line no-undef
+        document.head.appendChild(videoStyleElement);
+      } else {
+        videoStyleElement.innerHTML = videoStyle;
+      }
+    });
+};
+
+// Wait for the video to load
+const waitForVideo = async (msDelay: number): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    console.time("Video loaded in");
+
+    // Set a timeout to 10 seconds
+    const timeout = setTimeout(() => {
+      console.log(`Timed out waiting ${msDelay}ms for video to load`);
+      reject();
+    }, msDelay);
+
     // eslint-disable-next-line no-undef
-    videoStyleElement = document.createElement("style");
-    videoStyleElement.id = CSS_IDS.VIDEO;
+    const videoObserver = new MutationObserver(() => {
+      // eslint-disable-next-line no-undef
+      const video = document.querySelector("video");
+      if (video) {
+        videoObserver.disconnect();
+        console.timeEnd("Video loaded in");
+        clearTimeout(timeout);
+        resolve();
+      }
+    });
+
+    const checker = (): void => {
+      if (
+        // eslint-disable-next-line no-undef
+        document.querySelector(".miniplayer #container:has(video)") ||
+        // eslint-disable-next-line no-undef
+        document.querySelector(
+          "#player-theater-container #container:has(video)"
+        ) ||
+        // eslint-disable-next-line no-undef
+        document.querySelector(
+          ":not(.ytd-page-manager[theater]) #container:has(video)"
+        )
+      ) {
+        videoObserver.disconnect();
+        console.timeEnd("Video loaded in");
+        clearTimeout(timeout);
+        resolve();
+      }
+    };
+
+    // Check that the video is not already loaded
+    checker();
+
+    console.log(`Waiting ${msDelay}ms for video to load`);
     // eslint-disable-next-line no-undef
-    document.head.appendChild(videoStyleElement);
-  } else {
-    videoStyleElement.innerHTML = videoStyle;
-  }
+    videoObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  });
 };
 
 // Removes styling from the active video if it is not on Nebula
@@ -55,7 +120,7 @@ export const removeVideoStyle = async (): Promise<void> => {
     ) as HTMLStyleElement;
 
     if (videoStyleElement) {
-      videoStyleElement.innerHTML = "";
+      videoStyleElement.remove();
     }
   }
 };

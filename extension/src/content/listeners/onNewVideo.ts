@@ -47,35 +47,53 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     const promises = [];
     if (video.matched) {
       promises.push(
-        checkVideoButton(video).then((exists) => {
-          if (!exists) addVideoButton(video);
-        })
+        checkVideoButton(video)
+          .then((exists) => {
+            if (!exists) addVideoButton(video);
+          })
+          .catch((err) => {
+            console.error("onNewVideo: Error checking video button", err);
+          })
       );
       promises.push(
-        checkVideoStyle(video).then((exists) => {
-          if (!exists) addVideoStyle(video);
-        })
+        checkVideoStyle(video)
+          .then((exists) => {
+            if (!exists) addVideoStyle(video);
+          })
+          .catch((err) => {
+            console.error("onNewVideo: Error checking video style", err);
+          })
       );
     }
 
     if (video.channel.known) {
       promises.push(
-        checkChannelButton(video.channel).then((exists) => {
-          if (!exists) addChannelButton(video.channel);
-        })
+        checkChannelButton(video.channel)
+          .then((exists) => {
+            if (!exists) addChannelButton(video.channel);
+          })
+          .catch((err) => {
+            console.error("onNewVideo: Error checking channel button: ", err);
+          })
       );
       promises.push(
-        checkChannelStyle(video.channel).then((exists) => {
-          if (!exists) addChannelStyle(video.channel);
-        })
+        checkChannelStyle(video.channel)
+          .then((exists) => {
+            if (!exists) addChannelStyle(video.channel);
+          })
+          .catch((err) => {
+            console.error("onNewVideo: Error checking channel style: ", err);
+          })
       );
     }
 
     // Wait for all promises to resolve
     if (promises.length > 0) {
       console.time("onNewVideo: Promise.all");
-      await Promise.all(promises);
+      await Promise.allSettled(promises);
       console.timeEnd("onNewVideo: Promise.all");
+    } else {
+      console.debug("onNewVideo: No promises to resolve");
     }
   } else {
     // New video
@@ -85,13 +103,23 @@ export const onNewVideo = async (video: Video): Promise<void> => {
       localVideo
     );
 
-    // Check if the video is known - if so add the channel button and style channel box
-    video.known ? addChannelButton(video.channel) : removeChannelButton();
-    video.known ? addChannelStyle(video.channel) : removeChannelStyle();
+    // Check if the channel is known - if so add the channel button and style channel box
+    if (video.channel.known) {
+      addChannelButton(video.channel);
+      addChannelStyle(video.channel);
+    } else {
+      removeChannelButton();
+      removeChannelStyle();
+    }
 
-    // Check if the video is on Nebula - if so add the video button
-    video.matched ? addVideoButton(video) : removeVideoButton();
-    video.matched ? addVideoStyle(video) : removeVideoStyle();
-    console.timeEnd("onNewVideo");
+    if (video.matched) {
+      // Add the video button and style video box
+      addVideoButton(video);
+      addVideoStyle(video);
+    } else {
+      removeVideoButton();
+      removeVideoStyle();
+    }
   }
+  console.timeEnd("onNewVideo");
 };

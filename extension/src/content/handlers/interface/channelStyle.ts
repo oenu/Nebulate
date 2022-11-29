@@ -5,25 +5,74 @@ import { Channel } from "../../../common/types";
 
 // TODO: Add channel identifier to css selectors to avoid conflicts - requires updating all channels to have custom_url property in lookup table
 export const addChannelStyle = async (channel: Channel): Promise<void> => {
-  console.debug("addChannelStyle: adding channel style for channel: ", channel);
-  const channelStyle = `div#owner 
+  // Wait for the channel box to load
+  waitForChannelBox(10000)
+    .catch(() => {
+      throw new Error("Channel box failed to load");
+    })
+    .then(() => {
+      console.debug(
+        "addChannelStyle: adding channel style for channel: ",
+        channel
+      );
+      const channelStyle = `div#owner 
       { transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
       box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209); }`;
-  // eslint-disable-next-line no-undef
-  let channelStyleElement = document.getElementById(
-    CSS_IDS.CHANNEL
-    // eslint-disable-next-line no-undef
-  ) as HTMLStyleElement;
+      // eslint-disable-next-line no-undef
+      let channelStyleElement = document.getElementById(
+        CSS_IDS.CHANNEL
+        // eslint-disable-next-line no-undef
+      ) as HTMLStyleElement;
 
-  if (!channelStyleElement) {
+      if (!channelStyleElement) {
+        // eslint-disable-next-line no-undef
+        channelStyleElement = document.createElement("style");
+        channelStyleElement.id = CSS_IDS.CHANNEL;
+        channelStyleElement.innerHTML = channelStyle;
+        // eslint-disable-next-line no-undef
+        document.head.appendChild(channelStyleElement);
+      } else {
+        channelStyleElement.innerHTML = channelStyle;
+      }
+    });
+};
+
+// Wait for the channel box to load
+const waitForChannelBox = async (msDelay: number): Promise<void> => {
+  return new Promise((resolve, reject) => {
     // eslint-disable-next-line no-undef
-    channelStyleElement = document.createElement("style");
-    channelStyleElement.id = CSS_IDS.CHANNEL;
+    if (document.querySelector("div#owner")) resolve();
+
     // eslint-disable-next-line no-undef
-    document.head.appendChild(channelStyleElement);
-  } else {
-    channelStyleElement.innerHTML = channelStyle;
-  }
+    const channelBoxObserver = new MutationObserver(() => {
+      // eslint-disable-next-line no-undef
+      const channelBox = document.querySelector("div#owner");
+      if (channelBox) {
+        channelBoxObserver.disconnect();
+        console.timeEnd("Channel box loaded in");
+        clearTimeout(timeout);
+        resolve();
+      }
+    });
+
+    // Check that the channel box is not already loaded
+    // eslint-disable-next-line no-undef
+    const channelBox = document.querySelector("div#owner");
+    if (channelBox) resolve();
+
+    // Set a timeout to 10 seconds
+    const timeout = setTimeout(() => {
+      console.log(`Timed out waiting ${msDelay}ms for channel box to load`);
+      reject();
+    }, msDelay);
+    console.log(`Waiting ${msDelay}ms for channel box to load`);
+    console.time("Channel box loaded in");
+    // eslint-disable-next-line no-undef
+    channelBoxObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  });
 };
 
 // Removes styling from the active channel if it is not on Nebula
@@ -37,7 +86,7 @@ export const removeChannelStyle = async (): Promise<void> => {
     ) as HTMLStyleElement;
 
     if (channelStyleElement) {
-      channelStyleElement.innerHTML = "";
+      channelStyleElement.remove();
     }
   }
 };

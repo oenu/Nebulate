@@ -39,14 +39,14 @@ export const addVideoButton = async (video: Video): Promise<void> => {
     // Add the click event listener
     nebulate_button.addEventListener("click", () => {
       if (video.slug) {
-        console.debug("VideoButton: redirecting to video" + video);
+        console.debug("VideoButton: redirecting to video" + video.slug);
         const message: VideoRedirectMessage = {
           type: Messages.VIDEO_REDIRECT,
           video,
         };
         chrome.runtime.sendMessage(message);
       } else {
-        console.error("VideoButton: No video found " + video);
+        console.error("VideoButton: No video found " + video.slug);
       }
     });
     return Promise.resolve();

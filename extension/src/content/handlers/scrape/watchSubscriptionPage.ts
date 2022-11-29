@@ -1,7 +1,5 @@
 import { checkTable } from "../../../common/checkTable"; // Checks a list of videoIDs against the database
 import { CSS_IDS } from "../../../common/enums";
-// import { Video } from "../../../common/types";
-// import { videoId } from "../../page/update";
 
 // Style Subs Page Videos
 
@@ -79,9 +77,12 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
 
           // Remove duplicates
           const uniqueVideoIds = [...new Set(videoIds)];
-          console.debug("checkSubsPage: Found videos: ", uniqueVideoIds);
+          console.debug(
+            "watchSubscriptionPage: Found videos: ",
+            uniqueVideoIds
+          );
           if (!uniqueVideoIds) {
-            console.debug("checkSubsPage: No unique videos found");
+            console.debug("watchSubscriptionPage: No unique videos found");
             return;
           }
 
@@ -91,7 +92,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
           );
 
           if (filteredVideoIds.length === 0) {
-            console.debug("checkSubsPage: No videos passed filter");
+            console.debug("watchSubscriptionPage: No videos passed filter");
             return;
           }
 
@@ -106,7 +107,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
 
           // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
           console.debug(
-            "checkSubsPage: Checked videos: ",
+            "watchSubscriptionPage: Checked videos: ",
             checkedVideos.length,
             "adding css"
           );
@@ -132,11 +133,8 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
       subtree: true,
     });
 
-    // Extend the observer to have a disconnect function that also clears the timeout
-    // eslint-disable-next-line no-undef
-
     return observer;
   } else {
-    throw new Error("checkSubsPage: Not on subscriptions page");
+    throw new Error("watchSubscriptionPage: Not on subscriptions page");
   }
 };

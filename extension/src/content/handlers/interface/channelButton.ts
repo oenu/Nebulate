@@ -56,8 +56,8 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
             "#subscribe-button:not(.skeleton-bg-color)"
           );
           if (subscribeButton) {
-            clearInterval(interval);
             resolve(subscribeButton);
+            clearInterval(interval);
           } else {
             console.debug(
               "addChannelButton: Subscribe button not found, retrying"
@@ -75,6 +75,13 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
       console.warn("ChannelButton: No subscribe button found");
       return Promise.reject();
     }
+
+    // Make sure that no other nebulate buttons are present
+    // eslint-disable-next-line no-undef
+    const nebulateButtons = document.querySelectorAll(`#${BUTTON_IDS.CHANNEL}`);
+    nebulateButtons.forEach((button) => {
+      button.remove();
+    });
 
     // console.debug("addChannelButton: Adding button to DOM");
     subscribeButton.insertAdjacentElement("afterend", nebulate_logo);

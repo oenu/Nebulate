@@ -63,10 +63,8 @@ export const urlChanged = async (url: string): Promise<void> => {
   // 1.
   // Quickly handle a clear url change
   // Get videoId from url
-  console.time("urlChanged: update");
   await fastUpdate(url);
   await updater(url);
-  console.timeEnd("urlChanged: update");
 
   // 2.
   // Start the interval that checks for new videos (every 10 seconds) if it isn't already running
@@ -155,6 +153,7 @@ const updater = async (url: string): Promise<void> => {
 
   // Identify the page type
   const pageType = identifyPage(url);
+  console.timeEnd("updater: identifyPageType");
   if (localPage.pageType !== pageType) {
     console.debug(
       "urlChanged: Page type changed, clearing local cache",
@@ -190,11 +189,16 @@ const updater = async (url: string): Promise<void> => {
   }
 
   // Add buttons if they are needed
+  console.time("updater: addButtons");
   await addButtons(currentVideo);
+  console.timeEnd("updater: addButtons");
+  console.time("updater: addActiveStyle");
   await addActiveStyle(currentVideo);
+  console.timeEnd("updater: addActiveStyle");
 
   // 3.
   // If is subscription page, get the videos from the page
+  console.time("updater: getVideosFromPage");
   switch (pageType) {
     case "subscriptions":
       {
@@ -313,9 +317,18 @@ const updater = async (url: string): Promise<void> => {
       break;
   }
 
-  const styles = Object.values(pageVideos).map((v) => v.video);
-  console.debug("updater: Video page: Updating page style");
-  await createStyle(styles);
+  // 5.
+  // If there are videos, update the style with all the videos
+
+  if (Object.keys(pageVideos).length > 0) {
+    console.time("updater: createStyle");
+    const styles = Object.values(pageVideos).map((v) => v.video);
+    console.debug("updater: Video page: Updating page style");
+    await createStyle(styles);
+    console.timeEnd("updater: createStyle");
+  } else {
+    console.debug("updater: No videos found");
+  }
 
   console.log(
     `urlChanged: update complete, ${

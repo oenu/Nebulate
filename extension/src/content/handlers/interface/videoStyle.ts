@@ -59,3 +59,24 @@ export const removeVideoStyle = async (): Promise<void> => {
     }
   }
 };
+
+export const checkVideoStyle = async (video: Video): Promise<boolean> => {
+  try {
+    console.debug(
+      "checkVideoStyle: Checking if video style exists for video: ",
+      video
+    );
+    // eslint-disable-next-line no-undef
+    const style = document.getElementById(CSS_IDS.VIDEO);
+    if (style) {
+      console.debug("checkVideoStyle: Video style exists");
+      return Promise.resolve(true);
+    } else {
+      console.debug("checkVideoStyle: Video style does not exist");
+      return Promise.resolve(false);
+    }
+  } catch (error) {
+    console.error("checkVideoStyle: " + error);
+    return Promise.reject();
+  }
+};

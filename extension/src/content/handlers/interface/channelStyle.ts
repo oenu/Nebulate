@@ -41,3 +41,24 @@ export const removeChannelStyle = async (): Promise<void> => {
     }
   }
 };
+
+export const checkChannelStyle = async (channel: Channel): Promise<boolean> => {
+  try {
+    console.debug(
+      "checkChannelStyle: Checking if channel style exists and is valid for channel: ",
+      channel
+    );
+    // eslint-disable-next-line no-undef
+    const style = document.getElementById(CSS_IDS.CHANNEL);
+    if (style) {
+      console.debug("checkChannelStyle: Channel style exists");
+      return Promise.resolve(true);
+    } else {
+      console.debug("checkChannelStyle: Channel style does not exist");
+      return Promise.resolve(false);
+    }
+  } catch (error) {
+    console.error("checkChannelStyle: " + error);
+    return Promise.reject();
+  }
+};

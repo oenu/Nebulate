@@ -2,7 +2,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Messages } from "./enums";
-import { TableSummary } from "./backgroundFunctions/summarizeTable";
+import { TableSummary } from "./background/summarizeTable";
 
 // Popup Message Types
 export type PopupRedirectMessage = {

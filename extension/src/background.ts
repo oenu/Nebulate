@@ -1,19 +1,15 @@
 import { Messages, Alarms } from "./enums";
-// import { checkTable } from "./contentFunctions/checkTable";
-import { updateTable } from "./backgroundFunctions/updateTable";
-
-// import { Video } from "./types";
+import { updateTable } from "./background/updateTable";
 
 // Content Script Messages
 import {
   VideoRedirectMessage,
   ChannelRedirectMessage,
-  // CheckVideoMessage,
   UrlUpdateMessage,
-  // CheckVideoMessageResponse,
 } from "./content_script";
 import { PopupRedirectMessage } from "./popup";
-import { summarizeTable } from "./backgroundFunctions/summarizeTable";
+import { summarizeTable } from "./background/summarizeTable";
+import { urlChecker } from "./background/urlChecker";
 
 console.log("Background script running");
 // Config Variables
@@ -37,9 +33,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   console.log("Tab Detected");
   try {
     if (changeInfo.status === "complete") {
-      // Tell the content script that the page has changed.
-      console.log("Tab Complete", tab.url);
       if (tab.url) {
+        urlChecker(tab.url, tabId);
         const urlMessage: UrlUpdateMessage = {
           type: Messages.URL_UPDATE,
           url: tab.url,

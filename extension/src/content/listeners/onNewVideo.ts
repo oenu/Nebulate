@@ -87,9 +87,9 @@ export const onNewVideo = async (video: Video): Promise<void> => {
       );
     }
 
-    // Wait for all promises to resolve
     if (promises.length > 0) {
       console.time("onNewVideo: Promise.all");
+      // Wait for all promises to resolve
       await Promise.allSettled(promises);
       console.timeEnd("onNewVideo: Promise.all");
     } else {

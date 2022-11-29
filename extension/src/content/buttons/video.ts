@@ -1,5 +1,5 @@
 import { VideoRedirectMessage } from "../../content_script";
-import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../enums";
+import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../common/enums";
 import { getLocalPage } from "../page/update";
 
 /**

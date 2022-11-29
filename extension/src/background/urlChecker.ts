@@ -1,6 +1,6 @@
-import { checkTable } from "../contentFunctions/checkTable";
-import { Messages } from "../enums";
-import { Video } from "../types";
+import { checkTable } from "../content/checkTable";
+import { Messages } from "../common/enums";
+import { Video } from "../common/types";
 // This function is called when a tab is updated and contains "https://www.youtube.com/watch?v=" in the URL
 
 // This function will check to see if the video is known in the lookup table, if it is then it will message the content script

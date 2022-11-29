@@ -1,6 +1,6 @@
-import { urlChanged } from "./contentFunctions/page/update";
-import { Messages } from "./enums";
-import { Channel, Video } from "./types";
+import { urlChanged } from "./content/page/update";
+import { Messages } from "./common/enums";
+import { Channel, Video } from "./common/types";
 
 console.debug("CS: init");
 // // Runs in the context of the youtube tab

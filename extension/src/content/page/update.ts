@@ -1,11 +1,11 @@
 import { checkTable } from "../checkTable";
-import { Channel, Video } from "../../types";
+import { Channel, Video } from "../../common/types";
 
 // Centralized function to update the style elements
 import { createStyle } from "../styling/bulk";
 
 // Scrapes the page for the video data
-import { BUTTON_IDS } from "../../enums";
+import { BUTTON_IDS } from "../../common/enums";
 import { addVideoButton } from "../buttons/video";
 import { addChannelButton } from "../buttons/channel";
 import { addActiveStyle, removeActiveStyle } from "../styling/active";

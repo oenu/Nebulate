@@ -1,5 +1,5 @@
 import { ChannelRedirectMessage } from "../../content_script";
-import { BUTTON_IDS, Messages } from "../../enums";
+import { BUTTON_IDS, Messages } from "../../common/enums";
 import { getLocalPage } from "../page/update";
 /**
  * AddChannelButton

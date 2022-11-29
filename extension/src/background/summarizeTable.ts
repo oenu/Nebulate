@@ -1,4 +1,4 @@
-import { LookupTable } from "../parent_types";
+import { LookupTable } from "../common/parent_types";
 
 export type TableSummary = {
   totalMatches: number; // Equal to the number of Nebula.app videos with youtube matches

@@ -1,5 +1,5 @@
-import { CSS_IDS } from "../../enums";
-import { Video } from "../../types";
+import { CSS_IDS } from "../../common/enums";
+import { Video } from "../../common/types";
 
 // eslint-disable-next-line no-undef
 let styleElement: HTMLStyleElement | undefined; // The style element that is used to highlight videos on the page

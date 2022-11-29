@@ -1,7 +1,7 @@
 // Placeholder
 import React from "react";
 import ReactDOM from "react-dom";
-import { Messages } from "./enums";
+import { Messages } from "./common/enums";
 import { TableSummary } from "./background/summarizeTable";
 
 // Popup Message Types

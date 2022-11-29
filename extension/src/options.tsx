@@ -32,7 +32,7 @@ import {
 } from "@tabler/icons";
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Messages } from "./enums";
+import { Messages } from "./common/enums";
 import { TableSummary } from "./background/summarizeTable";
 import { PopupRedirectMessage } from "./popup";
 

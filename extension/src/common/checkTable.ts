@@ -1,7 +1,7 @@
 // Check the local table for the given videoId
 
-import { LookupTable } from "../common/parent_types";
-import { Video } from "../common/types";
+import { LookupTable } from "./parent_types";
+import { Video } from "./types";
 
 /**
  * Check the local table for the given urls / videoIds

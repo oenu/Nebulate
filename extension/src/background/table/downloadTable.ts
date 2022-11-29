@@ -1,4 +1,4 @@
-import { LookupTable } from "../common/parent_types";
+import { LookupTable } from "../../common/parent_types";
 
 const downloadTable = async (): Promise<LookupTable | void> => {
   let response;

@@ -1,4 +1,5 @@
-import { updateTable } from "../updateTable";
+import { defaults } from "../../common/defaults";
+import { updateTable } from "../table/updateTable";
 
 /**
  * Listener Tasks:

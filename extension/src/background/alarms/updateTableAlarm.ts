@@ -1,5 +1,5 @@
 import { Alarms } from "../../common/enums";
-import { updateTable } from "../updateTable";
+import { updateTable } from "../table/updateTable";
 
 // Check if the alarm is already set, and if not, set it
 chrome.alarms.get(Alarms.UPDATE_LOOKUP_TABLE, (alarm) => {

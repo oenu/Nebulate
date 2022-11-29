@@ -1,4 +1,4 @@
-import { checkTable } from "../checkTable";
+import { checkTable } from "../../common/checkTable";
 import { Channel, Video } from "../../common/types";
 
 // Centralized function to update the style elements

@@ -2,7 +2,9 @@
 import { Messages } from "./common/enums";
 import { Channel, Video } from "./common/types";
 
+// Listeners
 import "./content/listeners/onNewVideo";
+import "./content/listeners/onSubscriptionPage";
 
 console.debug("CS: init");
 // // Runs in the context of the youtube tab

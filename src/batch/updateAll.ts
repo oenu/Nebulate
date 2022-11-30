@@ -68,7 +68,15 @@ const updateAll = async (): Promise<void> => {
 
   // If no channels need to be scraped, return
   if (channelsToScrape.length === 0) {
-    logger.info("No channels need to be scraped");
+    logger.info("updateAll: No channels need to be scraped, updating table...");
+    await generateTable().catch((err) => {
+      logger.error(`updateAll: ${err}`);
+    });
+    logger.info("updateAll: Table generated, uploading table...");
+    await uploadTable().catch((err) => {
+      logger.error("updateAll:", err);
+    });
+    logger.info("updateAll: Table uploaded!");
     console.timeEnd("updateAll");
     return;
   } else {

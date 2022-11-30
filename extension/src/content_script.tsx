@@ -2,10 +2,37 @@
 import { Messages } from "./common/enums";
 import { Channel, Video } from "./common/types";
 
+// Listeners
 import "./content/listeners/onNewVideo";
+import "./content/listeners/onSubscriptionPage";
+import "./content/listeners/onVideoPage";
 
-console.debug("CS: init");
 // // Runs in the context of the youtube tab
+
+// Disable console.log in production
+if (process.env.NODE_ENV === "production") {
+  console.debug("%cConsole Disabled in Production", "color: green");
+  console.debug(
+    "%cTo view the development build please visit the repo: https://github.com/oenu/Nebulate",
+    "color: green"
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.log = (): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.debug = (): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.info = (): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.warn = (): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.error = (): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.time = (): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  console.timeEnd = (): void => {};
+}
+console.debug("CS: init");
 
 export type videoId = string;
 

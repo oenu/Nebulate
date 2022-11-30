@@ -9,40 +9,57 @@ export type PopupRedirectMessage = {
   type: Messages.POPUP_REDIRECT;
   url: string;
 };
+export type PopupSummarizeMessageResponse = {
+  type: Messages.SUMMARIZE_TABLE_RESPONSE;
+  table: TableSummary;
+};
 
 // eslint-disable-next-line no-undef
 ReactDOM.render(<Popup />, document.getElementById("root"));
 
-/**
- * Popup Component
- * This component is the popup that appears when the user clicks on the extension icon.
- * Required Functionality:
- * 1. Show user a summary of the Nebula data and how long ago it was updated
- * 2. Visit Nebula site
- * 3. Visit project GitHub repo
- * 4. Allow user to view developer information
- * 5. Allow user to request a refresh of the Nebula data
- * 6. Allow user to report an issue
- */
-
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function Popup() {
   // Store the table summary in state
-  const [tableSummary, setTableSummary] = React.useState<TableSummary | null>(
-    null
-  );
+  const [tableSummary, setTableSummary] = React.useState<
+    TableSummary | undefined
+  >(undefined);
+
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === Messages.SUMMARIZE_TABLE_RESPONSE) {
+      console.log(message.table);
+      setTableSummary(message.table);
+    }
+  });
 
   React.useEffect(() => {
     console.log("Popup: Getting table summary on load");
-
-    // Get the table summary from the background script
-    const asyncSummary = async (): Promise<void> => {
-      const table = await getTableSummary();
-      setTableSummary(table);
-    };
-
-    asyncSummary();
+    requestSummary();
   }, []);
+
+  // eslint-disable-next-line no-undef
+  const renderTableSummary = (): JSX.Element => {
+    if (tableSummary === null || tableSummary === undefined) {
+      return <div>Loading...</div>;
+    } else {
+      console.log("Rendering table summary");
+      return (
+        <div>
+          <p>Matched videos: {tableSummary.totalMatches}</p>
+          <p>Matched channels: {tableSummary.totalChannels}</p>
+          <p>Unmatched videos: {tableSummary.totalUnmatched}</p>
+          <p>Total videos: {tableSummary.totalVideos}</p>
+          <p>
+            Last update:{" "}
+            {new Date(tableSummary.lastUpdated).toLocaleString("en-US")}
+          </p>
+          <p>
+            Table generated:{" "}
+            {new Date(tableSummary.generatedAt).toLocaleString("en-US")}
+          </p>
+        </div>
+      );
+    }
+  };
 
   // Render the popup
   return (
@@ -62,24 +79,7 @@ function Popup() {
       - last update time
       - when the table was generated
       */}
-      {tableSummary ? (
-        <div>
-          <p>Matched videos: {tableSummary.totalMatches}</p>
-          <p>Matched channels: {tableSummary.totalChannels}</p>
-          <p>Unmatched videos: {tableSummary.totalUnmatched}</p>
-          <p>Total videos: {tableSummary.totalVideos}</p>
-          <p>
-            Last update:{" "}
-            {new Date(tableSummary.lastUpdated).toLocaleString("en-US")}
-          </p>
-          <p>
-            Table generated:{" "}
-            {new Date(tableSummary.generatedAt).toLocaleString("en-US")}
-          </p>
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+      {renderTableSummary()}
       {/* 2. Visit Nebula site */}
       <button onClick={(): void => popupRedirect("https://nebula.app")}>
         Nebula
@@ -173,34 +173,37 @@ const popupRefreshTable = async (): Promise<void> => {
   });
 };
 
-/**
- * Nebula Table Summary
- * Should show the user a summary of the Nebula data and how long ago it was updated
- * 1. Send a message to the background script to get the table summary and wait for a response
- */
-const getTableSummary = async (): Promise<TableSummary> => {
-  console.log("Getting table summary");
+// /**
+//  * Nebula Table Summary
+//  * Should show the user a summary of the Nebula data and how long ago it was updated
+//  * 1. Send a message to the background script to get the table summary and wait for a response
+//  */
+// const getTableSummary = async (): Promise<TableSummary> => {
+//   console.log("Getting table summary");
 
-  // 1.
-  // Send a message to the background script to get the table summary and wait for a response
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(
-      {
-        type: Messages.SUMMARIZE_TABLE,
-      },
-      (response) => {
-        console.debug("Popup: Got table summary response");
-        console.debug(response);
-        // 2.
-        // Check if the response is valid
-        if (response) {
-          // 3.
-          // If the response is valid, return the table summary
-          resolve(response);
-        } else {
-          reject(response);
-        }
-      }
-    );
+//   // 1.
+//   // Send a message to the background script to get the table summary and wait for a response
+//   return new Promise((resolve, reject) => {
+//     chrome.runtime.sendMessage(
+//       {
+//         type: Messages.SUMMARIZE_TABLE,
+//       },
+//       (response) => {
+//         console.debug("Popup: Got table summary response" + response);
+//         if (response.type === Messages.SUMMARIZE_TABLE) {
+//           resolve(response.table);
+//         } else {
+//           reject(response);
+//         }
+//       }
+//     );
+//   });
+// };
+
+// Request Summary - Request a message containing a summary of the Nebula data
+const requestSummary = (): void => {
+  console.log("Requesting summary");
+  chrome.runtime.sendMessage({
+    type: Messages.SUMMARIZE_TABLE,
   });
 };

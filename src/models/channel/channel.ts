@@ -4,6 +4,7 @@ import { Schema, InferSchemaType } from "mongoose";
 // Types
 import type { NebulaVideoType } from "../nebulaVideo/nebulaVideo";
 import type { YoutubeVideoType } from "../youtubeVideo/youtubeVideo";
+import type { discrepancy } from "./methods/checkConfig";
 
 // Fantastic Doc on mongoose schemas:
 // https://millo-l.github.io/Typescript-mongoose-methods-statics/
@@ -40,6 +41,8 @@ interface ChannelDocument extends ChannelInterface, mongoose.Document {
   scrapeNebula: (onlyScrapeNew?: boolean) => Promise<NebulaVideoType[]>;
   // eslint-disable-next-line no-unused-vars
   scrapeYoutube: (onlyScrapeNew?: boolean) => Promise<YoutubeVideoType[]>;
+  // eslint-disable-next-line no-unused-vars
+  checkConfig: () => Promise<{ [key: string]: discrepancy }>;
   matchVideos: () => Promise<void>;
 }
 
@@ -103,6 +106,7 @@ require("./methods/scrapeYoutube");
 require("./methods/matchVideos");
 require("./methods/logScrape");
 require("./methods/logMatch");
+require("./methods/checkConfig");
 
 export type ChannelPreType = InferSchemaType<typeof channelSchema>;
 

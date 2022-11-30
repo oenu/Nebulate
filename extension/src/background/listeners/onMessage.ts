@@ -11,7 +11,7 @@ import { videoRedirect } from "../handlers/videoRedirect";
 import { summarizeTable } from "../table/summarizeTable";
 import { updateTable } from "../table/updateTable";
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender) => {
   try {
     chrome.storage.sync.get("preferNewTab").then(async (result) => {
       const preferNewTab = result.preferNewTab ?? defaults.preferNewTab;
@@ -57,9 +57,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
         // Summarize the lookup table and return the result
         case Messages.SUMMARIZE_TABLE: {
-          summarizeTable().then((summary) => {
-            sendResponse(summary);
+          const table = await summarizeTable();
+          chrome.runtime.sendMessage({
+            type: Messages.SUMMARIZE_TABLE_RESPONSE,
+            table,
           });
+
           break;
         }
 

@@ -24,6 +24,7 @@ export enum Messages {
   REFRESH_TABLE = "REFRESH_TABLE", // Sent from the popup to request a refresh of the table.
   REPORT_ISSUE = "REPORT_ISSUE", // Sent from the popup to send a report issue email.
   SUMMARIZE_TABLE = "SUMMARIZE_TABLE", // Sent from the popup to request a summary of the table.
+  SUMMARIZE_TABLE_RESPONSE = "SUMMARIZE_TABLE_RESPONSE", // Sent from the background script to respond to a SUMMARIZE_TABLE message.
 }
 
 // Message parameters for each message

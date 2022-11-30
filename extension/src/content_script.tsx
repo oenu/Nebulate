@@ -6,6 +6,7 @@ import { Channel, Video } from "./common/types";
 import "./content/listeners/onNewVideo";
 import "./content/listeners/onSubscriptionPage";
 import "./content/listeners/onVideoPage";
+import "./content/listeners/onHomePage";
 
 // // Runs in the context of the youtube tab
 

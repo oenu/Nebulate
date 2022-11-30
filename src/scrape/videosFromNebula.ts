@@ -27,6 +27,9 @@ export const videosFromNebula = async (
 ): Promise<any[] | undefined> => {
   // TODO: Fix this type, it might need to get changed in the other functions too
   try {
+    // If onlyScrapeNew is false, then we want to scrape all videos
+    if (!onlyScrapeNew) videoScrapeLimit = 2000;
+
     // Default scrape limit if none is provided
     if (!videoScrapeLimit) videoScrapeLimit = 20;
 
@@ -266,6 +269,12 @@ export const removeNebulaDuplicates = async (
       return existingVideo.slug === video.slug;
     });
   });
+
+  logger.info(
+    `removeNebulaDuplicates: ${
+      nebula_videos.length - nonConflictingVideos.length
+    } duplicates removed`
+  );
 
   return nonConflictingVideos;
 };

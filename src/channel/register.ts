@@ -102,11 +102,7 @@ export const channelFromNebula = async (
 }> => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channelSlug}/`;
-    const response = await axiosRetry.get(url, {
-      data: {
-        Authorization: `Bearer ${global.token}`,
-      },
-    });
+    const response = await axiosRetry.get(url);
     // id, slug, title, description, type, zypeId, merch_collection;
     const { id, slug, title, description, type, zypeId, merch_collection } =
       response.data.details;

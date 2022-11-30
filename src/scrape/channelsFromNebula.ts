@@ -447,11 +447,7 @@ export const scrapeChannels = async (): Promise<
     // Get the next page of creators
     let response: any;
     try {
-      response = await axiosRetry.get(requestUrl, {
-        data: {
-          Authorization: `Bearer ${global.token}`,
-        },
-      });
+      response = await axiosRetry.get(requestUrl);
     } catch (error) {
       logger.error(error);
       throw error;

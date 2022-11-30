@@ -110,11 +110,7 @@ export const scrapeNebula = async (
     // Get the next page of videos
     let response: any;
     try {
-      response = await axiosRetry.get(requestUrl, {
-        data: {
-          Authorization: `Bearer ${global.token}`,
-        },
-      });
+      response = await axiosRetry.get(requestUrl);
     } catch (error: any) {
       logger.error(`scrapeNebula: ${error}`);
       return [];

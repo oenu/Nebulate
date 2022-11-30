@@ -57,42 +57,50 @@ export const summarizeTable = async (
   };
 
   // 3.
-  // Summarize the table
+  // wait for the table to be summarized
+  const summarizedTable = await new Promise<TableSummary>((resolve, reject) => {
+    if (!table) {
+      reject("Summarize Table: No table provided or found in storage");
+    } else {
+      table?.channels.forEach((channel) => {
+        // Add channel to channelMatchedVideos
+        tableSummary.channelMatchedVideos[channel.slug] = {
+          numberOfMatchedVideos: 0,
+          numberOfUnmatchedVideos: 0,
+        };
 
-  table.channels.forEach((channel) => {
-    // Add channel to channelMatchedVideos
-    tableSummary.channelMatchedVideos[channel.slug] = {
-      numberOfMatchedVideos: 0,
-      numberOfUnmatchedVideos: 0,
-    };
+        // Add channel to total channels
+        tableSummary.totalChannels++;
 
-    // Add channel to total channels
-    tableSummary.totalChannels++;
+        // Add matched videos to total matches
+        tableSummary.totalMatches += channel.matched.length;
 
-    // Add matched videos to total matches
-    tableSummary.totalMatches += channel.matched.length;
+        // Add unmatched videos to total unmatched
+        tableSummary.totalUnmatched += channel.not_matched.length;
 
-    // Add unmatched videos to total unmatched
-    tableSummary.totalUnmatched += channel.not_matched.length;
+        // Add matched videos to channel
+        tableSummary.channelMatchedVideos[channel.slug].numberOfMatchedVideos +=
+          channel.matched.length;
 
-    // Add matched videos to channel
-    tableSummary.channelMatchedVideos[channel.slug].numberOfMatchedVideos +=
-      channel.matched.length;
+        // Add unmatched videos to channel
+        tableSummary.channelMatchedVideos[
+          channel.slug
+        ].numberOfUnmatchedVideos += channel.not_matched.length;
 
-    // Add unmatched videos to channel
-    tableSummary.channelMatchedVideos[channel.slug].numberOfUnmatchedVideos +=
-      channel.not_matched.length;
+        // Add matched videos to total videos
+        tableSummary.totalVideos += channel.matched.length;
 
-    // Add matched videos to total videos
-    tableSummary.totalVideos += channel.matched.length;
+        // Add unmatched videos to total videos
+        tableSummary.totalVideos += channel.not_matched.length;
+      });
 
-    // Add unmatched videos to total videos
-    tableSummary.totalVideos += channel.not_matched.length;
+      resolve(tableSummary);
+    }
   });
 
   // 4.
   // Return the summary
   console.log("Summarize Table: Table summarized");
-  console.log(tableSummary);
-  return tableSummary;
+  console.log(summarizedTable);
+  return summarizedTable;
 };

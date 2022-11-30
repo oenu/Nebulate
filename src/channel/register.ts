@@ -67,6 +67,7 @@ const register = async (channelSlug: string): Promise<void> => {
     zypeId,
     youtubeId: channelYtId,
     merch_collection,
+    youtubeTitle: channel_youtube.channelTitle,
     custom_url: channel_youtube.custom_url,
     youtubeUploadId: channel_youtube.upload_playlist_id,
   });
@@ -117,8 +118,8 @@ export const channelFromNebula = async (
     // Things not required, but nice to have
     const warnings = [];
     if (!description) warnings.push("description");
-    if (!zypeId) warnings.push("zypeId");
-    if (!merch_collection) warnings.push("merch_collection");
+    // if (!zypeId) warnings.push("zypeId");
+    // if (!merch_collection) warnings.push("merch_collection");
 
     if (warnings.length > 0) {
       logger.warn(

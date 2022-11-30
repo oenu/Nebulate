@@ -1,18 +1,21 @@
-import { checkTable } from "../../../common/checkTable"; // Checks a list of videoIDs against the database
+import { checkTable } from "../../../common/checkTable";
 import { CSS_IDS } from "../../../common/enums";
 
-// Style Subs Page Videos
+// Style Home Page Videos
+
 const options = {
   matchedColor: "rgb(62 187 243)",
 };
 
-// Watch the Youtube Video page for videos
+// Returns an observer that can be disconnected when the page is closed
 // eslint-disable-next-line no-undef
-export const watchVideoPage = async (): Promise<MutationObserver> => {
-  // Check if the page is a video page
+export const watchHomePage = async (): Promise<MutationObserver> => {
   // eslint-disable-next-line no-undef
-  if (window.location.href.includes("youtube.com/watch")) {
-    const videoStyle = `
+  console.log(window.location.href);
+  // Check if the page is the home page
+  // eslint-disable-next-line no-undef
+  if (window.location.href === "https://www.youtube.com/") {
+    const homePageStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
       box-shadow: 0 0 0 4px ${options.matchedColor} !important;
@@ -21,7 +24,8 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
     /* Video Title Color */
     .nebulate-matched #video-title {
       color: ${options.matchedColor} !important;
-    }`;
+    }
+    `;
 
     // eslint-disable-next-line no-undef
     document.getElementById(CSS_IDS.MASS_VIDEO)?.remove();
@@ -29,20 +33,18 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
     // eslint-disable-next-line no-undef
     const styleElement = document.createElement("style");
     styleElement.id = CSS_IDS.MASS_VIDEO;
-    styleElement.innerHTML = videoStyle;
+    styleElement.innerHTML = homePageStyle;
 
     // eslint-disable-next-line no-undef
     document.head.appendChild(styleElement);
-
+    console.log("watchHomePage: Watching home page");
     // Mutation observer to watch for new videos, doesn't actually get the videos, just triggers a css selector to get the videos
     // eslint-disable-next-line no-undef
     const observer = new MutationObserver(async (mutations) => {
-      // Check if the page is still the video page
+      // Check if the page is still the home page
       // eslint-disable-next-line no-undef
-      if (!window.location.href.includes("youtube.com/watch")) {
-        console.debug(
-          "watchVideoPage: Video page closed, disconnecting observer"
-        );
+      if (window.location.href !== "https://www.youtube.com/") {
+        console.debug("Home page closed, disconnecting observer");
         observer.disconnect();
         return;
       }
@@ -52,7 +54,7 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
         // Get all the videos that haven't been checked yet
         // eslint-disable-next-line no-undef
         const videos = document.querySelectorAll(
-          "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped)"
+          "ytd-rich-grid-renderer div#content:has(a#thumbnail[href]):not(.nebulate-scraped)"
         );
         if (videos.length > 0) {
           // Get the videoIDs from the videos
@@ -61,7 +63,7 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
               // eslint-disable-next-line no-undef
               const href = video
                 .querySelector(
-                  "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped) a#thumbnail[href]"
+                  "ytd-rich-grid-renderer div#content:has(a#thumbnail[href]):not(.nebulate-scraped) a#thumbnail[href]"
                 )
                 ?.getAttribute("href")
                 ?.split("v=")[1]
@@ -71,15 +73,15 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
             .filter((href) => href !== undefined) as string[];
 
           if (videoIds.length === 0) {
-            console.debug("watchVideoPage: No video IDs found");
+            console.debug("No video IDs found");
             return;
           }
 
           // Remove duplicates
           const uniqueVideoIds = [...new Set(videoIds)];
-          console.debug("watchVideoPage: Found videos: ", uniqueVideoIds);
+          console.debug("Found videos: ", uniqueVideoIds);
           if (!uniqueVideoIds) {
-            console.debug("watchVideoPage: No unique videos found");
+            console.debug("No unique videos found");
             return;
           }
 
@@ -89,7 +91,7 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
           );
 
           if (filteredVideoIds.length === 0) {
-            console.debug("watchVideoPage: No videos passed filter");
+            console.debug("No videos passed filter");
             return;
           }
 
@@ -103,17 +105,13 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
           const checkedVideos = await checkTable(filteredVideoIds);
 
           // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
-          console.debug(
-            "watchVideoPage: Checked videos: ",
-            checkedVideos.length,
-            "adding css"
-          );
+          console.debug("Checked videos: ", checkedVideos.length, "adding css");
 
           // eslint-disable-next-line no-undef
           checkedVideos.forEach((video) => {
             // eslint-disable-next-line no-undef
             const videoElement = document.querySelector(
-              `ytd-compact-video-renderer:has(a#thumbnail[href*="${video.videoId}"])`
+              `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${video.videoId}'])`
             );
             if (videoElement) {
               if (video.matched) videoElement.classList.add("nebulate-matched");
@@ -124,7 +122,7 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
     });
 
     // Start watching for mutations
-    console.log("watchVideoPage: Watching video page...");
+    console.log("watchHomePage: Watching home page...");
     // eslint-disable-next-line no-undef
     observer.observe(document.body, {
       childList: true,
@@ -133,6 +131,8 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
 
     return observer;
   } else {
-    throw new Error("watchVideoPage: Not on video page");
+    throw new Error("watchHomePage: Not on home page");
   }
 };
+
+export default watchHomePage;

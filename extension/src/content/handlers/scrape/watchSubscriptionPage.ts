@@ -127,6 +127,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
     });
 
     // Start watching for mutations
+    console.log("watchSubscriptionPage: Watching subs page...");
     // eslint-disable-next-line no-undef
     observer.observe(document.body, {
       childList: true,

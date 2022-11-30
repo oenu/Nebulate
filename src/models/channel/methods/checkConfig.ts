@@ -99,24 +99,24 @@ export default channelSchema.methods.checkConfig = async function (): Promise<{
   }
 
   // zypeId
-  if (this.zypeId !== nebulaData.zypeId) {
-    discrepancies.zypeId = {
-      field: "zypeId",
-      platform: "nebula",
-      db_value: this.zypeId,
-      api_value: nebulaData.zypeId,
-    };
-  }
+  // if (this.zypeId !== nebulaData.zypeId) {
+  // discrepancies.zypeId = {
+  // field: "zypeId",
+  // platform: "nebula",
+  // db_value: this.zypeId,
+  // api_value: nebulaData.zypeId,
+  // };
+  // }
 
   // merch_collection
-  if (this.merch_collection !== nebulaData.merch_collection) {
-    discrepancies.merch_collection = {
-      field: "merch_collection",
-      platform: "nebula",
-      db_value: this.merch_collection,
-      api_value: nebulaData.merch_collection,
-    };
-  }
+  // if (this.merch_collection !== nebulaData.merch_collection) {
+  // discrepancies.merch_collection = {
+  // field: "merch_collection",
+  // platform: "nebula",
+  // db_value: this.merch_collection,
+  // api_value: nebulaData.merch_collection,
+  // };
+  // }
 
   // Check Youtube Data
   // custom_url

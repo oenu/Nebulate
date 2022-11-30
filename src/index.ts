@@ -97,6 +97,14 @@ app.use("/generateTable", reqAuth, generateTable);
 const uploadTable = require("./routes/uploadTable");
 app.use("/uploadTable", reqAuth, uploadTable);
 
+// Check a channel's config
+const checkConfig = require("./routes/checkConfig");
+app.use("/checkConfig", reqAuth, checkConfig);
+
+// Check all channels' config
+const checkAllConfig = require("./routes/checkAllConfigs");
+app.use("/checkAllConfigs", reqAuth, checkAllConfig);
+
 // Start the server
 mongoose.connection.once("open", async () => {
   // Initialize global variables

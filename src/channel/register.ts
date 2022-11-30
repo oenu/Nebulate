@@ -110,19 +110,30 @@ export const channelFromNebula = async (
     const { id, slug, title, description, type, zypeId, merch_collection } =
       response.data.details;
 
+    // Things required for the channel schema
     const errors = [];
-
     if (!id) errors.push("id");
     if (!slug) errors.push("slug");
     if (!title) errors.push("title");
-    if (!description) errors.push("description");
     if (!type) errors.push("type");
-    if (!zypeId) errors.push("zypeId");
-    if (!merch_collection) errors.push("merch_collection");
+
+    // Things not required, but nice to have
+    const warnings = [];
+    if (!description) warnings.push("description");
+    if (!zypeId) warnings.push("zypeId");
+    if (!merch_collection) warnings.push("merch_collection");
+
+    if (warnings.length > 0) {
+      logger.warn(
+        `channelFromNebula: Channel ${channelSlug} does not have ${warnings.join(
+          ", "
+        )}, continuing...`
+      );
+    }
 
     if (errors.length > 0) {
       throw new Error(
-        `ChannelFromNebula: ${errors.join(
+        `channelFromNebula: ${errors.join(
           ", "
         )} is missing from channel ${channelSlug}`
       );
@@ -131,10 +142,12 @@ export const channelFromNebula = async (
     return { id, slug, title, description, type, zypeId, merch_collection };
   } catch (error: any) {
     if (error?.code === "ERR_BAD_REQUEST") {
-      logger.error(`Register: ${channelSlug} not valid slug`);
-      throw new Error(`Register: ${channelSlug} not valid slug`);
+      logger.error(`channelFromNebula: ${channelSlug} not valid slug`);
+      throw new Error(`channelFromNebula: ${channelSlug} not valid slug`);
     }
-    logger.info(`Register: Channel ${channelSlug} does not exist in Nebula`);
+    logger.info(
+      `channelFromNebula: error getting channel ${channelSlug} from Nebula: ${error}`
+    );
     throw error;
   }
 };
@@ -180,12 +193,13 @@ export const channelFromYoutube = async (
   const response = await yt.channels.list({
     id: [channelYtId],
     auth: process.env.YOUTUBE_API_KEY as string,
-    part: ["contentDetails"],
+    part: ["contentDetails, snippet"],
   });
   if (!response?.data?.items || !response?.data?.items[0])
     throw new Error(
-      "Register: Could not get upload playlist id from youtube API"
+      "channelFromYoutube: Could not get upload playlist id from youtube API"
     );
+
   const channel = response?.data?.items[0];
   const upload_playlist_id = channel.contentDetails?.relatedPlaylists?.uploads;
   const channelTitle = channel.snippet?.title;
@@ -199,7 +213,7 @@ export const channelFromYoutube = async (
 
   if (!upload_playlist_id || !channelTitle || !custom_url) {
     throw new Error(
-      `ChannelFromYoutube: ${errors.join(
+      `channelFromYoutube: ${errors.join(
         ", "
       )} is missing from channel ${channelYtId}`
     );

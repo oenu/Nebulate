@@ -29,15 +29,7 @@ export const checkAllConfigs = async (): Promise<void> => {
       })
       .catch((err) => {
         logger.error(err);
-      })
-      .finally(async () => {
-        logger.info(
-          `Finished checking ${channel.slug}, waiting 20 seconds (nebula rate limit)`
-        );
       });
-
-    // Wait 20 seconds to avoid hitting the nebula rate limit
-    await new Promise((resolve) => setTimeout(resolve, 20000));
   }
 
   // Log the results in a readable format to the verbose console

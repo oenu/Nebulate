@@ -1,5 +1,5 @@
 // Register channel in DB
-import axios from "axios";
+// import axios from "axios";
 import logger from "../utils/logger";
 import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
@@ -13,6 +13,7 @@ import videosFromYoutube from "../scrape/videosFromYoutube";
 
 // Mongo Models
 import { Channel } from "../models/channel/channel";
+import axiosRetry from "../utils/axiosRetry";
 
 /**
  * @function register
@@ -101,7 +102,7 @@ export const channelFromNebula = async (
 }> => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channelSlug}/`;
-    const response = await axios.get(url, {
+    const response = await axiosRetry.get(url, {
       data: {
         Authorization: `Bearer ${global.token}`,
       },

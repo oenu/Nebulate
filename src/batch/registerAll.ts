@@ -64,15 +64,6 @@ const registerAll = async (): Promise<void> => {
 
       // Report the progress of the registration process and wait for 1 minute
       logger.info(`registerAll: ${remaining_slugs} channels remaining`);
-      console.timeLog(
-        "registerAll",
-        `Sleeping for ${
-          sleepDuration / 1000
-        } seconds. ${remaining_slugs} channels remaining. Estimated time remaining: ${Math.round(
-          remaining_slugs * (sleepDuration / 1000 / 60)
-        )} minutes`
-      );
-      await new Promise((resolve) => setTimeout(resolve, sleepDuration));
     }
   }
 

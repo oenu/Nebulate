@@ -148,7 +148,7 @@ const updateAll = async (): Promise<void> => {
     }
 
     // Scrape nebula (if needed)
-    let scrapedNebula = false; // Used for rate limiting
+
     if (
       status.needsNebulaScrape ||
       status.needsDeepScrape ||
@@ -156,7 +156,6 @@ const updateAll = async (): Promise<void> => {
     ) {
       newNebulaVideos =
         (await channel.scrapeNebula(status.needsDeepScrape)) || [];
-      scrapedNebula = true;
       addedNebula += newNebulaVideos.length;
     }
 
@@ -168,12 +167,6 @@ const updateAll = async (): Promise<void> => {
     ) {
       await channel.matchVideos();
       ranMatch++;
-    }
-
-    // If nebula was scraped, sleep for 20 seconds to avoid rate limiting
-    if (scrapedNebula) {
-      logger.info("UpdateAll: Sleeping for 20 seconds to avoid rate limiting");
-      await new Promise((resolve) => setTimeout(resolve, 20000));
     }
   }
 

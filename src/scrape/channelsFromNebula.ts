@@ -1,5 +1,6 @@
 // Scrape the nebula creators page for channels
-import axios from "axios";
+// import axios from "axios";
+import axiosRetry from "../utils/axiosRetry";
 import logger from "../utils/logger";
 
 // Files
@@ -446,24 +447,14 @@ export const scrapeChannels = async (): Promise<
     // Get the next page of creators
     let response: any;
     try {
-      response = await axios.get(requestUrl, {
+      response = await axiosRetry.get(requestUrl, {
         data: {
           Authorization: `Bearer ${global.token}`,
         },
       });
-    } catch (error: any) {
-      if (error.status === 429) {
-        // If the request was rate limited, wait and try again
-        logger.debug(
-          `channelsFromNebula: Rate limited, waiting and trying again in 1 minute`
-        );
-        await new Promise((resolve) => setTimeout(resolve, 60000));
-        response = await axios.get(requestUrl, {
-          data: {
-            Authorization: `Bearer ${global.token}`,
-          },
-        });
-      }
+    } catch (error) {
+      logger.error(error);
+      throw error;
     }
 
     // Add the creators from the response to the buffer

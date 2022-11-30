@@ -35,9 +35,9 @@ const register = async (channelSlug: string): Promise<void> => {
   }
 
   // Get channel from Nebula
-  const channel_nebula = await channelFromNebula(channelSlug);
+
   const { id, slug, title, description, type, zypeId, merch_collection } =
-    channel_nebula.data.details;
+    await channelFromNebula(channelSlug);
 
   // Get channel youtube id from youtube mapping
   const channelYtId = await idFromYoutube(channelSlug);
@@ -88,7 +88,17 @@ const register = async (channelSlug: string): Promise<void> => {
  * @throws {Error} - If the channel does not exist in Nebula
  * @async
  */
-export const channelFromNebula = async (channelSlug: string): Promise<any> => {
+export const channelFromNebula = async (
+  channelSlug: string
+): Promise<{
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  type: string;
+  zypeId: string;
+  merch_collection: string;
+}> => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channelSlug}/`;
     const response = await axios.get(url, {
@@ -96,7 +106,29 @@ export const channelFromNebula = async (channelSlug: string): Promise<any> => {
         Authorization: `Bearer ${global.token}`,
       },
     });
-    return response;
+    // id, slug, title, description, type, zypeId, merch_collection;
+    const { id, slug, title, description, type, zypeId, merch_collection } =
+      response.data.details;
+
+    const errors = [];
+
+    if (!id) errors.push("id");
+    if (!slug) errors.push("slug");
+    if (!title) errors.push("title");
+    if (!description) errors.push("description");
+    if (!type) errors.push("type");
+    if (!zypeId) errors.push("zypeId");
+    if (!merch_collection) errors.push("merch_collection");
+
+    if (errors.length > 0) {
+      throw new Error(
+        `ChannelFromNebula: ${errors.join(
+          ", "
+        )} is missing from channel ${channelSlug}`
+      );
+    }
+
+    return { id, slug, title, description, type, zypeId, merch_collection };
   } catch (error: any) {
     if (error?.code === "ERR_BAD_REQUEST") {
       logger.error(`Register: ${channelSlug} not valid slug`);
@@ -159,16 +191,19 @@ export const channelFromYoutube = async (
   const channelTitle = channel.snippet?.title;
   const custom_url = channel.snippet?.customUrl;
 
-  if (!upload_playlist_id)
+  const errors = [];
+
+  if (!upload_playlist_id) errors.push("upload_playlist_id");
+  if (!channelTitle) errors.push("channelTitle");
+  if (!custom_url) errors.push("custom_url");
+
+  if (!upload_playlist_id || !channelTitle || !custom_url) {
     throw new Error(
-      "Register: Could not get upload playlist id from youtube API"
+      `ChannelFromYoutube: ${errors.join(
+        ", "
+      )} is missing from channel ${channelYtId}`
     );
-  if (!channelTitle)
-    throw new Error("Register: Could not get channel title from youtube API");
-  if (!custom_url)
-    throw new Error(
-      "Register: Could not get channel custom url from youtube API"
-    );
+  }
 
   return { upload_playlist_id, channelTitle, custom_url };
 };

@@ -46,6 +46,10 @@ chrome.storage.local.get("options").then((result) => {
         {} as optionUtilityType
       );
 
+      console.log(
+        `Options: Adding missing options: ${missingOptions.join(", ")}`
+      );
+
       // Combine the missing options with the existing options
       const newOptions = { ...options, ...missingDefaultOptions };
 
@@ -62,6 +66,7 @@ chrome.storage.local.get("options").then((result) => {
       console.log("Options: Obsolete options detected");
       // Remove the obsolete options from storage
       obsoleteOptions.forEach((obsoleteOption) => {
+        console.log("Options: Removing obsolete option: ", obsoleteOption);
         delete options[obsoleteOption];
       });
 
@@ -69,11 +74,38 @@ chrome.storage.local.get("options").then((result) => {
       chrome.storage.local.set({ options: options }).then(() => {
         console.log("Options: Obsolete options removed");
       });
+    } else {
+      console.log("Options: No obsolete options detected");
     }
 
-    // If there are no missing or obsolete options, do nothing
-    else {
-      console.log("Options: No obsolete options detected");
+    // Check if any of the options have been updated (description or title)
+    // Get a list of all the options that have been updated
+    const updatedOptions = Object.keys(options).filter(
+      (option) =>
+        options[option as OptionId].title !==
+          defaultOptions[option as OptionId].title ||
+        options[option as OptionId].description !==
+          defaultOptions[option as OptionId].description
+    ) as OptionId[];
+
+    // If there are any updated options, update them in storage
+    if (updatedOptions.length > 0) {
+      console.log("Options: Updated options detected");
+      // Update the updated options in storage
+      updatedOptions.forEach((updatedOption) => {
+        console.log(
+          `Options: Updating ${updatedOption}, from: ${options[updatedOption].title} to: ${defaultOptions[updatedOption].title} and/or ${options[updatedOption].description} to: ${defaultOptions[updatedOption].description}`
+        );
+
+        options[updatedOption] = defaultOptions[updatedOption];
+      });
+
+      // Set the options in storage
+      chrome.storage.local.set({ options: options }).then(() => {
+        console.log("Options: Updated options updated");
+      });
+    } else {
+      console.log("Options: No updated options detected");
     }
   }
 });
@@ -95,34 +127,35 @@ export const defaultOptions: optionUtilityType = {
     value: false,
   },
   videoGlow: {
-    title: "Video Glow",
-    description: "Glow current video if it exists on Nebula",
-    value: false,
+    title: "Highlight Nebula video",
+    description: "Highlight a YouTube video when it is available on Nebula",
+    value: true,
   },
   channelGlow: {
-    title: "Channel Glow",
-    description: "Glow channels that are on Nebula",
-    value: false,
+    title: "Highlight Nebula Channel",
+    description:
+      "Highlight a channel when watching one of their videos on YouTube",
+    value: true,
   },
   channelButton: {
-    title: "Channel Button",
+    title: "Redirect to Nebula Channel Button",
     description: "Add a button if the channel is on Nebula",
-    value: false,
+    value: true,
   },
   videoButton: {
-    title: "Video Button",
+    title: "Redirect to Nebula Video Button",
     description: "Add a button to video player if on Nebula",
-    value: false,
+    value: true,
   },
   bulkColor: {
-    title: "Bulk Color",
+    title: "Thumbnail Highlight Color",
     description:
-      "Color of the videos identified as on Nebula, but not the current video",
+      "Color to highlight thumbnails with when videos are available on Nebula",
     value: "#3EBBF3",
   },
   homeShow: {
-    title: "Home Page Highlighting",
-    description: "Highlight videos on the home page",
+    title: "Highlight on Home Page",
+    description: "Highlight YouTube thumbnails on the home page",
     value: true,
   },
   subscriptionsShow: {

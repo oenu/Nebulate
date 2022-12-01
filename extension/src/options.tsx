@@ -18,6 +18,8 @@ import {
   Title,
   Center,
   LoadingOverlay,
+  Image,
+  Divider,
 } from "@mantine/core";
 import {
   IconBrandGithub,
@@ -34,6 +36,7 @@ import {
 } from "@tabler/icons";
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
+
 import { Messages } from "./common/enums";
 import { TableSummary } from "./background/table/summarizeTable";
 import { PopupRedirectMessage } from "./popup";
@@ -299,7 +302,28 @@ function Options() {
       };
     });
 
-    const optionElements = optionsArray.map((option) => {
+    // Create a map to order the options
+    const optionOrderMap: Record<OptionId, number> = {
+      [OptionId.GRADIENT_START]: 0,
+      [OptionId.GRADIENT_END]: 1,
+      [OptionId.HIGHLIGHT_VIDEO]: 2,
+      [OptionId.HIGHLIGHT_CHANNEL]: 3,
+      [OptionId.ADD_VIDEO_BUTTON]: 4,
+      [OptionId.ADD_CHANNEL_BUTTON]: 5,
+      [OptionId.BULK_COLOR]: 6,
+      [OptionId.SHOW_ON_HOME]: 7,
+      [OptionId.SHOW_ON_SUBSCRIPTIONS]: 8,
+      [OptionId.SHOW_ON_VIDEO]: 9,
+      [OptionId.OPEN_IN_NEW_TAB]: 10,
+    };
+
+    // Sort the options by the order map
+    const sortedOptions = optionsArray.sort(
+      (a, b) => optionOrderMap[a.key] - optionOrderMap[b.key]
+    );
+
+    // Create the list of options
+    const optionElements = sortedOptions.map((option) => {
       if (option.booleanValue !== undefined) {
         // Boolean option
         return (
@@ -321,39 +345,67 @@ function Options() {
           return (
             <Card key={option.key}>
               <Text fz={"lg"}> {option.title} </Text>
-              <ColorPicker
-                mt="sm"
-                color={option.stringValue}
-                swatches={[
-                  "#3EBBF3", // Default
-                  "#25262b", // Dark
-                  "#868e96", // Light
-                  "#fa5252", // Red
-                  "#e64980", // Pink
-                  "#be4bdb", // Purple
-                  "#7950f2", // Violet
-                  "#4c6ef5", // Indigo
-                  "#15aabf", // Cyan
-                  "#12b886", // Teal
-                  "#40c057", // Green
-                  "#82c91e", // Lime
-                  "#fab005", // Yellow
-                  "#fd7e14", // Orange
-                ]}
-                swatchesPerRow={7}
-                onChangeEnd={(color: string): void => {
-                  setStringOption(option.key, color);
-                }}
-              />
+              <Group position="center" spacing={40}>
+                <ColorPicker
+                  mt="sm"
+                  color={option.stringValue}
+                  swatches={[
+                    "#3EBBF3", // Default
+                    "#25262b", // Dark
+                    "#868e96", // Light
+                    "#fa5252", // Red
+                    "#e64980", // Pink
+                    "#be4bdb", // Purple
+                    "#7950f2", // Violet
+                    "#4c6ef5", // Indigo
+                    "#15aabf", // Cyan
+                    "#12b886", // Teal
+                    "#40c057", // Green
+                    "#82c91e", // Lime
+                    "#fab005", // Yellow
+                    "#fd7e14", // Orange
+                  ]}
+                  swatchesPerRow={7}
+                  onChangeEnd={(color: string): void => {
+                    setStringOption(option.key, color);
+                  }}
+                />
+
+                {/* Thumbnail image of a recommended video from youtube.com with a border and title styled to match
+                   .nebulate-matched #thumbnail {
+                    box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
+                   }
+                  .nebulate-matched #video-title {
+                      color: ${options.bulkColor.value} !important;
+                  }
+                  */}
+                <Image
+                  src="http://placekitten.com/280/158"
+                  alt="Example of a styled thumbnail"
+                  width="280px"
+                  height="150px"
+                  style={{
+                    boxShadow: `0 0 0 4px ${option.stringValue}`,
+                  }}
+                />
+              </Group>
             </Card>
           );
         } else if (option.key === OptionId.GRADIENT_START) {
           // Special case for the gradient picker, it has two values (start and end) so we skip the end one later
           return (
-            <Card key={option.key}>
+            <Card
+              key={option.key}
+              //  box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209); }`;
+              style={{
+                boxShadow: `-10px 0 20px ${option.stringValue}, 10px 0 20px ${
+                  options[OptionId.GRADIENT_END].value
+                }`,
+              }}
+            >
+              <Text fz={"lg"}>Video Card Gradient</Text>
               <Center>
                 <Group>
-                  <Text fz={"lg"}> {option.title} </Text>
                   <ColorPicker
                     mt="sm"
                     color={option.stringValue}
@@ -430,6 +482,20 @@ function Options() {
     });
 
     if (optionElements) {
+      // Add divider before bulk color picker (based on the order map)
+      optionElements.splice(
+        optionOrderMap[OptionId.BULK_COLOR],
+        0,
+        <Divider key="divider" />
+      );
+
+      // Add divider before last option (newTab)
+      optionElements.splice(
+        optionElements.length - 1,
+        0,
+        <Divider key="divider2" />
+      );
+
       return optionElements;
     } else {
       return <Loader />;

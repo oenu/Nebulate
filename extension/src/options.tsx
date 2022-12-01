@@ -59,13 +59,21 @@ export enum OptionId {
   // eslint-disable-next-line no-unused-vars
   HIGHLIGHT_CHANNEL = "channelGlow",
   // eslint-disable-next-line no-unused-vars
-  HIGHLIGHT_ALL = "bulkGlow",
-  // eslint-disable-next-line no-unused-vars
-  GLOW_COLOR = "glowColor",
+  BULK_COLOR = "bulkColor",
   // eslint-disable-next-line no-unused-vars
   ADD_VIDEO_BUTTON = "videoButton",
   // eslint-disable-next-line no-unused-vars
   ADD_CHANNEL_BUTTON = "channelButton",
+  // eslint-disable-next-line no-unused-vars
+  SHOW_ON_VIDEO = "videoShow",
+  // eslint-disable-next-line no-unused-vars
+  SHOW_ON_SUBSCRIPTIONS = "subscriptionsShow",
+  // eslint-disable-next-line no-unused-vars
+  SHOW_ON_HOME = "homeShow",
+  // eslint-disable-next-line no-unused-vars
+  GRADIENT_START = "gradientStart",
+  // eslint-disable-next-line no-unused-vars
+  GRADIENT_END = "gradientEnd",
 }
 
 type Link = {
@@ -265,7 +273,7 @@ function Options() {
         });
       };
 
-      if (key === "glowColor") {
+      if (key === OptionId.BULK_COLOR) {
         return (
           <Card key={key}>
             <Text fz={"lg"}> {option.title} </Text>
@@ -295,6 +303,60 @@ function Options() {
             />
           </Card>
         );
+      } else if (key === OptionId.GRADIENT_START) {
+        <Card key={key}>
+          <Text fz={"lg"}> {option.title} </Text>
+          <ColorPicker
+            mt="sm"
+            color={option.value}
+            swatches={[
+              "#3EBBF3", // Default
+              "#25262b", // Dark
+              "#868e96", // Light
+              "#fa5252", // Red
+              "#e64980", // Pink
+              "#be4bdb", // Purple
+              "#7950f2", // Violet
+              "#4c6ef5", // Indigo
+              "#15aabf", // Cyan
+              "#12b886", // Teal
+              "#40c057", // Green
+              "#82c91e", // Lime
+              "#fab005", // Yellow
+              "#fd7e14", // Orange
+            ]}
+            swatchesPerRow={7}
+            onChangeEnd={(color: string): void => {
+              change(color);
+            }}
+          />
+          <ColorPicker
+            mt="sm"
+            color={optionValues[OptionId.GRADIENT_END].value as string}
+            swatches={[
+              "#5850D1", // Default
+              "#25262b", // Dark
+              "#868e96", // Light
+              "#fa5252", // Red
+              "#e64980", // Pink
+              "#be4bdb", // Purple
+              "#7950f2", // Violet
+              "#4c6ef5", // Indigo
+              "#15aabf", // Cyan
+              "#12b886", // Teal
+              "#40c057", // Green
+              "#82c91e", // Lime
+              "#fab005", // Yellow
+              "#fd7e14", // Orange
+            ]}
+            swatchesPerRow={7}
+            onChangeEnd={(color: string): void => {
+              change(color);
+            }}
+          />
+        </Card>;
+      } else if (key === OptionId.GRADIENT_END) {
+        return null;
       } else {
         return (
           <Card key={key}>

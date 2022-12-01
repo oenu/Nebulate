@@ -1,4 +1,4 @@
-import { OptionId } from "../options";
+import { OptionId } from "./../options";
 
 // First time setup
 chrome.storage.local.get("options").then((result) => {
@@ -91,21 +91,66 @@ export const allOptions: optionUtilityType = {
         changeOption(OptionId.ADD_VIDEO_BUTTON, value);
     },
   },
-  bulkGlow: {
-    title: "Bulk Glow",
-    description: "Glow all videos on a page that are on Nebula",
-    value: false,
-    callback: (value: string | boolean) => {
-      if (typeof value === "boolean")
-        changeOption(OptionId.HIGHLIGHT_ALL, value);
-    },
-  },
-  glowColor: {
-    title: "Glow Color",
-    description: "Color of the glow",
+  bulkColor: {
+    title: "Bulk Color",
+    description:
+      "Color of the videos identified as on Nebula, but not the current video",
     value: "#3EBBF3",
     callback: (value: string | boolean) => {
-      if (typeof value === "string") changeOption(OptionId.GLOW_COLOR, value);
+      if (typeof value === "string") changeOption(OptionId.BULK_COLOR, value);
+    },
+  },
+  homeShow: {
+    title: "Home Page Highlighting",
+    description: "Highlight videos on the home page",
+    value: true,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.SHOW_ON_HOME, value);
+    },
+  },
+  subscriptionsShow: {
+    title: "Subscriptions Page Highlighting",
+    description: "Highlight videos on the subscriptions page",
+    value: true,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.SHOW_ON_SUBSCRIPTIONS, value);
+    },
+  },
+  videoShow: {
+    title: "Video Page Highlighting",
+    description: "Highlight videos on the video page",
+    value: true,
+    callback: (value: string | boolean) => {
+      if (typeof value === "boolean")
+        changeOption(OptionId.SHOW_ON_VIDEO, value);
+    },
+  },
+  gradientStart: {
+    title: "Gradient Start",
+    description: "Start of the gradient for the current video",
+    value: "#3EBBF3",
+    callback: (value: string | boolean) => {
+      if (typeof value === "string")
+        changeOption(OptionId.GRADIENT_START, value);
+    },
+  },
+  gradientEnd: {
+    title: "Gradient End",
+    description: "End of the gradient for the current video",
+    value: "#5850D1",
+    callback: (value: string | boolean) => {
+      if (typeof value === "string") changeOption(OptionId.GRADIENT_END, value);
     },
   },
 } as const;
+
+export const getOptions = (): Promise<optionUtilityType> => {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("options").then((result) => {
+      const options = result.options;
+      resolve(options);
+    });
+  });
+};

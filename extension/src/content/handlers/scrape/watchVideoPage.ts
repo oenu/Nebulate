@@ -1,10 +1,11 @@
 import { checkTable } from "../../../common/checkTable"; // Checks a list of videoIDs against the database
 import { CSS_IDS } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 
 // Style Subs Page Videos
-const options = {
-  matchedColor: "rgb(62 187 243)",
-};
+// const options = {
+// matchedColor: "rgb(62 187 243)",
+// };
 
 // Watch the Youtube Video page for videos
 // eslint-disable-next-line no-undef
@@ -12,15 +13,23 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
   // Check if the page is a video page
   // eslint-disable-next-line no-undef
   if (window.location.href.includes("youtube.com/watch")) {
+    // Get options
+
+    const options = await getOptions();
+
+    if (!options.videoShow) {
+      throw new Error("Options are set to not show on video page");
+    }
+
     const videoStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
-      box-shadow: 0 0 0 4px ${options.matchedColor} !important;
+      box-shadow: 0 0 0 4px ${options.bulkColor} !important;
     }
 
     /* Video Title Color */
     .nebulate-matched #video-title {
-      color: ${options.matchedColor} !important;
+      color: ${options.bulkColor} !important;
     }`;
 
     // eslint-disable-next-line no-undef

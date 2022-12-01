@@ -1,4 +1,5 @@
 import { Messages } from "../../common/enums";
+import { getOptions } from "../../common/options";
 import watchHomePage from "../handlers/scrape/watchHomePage";
 
 // eslint-disable-next-line no-undef
@@ -11,11 +12,18 @@ chrome.runtime.onMessage.addListener(
     // _sender, sendResponse
   ) => {
     if (message.type === Messages.URL_UPDATE) {
+      const options = await getOptions();
       console.debug("onHomePage: Received message: ", message);
       // Home page is just youtube.com
       // eslint-disable-next-line no-undef
       if (window.location.href === "https://www.youtube.com/") {
         console.debug("onHomePage: On home page");
+
+        // Check if options are set to show on home page
+        if (!options.homeShow) {
+          console.debug("onHomePage: Options are set to not show on home page");
+          return;
+        }
 
         // Check if we are already observing the page
         if (observer) {

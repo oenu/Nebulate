@@ -13,7 +13,12 @@ chrome.runtime.onMessage.addListener(
   ) => {
     if (message.type === Messages.URL_UPDATE) {
       const options = await getOptions();
+      if (!options.homeShow.value) {
+        console.log("onHomePage: Disabled");
+        return;
+      }
       console.debug("onHomePage: Received message: ", message);
+
       // Home page is just youtube.com
       // eslint-disable-next-line no-undef
       if (window.location.href === "https://www.youtube.com/") {

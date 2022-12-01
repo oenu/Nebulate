@@ -1,6 +1,7 @@
 // Adds styling to the active video if it is on Nebula
 
 import { CSS_IDS } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 // import { getOptions } from "../../../common/options";
 import { Video } from "../../../common/types";
 
@@ -8,7 +9,22 @@ import { Video } from "../../../common/types";
 export const addVideoStyle = async (video: Video): Promise<void> => {
   // Wait for the video to load
 
-  // const options = await getOptions();
+  // Check if adding video style is enabled
+  const options = await getOptions();
+
+  if (!options.videoGlow) {
+    throw new Error("Options are set to not show on video page");
+  }
+
+  if (!options.gradientStart.value) {
+    console.warn("Gradient start color not set, using default");
+    options.gradientStart.value = "rgb(62, 187, 243)";
+  }
+
+  if (!options.gradientEnd.value) {
+    console.warn("Gradient end color not set, using default");
+    options.gradientEnd.value = "rgb(88, 80, 209)";
+  }
 
   waitForVideo(10000)
     .catch(() => {
@@ -16,28 +32,29 @@ export const addVideoStyle = async (video: Video): Promise<void> => {
     })
     .then(() => {
       console.debug("addVideoStyle: adding video style for video: ", video);
+
       const videoStyle = `
       /* Nebulate Video Style ${video.videoId} */
 
   /* Mini Player */
   .miniplayer #container:has(video) {
-    box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
+    box-shadow: -10px 0 40px ${options.gradientStart.value}, 10px 0 40px ${options.gradientEnd.value} !important;
     transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
     clip-path: inset(-100% -100% 0 -100%);
   }
   
   /* Theatre Player */
   #player-theater-container #container:has(video) {
-    box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
+    box-shadow: -10px 0 40px ${options.gradientStart.value}, 10px 0 40px ${options.gradientEnd.value} !important;
     transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s
     /* clip-path: inset(0px -100vw 0px -100vw); */;
   }
     
   /* Normal Player */
   :not(.ytd-page-manager[theater]) #container:has(video) {
+    box-shadow: -10px 0 40px ${options.gradientStart.value}, 10px 0 40px ${options.gradientEnd.value} !important;
     transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
     transition-delay: 0.5s;
-    box-shadow: -10px 0 40px rgb(62, 187, 243), 10px 0 40px rgb(88, 80, 209);
   }`;
       // eslint-disable-next-line no-undef
       let videoStyleElement = document.getElementById(

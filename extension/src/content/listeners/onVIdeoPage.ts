@@ -1,6 +1,6 @@
 import { Messages } from "../../common/enums";
 import { getOptions } from "../../common/options";
-import { watchVideoPage } from "../handlers/scrape/watchVideoPage";
+import { watchVideoPage } from "../handlers/pageWatchers/watchVideoPage";
 
 // eslint-disable-next-line no-undef
 let observer: MutationObserver | undefined;

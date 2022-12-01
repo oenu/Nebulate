@@ -42,6 +42,17 @@ chrome.runtime.onMessage.addListener(
 export const onNewVideo = async (video: Video): Promise<void> => {
   const options = await getOptions();
 
+  // Check if any of the options are enabled
+  if (
+    !options.videoButton.value &&
+    !options.videoGlow.value &&
+    !options.channelButton.value &&
+    !options.channelGlow.value
+  ) {
+    console.log("onNewVideo: Disabled");
+    return;
+  }
+
   console.time("onNewVideo");
   // Check if the video is new
   if (video === localVideo) {
@@ -49,7 +60,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     // Create array of promises
     const promises = [];
     if (video.matched) {
-      options.videoButton &&
+      options.videoButton.value &&
         promises.push(
           checkVideoButton(video)
             .then((exists) => {
@@ -59,7 +70,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
               console.error("onNewVideo: Error checking video button", err);
             })
         );
-      options.videoGlow &&
+      options.videoGlow.value &&
         promises.push(
           checkVideoStyle(video)
             .then((exists) => {
@@ -72,7 +83,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     }
 
     if (video.channel.known) {
-      options.channelButton &&
+      options.channelButton.value &&
         promises.push(
           checkChannelButton(video.channel)
             .then((exists) => {
@@ -82,7 +93,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
               console.error("onNewVideo: Error checking channel button: ", err);
             })
         );
-      options.channelGlow &&
+      options.channelGlow.value &&
         promises.push(
           checkChannelStyle(video.channel)
             .then((exists) => {
@@ -111,22 +122,22 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     );
 
     // Add the channel button if the channel is known
-    video.channel.known && options.channelButton
+    video.channel.known && options.channelButton.value
       ? addChannelButton(video.channel)
       : removeChannelButton();
 
     // Style the channel box if the channel is known
-    video.channel.known && options.channelGlow
+    video.channel.known && options.channelGlow.value
       ? addChannelStyle(video.channel)
       : removeChannelStyle();
 
     // Add the video button if the video is matched
-    video.matched && options.videoButton
+    video.matched && options.videoButton.value
       ? addVideoButton(video)
       : removeVideoButton();
 
     // Style the video box if the video is matched
-    video.matched && options.videoGlow
+    video.matched && options.videoGlow.value
       ? addVideoStyle(video)
       : removeVideoStyle();
   }

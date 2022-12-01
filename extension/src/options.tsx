@@ -38,7 +38,7 @@ import { Messages } from "./common/enums";
 import { TableSummary } from "./background/table/summarizeTable";
 import { PopupRedirectMessage } from "./popup";
 import { PopupSummarizeMessageResponse } from "./popup";
-import { allOptions, optionUtilityType } from "./common/options";
+import { getOptions, optionUtilityType } from "./common/options";
 const optionRedirect = (url: string): void => {
   console.debug("Redirecting to url " + url);
 
@@ -104,29 +104,21 @@ interface StatsGridProps {
 function Options() {
   const [tableSummary, setTableSummary] = React.useState<TableSummary>();
   const [optionsLoaded, setOptionsLoaded] = React.useState(false);
-  const [optionValues, setOptionValues] =
-    React.useState<optionUtilityType>(allOptions);
+  const [optionValues, setOptionValues] = React.useState<optionUtilityType>();
 
   useEffect(() => {
-    // Listen for changes to options
+    // Start listening for changes to options
     chrome.storage.onChanged.addListener((changes) => {
       if (changes.options) {
         // Check if the options have changed
         if (changes.options.newValue === changes.options.oldValue) {
           console.debug("Options have not changed");
           return;
+        } else {
+          console.debug("Options have changed");
+          // Update the options
+          setOptionValues(changes.options.newValue);
         }
-
-        console.log("Options changed");
-        console.log(changes.options.newValue);
-
-        const newOptions = changes.options.newValue;
-        const newOptionValues = { ...optionValues };
-        Object.keys(newOptions).forEach((key) => {
-          const option = key as OptionId;
-          newOptionValues[option].value = newOptions[option];
-        });
-        setOptionValues(newOptionValues);
       }
     });
 
@@ -138,26 +130,23 @@ function Options() {
       }
     });
 
-    // On page load, get the options and set them
+    // On page load, get the options from storage and set them in local state
     chrome.storage.local.get("options", (result) => {
-      console.log("Options loaded:");
-      console.log(result);
-      const newOptionValues = { ...optionValues };
-      Object.keys(result.options).forEach((key) => {
-        const option = key as OptionId;
-        newOptionValues[option].value = result.options[option];
-      });
-      setOptionValues(newOptionValues);
+      console.log("Getting options on page load");
+      console.log("Existing Options");
+      console.table(result.options);
+
+      if (result.options) {
+        setOptionValues(result.options);
+      } else {
+        console.error("No options found in storage");
+      }
+
       setOptionsLoaded(true);
     });
 
     getTableSummary();
   }, []);
-
-  // ================== Options ==================
-  // Get options from storage
-
-  // Set the options in individual state variables and defaults
 
   // ================== Links ==================
   const links = [
@@ -235,145 +224,230 @@ function Options() {
     },
   ];
 
+  // ================== Functions ==================
+
+  const toggleOption = async (key: keyof optionUtilityType): Promise<void> => {
+    // IMPORTANT: the options are stored in an object with the type of { [key: string]: {title, description, value} }
+
+    // Get the current value of the option from storage
+    const currentOptions = await getOptions();
+
+    // Create a new object with the updated value
+    const newOptions = {
+      ...currentOptions,
+      [key]: {
+        title: currentOptions[key].title,
+        description: currentOptions[key].description,
+        value: !currentOptions[key].value,
+      },
+    };
+
+    // Update the options in storage
+    await chrome.storage.local.set({ options: newOptions });
+
+    // Update the options in local state
+    setOptionValues(newOptions);
+
+    console.log(
+      `Toggled option ${key} from ${currentOptions[key].value} to ${newOptions[key].value}`
+    );
+  };
+
+  const setStringOption = async (
+    key: keyof optionUtilityType,
+    value: string
+  ): Promise<void> => {
+    // Get the current value of the option from storage
+    const currentOptions = await getOptions();
+
+    // Create a new object with the new value
+    const newOptions = {
+      ...currentOptions,
+      [key]: {
+        title: currentOptions[key].title,
+        description: currentOptions[key].description,
+        value,
+      },
+    };
+
+    // Update the options in storage
+    await chrome.storage.local.set({ options: newOptions });
+
+    // Update the options in local state
+    setOptionValues(newOptions);
+
+    console.log(
+      `Set string option ${key} from ${currentOptions[key].value} to ${newOptions[key].value}`
+    );
+  };
+
   // ================== List Constructors ==================
-  const optionsList = Object.entries(allOptions).map(([key, option]) => {
-    if (typeof option.value === "boolean") {
-      const toggle = (): void => {
-        option.callback(!option.value);
-        setOptionValues({
-          ...optionValues,
-          [key]: {
-            ...option,
-            value: !option.value,
-          },
-        });
-      };
 
-      return (
-        <Card key={key}>
-          <Text fz={"lg"}> {option.title} </Text>
-          <Switch
-            checked={option.value}
-            onChange={(): void => {
-              toggle();
-            }}
-            label={option.description}
-          />
-        </Card>
+  const optionsList = (options: optionUtilityType): React.ReactNode => {
+    // Generate an array of options including all their values (title, description, value, etc)
+    const optionsArray = Object.entries(options).map(([key, value]) => {
+      console.log(
+        `Option: ${key} - Value: ${value.value} - Title: ${value.title} - Description: ${value.description}`
       );
-    } else if (typeof option.value === "string") {
-      const change = (value: string): void => {
-        option.callback(value);
-        setOptionValues({
-          ...optionValues,
-          [key]: {
-            ...option,
-            value,
-          },
-        });
+      return {
+        key: key as keyof optionUtilityType,
+        title: value.title,
+        description: value.description,
+        booleanValue:
+          typeof value.value === "boolean" ? value.value : undefined,
+        stringValue: typeof value.value === "string" ? value.value : undefined,
       };
+    });
 
-      if (key === OptionId.BULK_COLOR) {
+    const optionElements = optionsArray.map((option) => {
+      if (option.booleanValue !== undefined) {
+        // Boolean option
         return (
-          <Card key={key}>
+          <Card key={option.key}>
             <Text fz={"lg"}> {option.title} </Text>
-            <ColorPicker
-              mt="sm"
-              color={option.value}
-              swatches={[
-                "#3EBBF3", // Default
-                "#25262b", // Dark
-                "#868e96", // Light
-                "#fa5252", // Red
-                "#e64980", // Pink
-                "#be4bdb", // Purple
-                "#7950f2", // Violet
-                "#4c6ef5", // Indigo
-                "#15aabf", // Cyan
-                "#12b886", // Teal
-                "#40c057", // Green
-                "#82c91e", // Lime
-                "#fab005", // Yellow
-                "#fd7e14", // Orange
-              ]}
-              swatchesPerRow={7}
-              onChangeEnd={(color: string): void => {
-                change(color);
-              }}
-            />
-          </Card>
-        );
-      } else if (key === OptionId.GRADIENT_START) {
-        <Card key={key}>
-          <Text fz={"lg"}> {option.title} </Text>
-          <ColorPicker
-            mt="sm"
-            color={option.value}
-            swatches={[
-              "#3EBBF3", // Default
-              "#25262b", // Dark
-              "#868e96", // Light
-              "#fa5252", // Red
-              "#e64980", // Pink
-              "#be4bdb", // Purple
-              "#7950f2", // Violet
-              "#4c6ef5", // Indigo
-              "#15aabf", // Cyan
-              "#12b886", // Teal
-              "#40c057", // Green
-              "#82c91e", // Lime
-              "#fab005", // Yellow
-              "#fd7e14", // Orange
-            ]}
-            swatchesPerRow={7}
-            onChangeEnd={(color: string): void => {
-              change(color);
-            }}
-          />
-          <ColorPicker
-            mt="sm"
-            color={optionValues[OptionId.GRADIENT_END].value as string}
-            swatches={[
-              "#5850D1", // Default
-              "#25262b", // Dark
-              "#868e96", // Light
-              "#fa5252", // Red
-              "#e64980", // Pink
-              "#be4bdb", // Purple
-              "#7950f2", // Violet
-              "#4c6ef5", // Indigo
-              "#15aabf", // Cyan
-              "#12b886", // Teal
-              "#40c057", // Green
-              "#82c91e", // Lime
-              "#fab005", // Yellow
-              "#fd7e14", // Orange
-            ]}
-            swatchesPerRow={7}
-            onChangeEnd={(color: string): void => {
-              change(color);
-            }}
-          />
-        </Card>;
-      } else if (key === OptionId.GRADIENT_END) {
-        return null;
-      } else {
-        return (
-          <Card key={key}>
-            <Text fz={"lg"}> {option.title} </Text>
-
-            <TextInput
-              value={option.value}
-              onChange={(e): void => {
-                change(e.target.value);
+            <Switch
+              checked={option.booleanValue}
+              onChange={(): void => {
+                // Toggle the option
+                toggleOption(option.key);
               }}
               label={option.description}
             />
           </Card>
         );
+      } else if (option.stringValue !== undefined) {
+        // Special cases for the color pickers
+        if (option.key === OptionId.BULK_COLOR) {
+          return (
+            <Card key={option.key}>
+              <Text fz={"lg"}> {option.title} </Text>
+              <ColorPicker
+                mt="sm"
+                color={option.stringValue}
+                swatches={[
+                  "#3EBBF3", // Default
+                  "#25262b", // Dark
+                  "#868e96", // Light
+                  "#fa5252", // Red
+                  "#e64980", // Pink
+                  "#be4bdb", // Purple
+                  "#7950f2", // Violet
+                  "#4c6ef5", // Indigo
+                  "#15aabf", // Cyan
+                  "#12b886", // Teal
+                  "#40c057", // Green
+                  "#82c91e", // Lime
+                  "#fab005", // Yellow
+                  "#fd7e14", // Orange
+                ]}
+                swatchesPerRow={7}
+                onChangeEnd={(color: string): void => {
+                  setStringOption(option.key, color);
+                }}
+              />
+            </Card>
+          );
+        } else if (option.key === OptionId.GRADIENT_START) {
+          // Special case for the gradient picker, it has two values (start and end) so we skip the end one later
+          return (
+            <Card key={option.key}>
+              <Center>
+                <Group>
+                  <Text fz={"lg"}> {option.title} </Text>
+                  <ColorPicker
+                    mt="sm"
+                    color={option.stringValue}
+                    swatches={[
+                      "#3EBBF3", // Default
+                      "#25262b", // Dark
+                      "#868e96", // Light
+                      "#fa5252", // Red
+                      "#e64980", // Pink
+                      "#be4bdb", // Purple
+                      "#7950f2", // Violet
+                      "#4c6ef5", // Indigo
+                      "#15aabf", // Cyan
+                      "#12b886", // Teal
+                      "#40c057", // Green
+                      "#82c91e", // Lime
+                      "#fab005", // Yellow
+                      "#fd7e14", // Orange
+                    ]}
+                    swatchesPerRow={7}
+                    onChangeEnd={(color: string): void => {
+                      setStringOption(option.key, color);
+                    }}
+                  />
+                  <ColorPicker
+                    mt="sm"
+                    color={options[OptionId.GRADIENT_END].value as string}
+                    swatches={[
+                      "#5850D1", // Default
+                      "#25262b", // Dark
+                      "#868e96", // Light
+                      "#fa5252", // Red
+                      "#e64980", // Pink
+                      "#be4bdb", // Purple
+                      "#7950f2", // Violet
+                      "#4c6ef5", // Indigo
+                      "#15aabf", // Cyan
+                      "#12b886", // Teal
+                      "#40c057", // Green
+                      "#82c91e", // Lime
+                      "#fab005", // Yellow
+                      "#fd7e14", // Orange
+                    ]}
+                    swatchesPerRow={7}
+                    onChangeEnd={(color: string): void => {
+                      setStringOption(OptionId.GRADIENT_END, color);
+                    }}
+                  />
+                </Group>
+              </Center>
+            </Card>
+          );
+        } else if (option.key === OptionId.GRADIENT_END) {
+          // Skip the end color picker, we already did it above
+          return null;
+        } else {
+          // Res of the string options
+          return (
+            <Card key={option.key}>
+              <Text fz={"lg"}> {option.title} </Text>
+
+              <TextInput
+                mt="sm"
+                value={option.stringValue}
+                onChange={(e): void => {
+                  setStringOption(option.key, e.target.value);
+                }}
+                label={option.description}
+              />
+            </Card>
+          );
+        }
       }
+    });
+
+    if (optionElements) {
+      return optionElements;
+    } else {
+      return <Loader />;
     }
-  });
+  };
+
+  const renderOptions = (): React.ReactNode => {
+    if (optionValues) {
+      if (Object.keys(optionValues).length > 0) {
+        console.log("Rendering options");
+        console.log(optionValues);
+
+        return optionsList(optionValues);
+      }
+    } else {
+      return <Loader />;
+    }
+  };
 
   const linksList = links.map((link) => (
     <Card key={link.title}>
@@ -413,7 +487,7 @@ function Options() {
             </Title>
             <Stack>
               <LoadingOverlay visible={!optionsLoaded} />
-              {optionsList}
+              {renderOptions()}
             </Stack>
           </Grid.Col>
           <Grid.Col lg={6} md={6} sm={12} xs={12}>

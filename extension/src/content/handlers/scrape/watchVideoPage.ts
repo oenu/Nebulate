@@ -17,19 +17,24 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
 
     const options = await getOptions();
 
-    if (!options.videoShow) {
+    if (!options.videoShow.value) {
       throw new Error("Options are set to not show on video page");
+    }
+
+    if (!options.bulkColor.value) {
+      console.warn("watchVideoPage: Bulk color not set, using default");
+      options.bulkColor.value = "#3ebff3";
     }
 
     const videoStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
-      box-shadow: 0 0 0 4px ${options.bulkColor} !important;
+      box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
     }
 
     /* Video Title Color */
     .nebulate-matched #video-title {
-      color: ${options.bulkColor} !important;
+      color: ${options.bulkColor.value} !important;
     }`;
 
     // eslint-disable-next-line no-undef

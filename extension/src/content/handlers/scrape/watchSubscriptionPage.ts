@@ -1,27 +1,35 @@
 import { checkTable } from "../../../common/checkTable"; // Checks a list of videoIDs against the database
 import { CSS_IDS } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 
 // Style Subs Page Videos
-
-const options = {
-  matchedColor: "rgb(62 187 243)",
-};
 
 // Returns an observer that can be disconnected when the page is closed
 // eslint-disable-next-line no-undef
 export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
+  const options = await getOptions();
+
+  if (!options.subscriptionsShow.value) {
+    throw new Error("Options are set to not show on subscription page");
+  }
+
+  if (!options.bulkColor.value) {
+    console.warn("watchSubsPage: Bulk color not set, using default");
+    options.bulkColor.value = "#3ebff3";
+  }
+
   // Check if the page is the subscriptions page
   // eslint-disable-next-line no-undef
   if (window.location.href.includes("youtube.com/feed/subscriptions")) {
     const subScriptionStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
-      box-shadow: 0 0 0 4px ${options.matchedColor} !important;
+      box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
     }
 
     /* Video Title Color */
     .nebulate-matched #video-title {
-      color: ${options.matchedColor} !important;
+      color: ${options.bulkColor.value} !important;
     }
     `;
 

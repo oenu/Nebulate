@@ -1,29 +1,35 @@
 import { checkTable } from "../../../common/checkTable";
 import { CSS_IDS } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 
 // Style Home Page Videos
-
-const options = {
-  matchedColor: "rgb(62 187 243)",
-};
 
 // Returns an observer that can be disconnected when the page is closed
 // eslint-disable-next-line no-undef
 export const watchHomePage = async (): Promise<MutationObserver> => {
-  // eslint-disable-next-line no-undef
-  console.log(window.location.href);
+  const options = await getOptions();
+
+  if (!options.homeShow.value) {
+    throw new Error("Options are set to not show on home page");
+  }
+
+  if (!options.bulkColor.value) {
+    console.warn("watchHomePage: Bulk color not set, using default");
+    options.bulkColor.value = "#3ebff3";
+  }
+
   // Check if the page is the home page
   // eslint-disable-next-line no-undef
   if (window.location.href === "https://www.youtube.com/") {
     const homePageStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
-      box-shadow: 0 0 0 4px ${options.matchedColor} !important;
+      box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
     }
 
     /* Video Title Color */
     .nebulate-matched #video-title {
-      color: ${options.matchedColor} !important;
+      color: ${options.bulkColor.value} !important;
     }
     `;
 

@@ -21,6 +21,7 @@ import {
   checkVideoStyle,
   removeVideoStyle,
 } from "../handlers/interface/videoStyle";
+import { getOptions } from "../../common/options";
 
 let localVideo: Video;
 
@@ -39,6 +40,8 @@ chrome.runtime.onMessage.addListener(
 
 // Handles a new video message sent by the background script
 export const onNewVideo = async (video: Video): Promise<void> => {
+  const options = await getOptions();
+
   console.time("onNewVideo");
   // Check if the video is new
   if (video === localVideo) {
@@ -46,45 +49,49 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     // Create array of promises
     const promises = [];
     if (video.matched) {
-      promises.push(
-        checkVideoButton(video)
-          .then((exists) => {
-            if (!exists) addVideoButton(video);
-          })
-          .catch((err) => {
-            console.error("onNewVideo: Error checking video button", err);
-          })
-      );
-      promises.push(
-        checkVideoStyle(video)
-          .then((exists) => {
-            if (!exists) addVideoStyle(video);
-          })
-          .catch((err) => {
-            console.error("onNewVideo: Error checking video style", err);
-          })
-      );
+      options.videoButton &&
+        promises.push(
+          checkVideoButton(video)
+            .then((exists) => {
+              if (!exists) addVideoButton(video);
+            })
+            .catch((err) => {
+              console.error("onNewVideo: Error checking video button", err);
+            })
+        );
+      options.videoGlow &&
+        promises.push(
+          checkVideoStyle(video)
+            .then((exists) => {
+              if (!exists) addVideoStyle(video);
+            })
+            .catch((err) => {
+              console.error("onNewVideo: Error checking video style", err);
+            })
+        );
     }
 
     if (video.channel.known) {
-      promises.push(
-        checkChannelButton(video.channel)
-          .then((exists) => {
-            if (!exists) addChannelButton(video.channel);
-          })
-          .catch((err) => {
-            console.error("onNewVideo: Error checking channel button: ", err);
-          })
-      );
-      promises.push(
-        checkChannelStyle(video.channel)
-          .then((exists) => {
-            if (!exists) addChannelStyle(video.channel);
-          })
-          .catch((err) => {
-            console.error("onNewVideo: Error checking channel style: ", err);
-          })
-      );
+      options.channelButton &&
+        promises.push(
+          checkChannelButton(video.channel)
+            .then((exists) => {
+              if (!exists) addChannelButton(video.channel);
+            })
+            .catch((err) => {
+              console.error("onNewVideo: Error checking channel button: ", err);
+            })
+        );
+      options.channelGlow &&
+        promises.push(
+          checkChannelStyle(video.channel)
+            .then((exists) => {
+              if (!exists) addChannelStyle(video.channel);
+            })
+            .catch((err) => {
+              console.error("onNewVideo: Error checking channel style: ", err);
+            })
+        );
     }
 
     if (promises.length > 0) {
@@ -103,23 +110,25 @@ export const onNewVideo = async (video: Video): Promise<void> => {
       localVideo
     );
 
-    // Check if the channel is known - if so add the channel button and style channel box
-    if (video.channel.known) {
-      addChannelButton(video.channel);
-      addChannelStyle(video.channel);
-    } else {
-      removeChannelButton();
-      removeChannelStyle();
-    }
+    // Add the channel button if the channel is known
+    video.channel.known && options.channelButton
+      ? addChannelButton(video.channel)
+      : removeChannelButton();
 
-    if (video.matched) {
-      // Add the video button and style video box
-      addVideoButton(video);
-      addVideoStyle(video);
-    } else {
-      removeVideoButton();
-      removeVideoStyle();
-    }
+    // Style the channel box if the channel is known
+    video.channel.known && options.channelGlow
+      ? addChannelStyle(video.channel)
+      : removeChannelStyle();
+
+    // Add the video button if the video is matched
+    video.matched && options.videoButton
+      ? addVideoButton(video)
+      : removeVideoButton();
+
+    // Style the video box if the video is matched
+    video.matched && options.videoGlow
+      ? addVideoStyle(video)
+      : removeVideoStyle();
   }
   console.timeEnd("onNewVideo");
 };

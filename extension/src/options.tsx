@@ -329,6 +329,7 @@ function Options() {
         return (
           <Card key={option.key}>
             <Text fz={"lg"}> {option.title} </Text>
+            <Divider mt={"sm"} />
             <Switch
               checked={option.booleanValue}
               onChange={(): void => {
@@ -345,6 +346,7 @@ function Options() {
           return (
             <Card key={option.key}>
               <Text fz={"lg"}> {option.title} </Text>
+              <Divider mt={"sm"} />
               <Group position="center" spacing={40}>
                 <ColorPicker
                   mt="sm"
@@ -380,16 +382,25 @@ function Options() {
                       color: ${options.bulkColor.value} !important;
                   }
                   */}
-                <Image
-                  src="http://placekitten.com/280/158"
-                  alt="Example of a styled thumbnail"
-                  width="280px"
-                  height="150px"
-                  style={{
-                    boxShadow: `0 0 0 4px ${option.stringValue}`,
-                    borderRadius: "4px",
-                  }}
-                />
+                <Stack>
+                  <Image
+                    src="http://placekitten.com/280/158"
+                    alt="Example of a styled thumbnail"
+                    width="280px"
+                    height="150px"
+                    style={{
+                      boxShadow: `0 0 0 4px ${option.stringValue}`,
+                      borderRadius: "4px",
+                    }}
+                  />
+                  <Text
+                    style={{
+                      color: option.stringValue,
+                    }}
+                  >
+                    I can has nebula video?
+                  </Text>
+                </Stack>
               </Group>
             </Card>
           );
@@ -406,6 +417,7 @@ function Options() {
               }}
             >
               <Text fz={"lg"}>Video Card Gradient</Text>
+              <Divider mt={"sm"} />
               <Center>
                 <Group>
                   <ColorPicker

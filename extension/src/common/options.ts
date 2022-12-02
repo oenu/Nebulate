@@ -184,6 +184,11 @@ export const defaultOptions: optionUtilityType = {
     description: "End of the gradient for the current video",
     value: "#5850D1",
   },
+  buttonColor: {
+    title: "Button Color",
+    description: "Color of the Nebula buttons",
+    value: "#3EBBF3",
+  },
 } as const;
 
 export const getOptions = (): Promise<optionUtilityType> => {

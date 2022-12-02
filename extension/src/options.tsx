@@ -374,6 +374,7 @@ function Options() {
                 {/* Thumbnail image of a recommended video from youtube.com with a border and title styled to match
                    .nebulate-matched #thumbnail {
                     box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
+                    
                    }
                   .nebulate-matched #video-title {
                       color: ${options.bulkColor.value} !important;
@@ -386,6 +387,7 @@ function Options() {
                   height="150px"
                   style={{
                     boxShadow: `0 0 0 4px ${option.stringValue}`,
+                    borderRadius: "4px",
                   }}
                 />
               </Group>

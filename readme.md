@@ -1,6 +1,7 @@
 # Nebulate
 
-> **I am excited to announce that this extension has prompted Nebula to begin development on a Developer API to support similar projects. I will be putting publishing to users on hold until this API becomes available**
+> ## This application has undergone a substantial re-write. Technical details on this page should not be considered to be reliable until this notice is removed. Due to the changes in Table distribution it is not required to run the server to listen for client messages
+  
 
 ## Introduction
 

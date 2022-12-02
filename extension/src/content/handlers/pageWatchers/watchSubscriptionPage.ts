@@ -24,6 +24,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
     const subScriptionStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
+      borderRadius: 4px !important;
       box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
     }
 

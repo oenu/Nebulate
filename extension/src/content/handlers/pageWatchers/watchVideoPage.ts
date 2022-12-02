@@ -29,6 +29,7 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
     const videoStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
+      borderRadius: 4px !important;
       box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
     }
 

@@ -1,9 +1,25 @@
+import { createStyledSvg } from "../../../common/createStyledSvg";
 import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 import { Video } from "../../../common/types";
 import { VideoRedirectMessage } from "../../../content_script";
 
 export const addVideoButton = async (video: Video): Promise<void> => {
   try {
+    const options = await getOptions();
+
+    // Check if the channel button is enabled
+    if (!options.videoButton.value) {
+      console.debug("addVideoButton: Video button is disabled");
+      return;
+    }
+
+    // Check if the button color is set
+    if (!options.buttonColor.value) {
+      console.debug("addVideoButton: Button color is not set, using default");
+      options.buttonColor.value = "#3EBBF3";
+    }
+
     console.debug("addVideoButton: Adding redirect button");
 
     // Check if button already exists
@@ -14,17 +30,26 @@ export const addVideoButton = async (video: Video): Promise<void> => {
       await removeVideoButton();
     }
 
-    // Create the button
+    // Create the video button svg
+    const nebulate_svg = createStyledSvg(options.buttonColor.value as string);
+    nebulate_svg.style.cursor = "pointer";
+    nebulate_svg.style.height = "40px";
+    nebulate_svg.style.width = "40px";
+    nebulate_svg.style.marginTop = "5px";
+    nebulate_svg.style.marginBottom = "5px";
+
+    // Wrap the svg in a div (for classes)
     // eslint-disable-next-line no-undef
-    const nebulate_button = document.createElement("img");
-
-    nebulate_button.src = chrome.runtime.getURL("assets/icon.png");
-    nebulate_button.className = "ytp-button " + CSS_CLASSES.VIDEO_BUTTON;
-    nebulate_button.id = BUTTON_IDS.VIDEO;
-    nebulate_button.title = "View this video on Nebula";
+    const nebulate_div = document.createElement("div");
+    nebulate_div.appendChild(nebulate_svg);
+    nebulate_div.id = BUTTON_IDS.VIDEO;
+    nebulate_div.className = "ytp-button " + CSS_CLASSES.VIDEO_BUTTON;
+    nebulate_div.style.width = "45px";
+    nebulate_div.title = "View this video on Nebula";
     video.slug &&
-      nebulate_button.setAttribute("data-nebula-video-slug", video.slug);
+      nebulate_div.setAttribute("data-nebula-video-slug", video.slug);
 
+    // Get the location of the controls (so we can insert the button)
     const youtube_right_controls =
       // eslint-disable-next-line no-undef
       document.getElementsByClassName("ytp-right-controls")[0];
@@ -34,10 +59,10 @@ export const addVideoButton = async (video: Video): Promise<void> => {
     }
 
     // Add the button to the page
-    youtube_right_controls.prepend(nebulate_button);
+    youtube_right_controls.prepend(nebulate_div);
 
     // Add the click event listener
-    nebulate_button.addEventListener("click", () => {
+    nebulate_div.addEventListener("click", () => {
       if (video.slug) {
         console.debug("VideoButton: redirecting to video" + video.slug);
         const message: VideoRedirectMessage = {

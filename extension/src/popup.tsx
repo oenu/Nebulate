@@ -71,35 +71,6 @@ function Popup() {
       }}
     >
       A graduate project by @oenu, this is in beta, im looking for work!
-      {/* 1. Show user a summary of the Nebula data and how long ago it was updated
-      - Matched videos
-      - Matched channels
-      - unMatched videos
-      - total videos
-      - last update time
-      - when the table was generated
-      */}
-      {renderTableSummary()}
-      {/* 2. Visit Nebula site */}
-      <button onClick={(): void => popupRedirect("https://nebula.app")}>
-        Nebula
-      </button>
-      {/* 3. Visit project GitHub repo */}
-      <button
-        onClick={(): void => popupRedirect("https://github.com/oenu/Nebulate")}
-      >
-        About
-      </button>
-      {/* 4. Allow user to view developer information */}
-      <button onClick={(): void => popupRedirect("https://twitter.com/_a_nb")}>
-        Contact
-      </button>
-      {/* 5. Allow user to request a refresh of the Nebula data */}
-      <button onClick={async (): Promise<void> => await popupRefreshTable()}>
-        Refresh Table
-      </button>
-      {/* 6. Allow user to report an issue */}
-      <button onClick={(): void => reportIssue()}>Report Issue</button>
       <button
         onClick={(): void => {
           if (chrome.runtime.openOptionsPage) {
@@ -110,15 +81,28 @@ function Popup() {
           }
         }}
       >
-        Options
+        About / Options
       </button>
+      {renderTableSummary()}
+      <button onClick={(): void => popupRedirect("https://nebula.app")}>
+        Nebula
+      </button>
+      <button
+        onClick={(): void => popupRedirect("https://github.com/oenu/Nebulate")}
+      >
+        GitHub
+      </button>
+      <button onClick={(): void => popupRedirect("https://twitter.com/_a_nb")}>
+        Contact
+      </button>
+      <button onClick={async (): Promise<void> => await popupRefreshTable()}>
+        Refresh Table
+      </button>
+      <button onClick={(): void => reportIssue()}>Report Issue</button>
     </div>
   );
 }
-/**
- * PopupRedirect
- * 1. Send a message to the background script to open a new tab with the given URL
- */
+
 const popupRedirect = (url: string): void => {
   console.debug("Redirecting to url " + url);
   // 1.
@@ -131,10 +115,6 @@ const popupRedirect = (url: string): void => {
   chrome.runtime.sendMessage(message);
 };
 
-/**
- * ReportIssue
- * 1. Send a message to the background script to open a new tab with a mailto link
- */
 const reportIssue = (): void => {
   console.debug("Reporting issue");
   // 1.
@@ -143,21 +123,13 @@ const reportIssue = (): void => {
   });
 };
 
-/**
- * RefreshTable
- * 1. Check when the last time the table was refreshed
- * 2. If it was less than 5 minutes ago, show an error message (prevent spamming)
- * 3. If it was more than 5 minutes ago, send a message to the background script to refresh the table
- */
 const popupRefreshTable = async (): Promise<void> => {
   console.log("Manually Refreshing table");
 
-  // 1.
   // Check when the last time the table was refreshed
   chrome.storage.local.get("lastUpdate", (result) => {
     const lastUpdate = result.lastUpdate;
 
-    // 2.
     // If it was less than 5 minutes ago, show an error message (prevent spamming)
     if (lastUpdate.lastUpdate && Date.now() - lastUpdate.lastUpdate < 300000) {
       // eslint-disable-next-line no-undef
@@ -165,40 +137,12 @@ const popupRefreshTable = async (): Promise<void> => {
       return;
     }
 
-    // 3.
     // If it was more than 5 minutes ago, send a message to the background script to refresh the table
     chrome.runtime.sendMessage({
       type: Messages.REFRESH_TABLE,
     });
   });
 };
-
-// /**
-//  * Nebula Table Summary
-//  * Should show the user a summary of the Nebula data and how long ago it was updated
-//  * 1. Send a message to the background script to get the table summary and wait for a response
-//  */
-// const getTableSummary = async (): Promise<TableSummary> => {
-//   console.log("Getting table summary");
-
-//   // 1.
-//   // Send a message to the background script to get the table summary and wait for a response
-//   return new Promise((resolve, reject) => {
-//     chrome.runtime.sendMessage(
-//       {
-//         type: Messages.SUMMARIZE_TABLE,
-//       },
-//       (response) => {
-//         console.debug("Popup: Got table summary response" + response);
-//         if (response.type === Messages.SUMMARIZE_TABLE) {
-//           resolve(response.table);
-//         } else {
-//           reject(response);
-//         }
-//       }
-//     );
-//   });
-// };
 
 // Request Summary - Request a message containing a summary of the Nebula data
 const requestSummary = (): void => {

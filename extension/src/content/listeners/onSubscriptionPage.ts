@@ -1,5 +1,6 @@
 import { Messages } from "../../common/enums";
-import { watchSubscriptionPage } from "../handlers/scrape/watchSubscriptionPage";
+import { getOptions } from "../../common/options";
+import { watchSubscriptionPage } from "../handlers/pageWatchers/watchSubscriptionPage";
 
 // eslint-disable-next-line no-undef
 let observer: MutationObserver | undefined;
@@ -11,6 +12,13 @@ chrome.runtime.onMessage.addListener(
     // _sender, sendResponse
   ) => {
     if (message.type === Messages.URL_UPDATE) {
+      const options = await getOptions();
+
+      if (!options.subscriptionsShow.value) {
+        console.log("onSubscriptionPage: Disabled");
+        return;
+      }
+
       console.debug("onSubscriptionPage: Received message: ", message);
       // eslint-disable-next-line no-undef
       if (window.location.href.includes("youtube.com/feed/subscriptions")) {

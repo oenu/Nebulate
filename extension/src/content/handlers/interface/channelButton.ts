@@ -1,11 +1,11 @@
+import { createStyledSvg } from "./../../../common/createStyledSvg";
 import { BUTTON_IDS, Messages } from "../../../common/enums";
 import { Channel } from "../../../common/types";
 import { ChannelRedirectMessage } from "../../../content_script";
+import { getOptions } from "../../../common/options";
 
 export const addChannelButton = async (channel: Channel): Promise<void> => {
   try {
-    console.debug("addChannelButton: Adding redirect button");
-
     // Check if button already exists
     // eslint-disable-next-line no-undef
     const button = document.getElementById(BUTTON_IDS.CHANNEL);
@@ -14,21 +14,34 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
       await removeChannelButton();
     }
 
+    const options = await getOptions();
+
+    // Check if the channel button is enabled
+    if (!options.channelButton.value) {
+      console.debug("addChannelButton: Channel button is disabled");
+      return;
+    }
+
+    // Check if the button color is set
+    if (!options.buttonColor.value) {
+      console.debug("addChannelButton: Button color is not set, using default");
+      options.buttonColor.value = "#3EBBF3";
+    }
+    console.debug("addChannelButton: Adding redirect button");
+
     // Create the button
-    // eslint-disable-next-line no-undef
-    const nebulate_logo = document.createElement("img");
-    nebulate_logo.src = chrome.runtime.getURL("assets/icon.png");
-    nebulate_logo.id = BUTTON_IDS.CHANNEL;
-    nebulate_logo.style.cursor = "pointer";
-    nebulate_logo.style.height = "36px";
-    nebulate_logo.style.maxWidth = "100%";
-    nebulate_logo.style.maxHeight = "100%";
-    nebulate_logo.style.lineHeight = "36px";
+    const nebulate_svg = createStyledSvg(options.buttonColor.value as string);
+    nebulate_svg.id = BUTTON_IDS.CHANNEL;
+    nebulate_svg.style.cursor = "pointer";
+    nebulate_svg.style.height = "36px";
+    nebulate_svg.style.maxWidth = "100%";
+    nebulate_svg.style.maxHeight = "100%";
+    nebulate_svg.style.lineHeight = "36px";
     channel.slug &&
-      nebulate_logo.setAttribute("data-nebula-channel-slug", channel.slug);
+      nebulate_svg.setAttribute("data-nebula-channel-slug", channel.slug);
 
     // Add the click event listener
-    nebulate_logo.addEventListener("click", () => {
+    nebulate_svg.addEventListener("click", () => {
       if (channel.slug) {
         console.debug("ChannelButton: redirecting to channel" + channel.slug);
         const message: ChannelRedirectMessage = {
@@ -84,7 +97,7 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
     });
 
     // console.debug("addChannelButton: Adding button to DOM");
-    subscribeButton.insertAdjacentElement("afterend", nebulate_logo);
+    subscribeButton.insertAdjacentElement("afterend", nebulate_svg);
     // console.debug("addChannelButton: Button added to DOM");
     return Promise.resolve();
   } catch (error) {

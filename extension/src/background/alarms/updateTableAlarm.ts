@@ -15,22 +15,20 @@ chrome.alarms.get(Alarms.UPDATE_LOOKUP_TABLE, (alarm) => {
   }
 });
 
-// Set the alarm
-const setUpdateTableAlarm = async (interval?: number): Promise<void> => {
+// Set the alarm (every 4 hours)
+const setUpdateTableAlarm = async (): Promise<void> => {
   try {
-    // 1
     chrome.alarms.clear(Alarms.UPDATE_LOOKUP_TABLE);
-    // 2
-    const updateInterval = await chrome.storage.sync.get("updateInterval");
-    const updateIntervalMinutes =
-      updateInterval.updateInterval || interval || 600;
-    // 3
-    if (updateIntervalMinutes > 0) {
-      chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
-        delayInMinutes: interval ?? updateIntervalMinutes,
-        periodInMinutes: updateIntervalMinutes,
-      });
-    }
+
+    console.log("BG: Setting alarm every 4 hours");
+    const updateIntervalMinutes = 240;
+
+    chrome.alarms.create(Alarms.UPDATE_LOOKUP_TABLE, {
+      periodInMinutes: updateIntervalMinutes,
+    });
+
+    // Update the table immediately
+    await updateTable();
   } catch (e) {
     console.log("BG: Error in setUpdateTableAlarm: ", e);
   }
@@ -43,6 +41,7 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
     // 1
     switch (alarm.name) {
       case Alarms.UPDATE_LOOKUP_TABLE:
+        console.log("UpdateLookupTableAlarm: Updating table");
         await updateTable();
         break;
       default:

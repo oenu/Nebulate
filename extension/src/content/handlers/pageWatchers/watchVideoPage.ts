@@ -1,29 +1,42 @@
 import { checkTable } from "../../../common/checkTable"; // Checks a list of videoIDs against the database
 import { CSS_IDS } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 
 // Style Subs Page Videos
+// const options = {
+// matchedColor: "rgb(62 187 243)",
+// };
 
-const options = {
-  matchedColor: "rgb(62 187 243)",
-};
-
-// Returns an observer that can be disconnected when the page is closed
+// Watch the Youtube Video page for videos
 // eslint-disable-next-line no-undef
-export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
-  // Check if the page is the subscriptions page
+export const watchVideoPage = async (): Promise<MutationObserver> => {
+  // Check if the page is a video page
   // eslint-disable-next-line no-undef
-  if (window.location.href.includes("youtube.com/feed/subscriptions")) {
-    const subScriptionStyle = `
+  if (window.location.href.includes("youtube.com/watch")) {
+    // Get options
+
+    const options = await getOptions();
+
+    if (!options.videoShow.value) {
+      throw new Error("Options are set to not show on video page");
+    }
+
+    if (!options.bulkColor.value) {
+      console.warn("watchVideoPage: Bulk color not set, using default");
+      options.bulkColor.value = "#3ebff3";
+    }
+
+    const videoStyle = `
     /* Thumbnail Border Color */
     .nebulate-matched #thumbnail {
-      box-shadow: 0 0 0 4px ${options.matchedColor} !important;
+      borderRadius: 4px !important;
+      box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
     }
 
     /* Video Title Color */
     .nebulate-matched #video-title {
-      color: ${options.matchedColor} !important;
-    }
-    `;
+      color: ${options.bulkColor.value} !important;
+    }`;
 
     // eslint-disable-next-line no-undef
     document.getElementById(CSS_IDS.MASS_VIDEO)?.remove();
@@ -31,7 +44,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
     // eslint-disable-next-line no-undef
     const styleElement = document.createElement("style");
     styleElement.id = CSS_IDS.MASS_VIDEO;
-    styleElement.innerHTML = subScriptionStyle;
+    styleElement.innerHTML = videoStyle;
 
     // eslint-disable-next-line no-undef
     document.head.appendChild(styleElement);
@@ -39,10 +52,12 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
     // Mutation observer to watch for new videos, doesn't actually get the videos, just triggers a css selector to get the videos
     // eslint-disable-next-line no-undef
     const observer = new MutationObserver(async (mutations) => {
-      // Check if the page is still the subscriptions page
+      // Check if the page is still the video page
       // eslint-disable-next-line no-undef
-      if (!window.location.href.includes("youtube.com/feed/subscriptions")) {
-        console.debug("Subs page closed, disconnecting observer");
+      if (!window.location.href.includes("youtube.com/watch")) {
+        console.debug(
+          "watchVideoPage: Video page closed, disconnecting observer"
+        );
         observer.disconnect();
         return;
       }
@@ -52,7 +67,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
         // Get all the videos that haven't been checked yet
         // eslint-disable-next-line no-undef
         const videos = document.querySelectorAll(
-          "ytd-grid-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped)"
+          "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped)"
         );
         if (videos.length > 0) {
           // Get the videoIDs from the videos
@@ -61,7 +76,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
               // eslint-disable-next-line no-undef
               const href = video
                 .querySelector(
-                  "ytd-grid-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped) a#thumbnail[href]"
+                  "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped) a#thumbnail[href]"
                 )
                 ?.getAttribute("href")
                 ?.split("v=")[1]
@@ -71,18 +86,15 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
             .filter((href) => href !== undefined) as string[];
 
           if (videoIds.length === 0) {
-            console.debug("No video IDs found");
+            console.debug("watchVideoPage: No video IDs found");
             return;
           }
 
           // Remove duplicates
           const uniqueVideoIds = [...new Set(videoIds)];
-          console.debug(
-            "watchSubscriptionPage: Found videos: ",
-            uniqueVideoIds
-          );
+          console.debug("watchVideoPage: Found videos: ", uniqueVideoIds);
           if (!uniqueVideoIds) {
-            console.debug("watchSubscriptionPage: No unique videos found");
+            console.debug("watchVideoPage: No unique videos found");
             return;
           }
 
@@ -92,7 +104,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
           );
 
           if (filteredVideoIds.length === 0) {
-            console.debug("watchSubscriptionPage: No videos passed filter");
+            console.debug("watchVideoPage: No videos passed filter");
             return;
           }
 
@@ -107,7 +119,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
 
           // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
           console.debug(
-            "watchSubscriptionPage: Checked videos: ",
+            "watchVideoPage: Checked videos: ",
             checkedVideos.length,
             "adding css"
           );
@@ -116,7 +128,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
           checkedVideos.forEach((video) => {
             // eslint-disable-next-line no-undef
             const videoElement = document.querySelector(
-              `ytd-grid-video-renderer:has(a#thumbnail[href*="${video.videoId}"])`
+              `ytd-compact-video-renderer:has(a#thumbnail[href*="${video.videoId}"])`
             );
             if (videoElement) {
               if (video.matched) videoElement.classList.add("nebulate-matched");
@@ -127,7 +139,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
     });
 
     // Start watching for mutations
-    console.log("watchSubscriptionPage: Watching subs page...");
+    console.log("watchVideoPage: Watching video page...");
     // eslint-disable-next-line no-undef
     observer.observe(document.body, {
       childList: true,
@@ -136,6 +148,6 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
 
     return observer;
   } else {
-    throw new Error("watchSubscriptionPage: Not on subscriptions page");
+    throw new Error("watchVideoPage: Not on video page");
   }
 };

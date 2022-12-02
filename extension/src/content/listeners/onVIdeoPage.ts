@@ -1,5 +1,6 @@
 import { Messages } from "../../common/enums";
-import { watchVideoPage } from "../handlers/scrape/watchVideoPage";
+import { getOptions } from "../../common/options";
+import { watchVideoPage } from "../handlers/pageWatchers/watchVideoPage";
 
 // eslint-disable-next-line no-undef
 let observer: MutationObserver | undefined;
@@ -11,6 +12,12 @@ chrome.runtime.onMessage.addListener(
     // _sender, sendResponse
   ) => {
     if (message.type === Messages.URL_UPDATE) {
+      const options = await getOptions();
+      if (!options.videoShow.value) {
+        console.log("onVideoPage: Disabled");
+        return;
+      }
+
       console.debug("onVideoPage: Received message: ", message);
       // eslint-disable-next-line no-undef
       if (window.location.href.includes("youtube.com/watch")) {

@@ -1,10 +1,27 @@
 // Adds styling to the active channel if it is on Nebula
 
 import { CSS_IDS } from "../../../common/enums";
+import { getOptions } from "../../../common/options";
 import { Channel } from "../../../common/types";
 
 // TODO: Add channel identifier to css selectors to avoid conflicts - requires updating all channels to have custom_url property in lookup table
 export const addChannelStyle = async (channel: Channel): Promise<void> => {
+  const options = await getOptions();
+
+  if (!options.channelGlow.value) {
+    throw new Error("Options are set to not show on channel page");
+  }
+
+  if (!options.gradientStart.value) {
+    console.warn("Gradient start color not set, using default");
+    options.gradientStart.value = "rgb(62, 187, 243)";
+  }
+
+  if (!options.gradientEnd.value) {
+    console.warn("Gradient end color not set, using default");
+    options.gradientEnd.value = "rgb(88, 80, 209)";
+  }
+
   // Wait for the channel box to load
   waitForChannelBox(10000)
     .catch(() => {
@@ -17,7 +34,7 @@ export const addChannelStyle = async (channel: Channel): Promise<void> => {
       );
       const channelStyle = `div#owner 
       { transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
-      box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209); }`;
+      box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important; }`;
       // eslint-disable-next-line no-undef
       let channelStyleElement = document.getElementById(
         CSS_IDS.CHANNEL

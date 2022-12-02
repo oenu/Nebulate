@@ -14,7 +14,7 @@ import { Channel } from "../models/channel/channel";
  * @async
  *
  */
-const match = async (channelSlug: string) => {
+const match = async (channelSlug: string): Promise<void> => {
   logger.info(`Match: Matching videos for ${channelSlug}`);
   // Check for channel slug
   if (!Channel.exists({ slug: channelSlug })) {
@@ -65,6 +65,6 @@ const match = async (channelSlug: string) => {
     `Match: Match complete for ${channelSlug}, ${newMatchCount} new, ${replacedMatchCount} replaced, ${anotherBetterMatchCount} another better, ${noMatchCount} no match, ${noChangeCount} no change`
   );
 
-  return `Match: Match complete for ${channelSlug}, ${newMatchCount} new, ${replacedMatchCount} replaced, ${anotherBetterMatchCount} another better, ${noMatchCount} no match, ${noChangeCount} no change`;
+  return;
 };
 export default match;

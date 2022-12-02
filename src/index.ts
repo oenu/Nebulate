@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import "dotenv/config";
 import express from "express";
 const app = express();
@@ -23,7 +24,9 @@ const port = process.env.PORT || 3000;
 
 // Types
 declare global {
+  // eslint-disable-next-line no-var
   var token: string;
+  // eslint-disable-next-line no-var
   var key: string;
 }
 
@@ -93,6 +96,14 @@ app.use("/generateTable", reqAuth, generateTable);
 // Upload table to storage
 const uploadTable = require("./routes/uploadTable");
 app.use("/uploadTable", reqAuth, uploadTable);
+
+// Check a channel's config
+const checkConfig = require("./routes/checkConfig");
+app.use("/checkConfig", reqAuth, checkConfig);
+
+// Check all channels' config
+const checkAllConfig = require("./routes/checkAllConfigs");
+app.use("/checkAllConfigs", reqAuth, checkAllConfig);
 
 // Start the server
 mongoose.connection.once("open", async () => {

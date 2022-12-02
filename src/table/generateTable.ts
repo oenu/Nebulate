@@ -6,6 +6,8 @@ import logger from "../utils/logger";
 // Mongoose Schema
 import { NebulaVideo } from "../models/nebulaVideo/nebulaVideo";
 import { YoutubeVideo } from "../models/youtubeVideo/youtubeVideo";
+import { youtubeIds } from "../utils/youtubeIds";
+import { Channel } from "../models/channel/channel";
 
 /**
  * @type {Object} MatchedVideo
@@ -20,14 +22,18 @@ export type MatchedVideo = {
 
 /**
  * @type {Object} ChannelEntry
+ * @property {string} slug - The channel slug of the channel that the videos belong to
+ * @property {string} youtubeId - The youtube id of the channel
+ * @property {string} custom_url - The custom url of the channel
  * @property {string[]} matched - A list of youtube video ids that have been matched to a nebula video
  * @property {string[]} not_matched - A list of youtube video ids that have not been matched to a nebula video
- * @property {string} slug - The channel slug of the channel that the videos belong to
  */
 export interface ChannelEntry {
+  slug: string;
+  custom_url: string;
+  youtubeId: string;
   matched: MatchedVideo[];
   not_matched: string[];
-  slug: string;
 }
 
 /**
@@ -53,91 +59,157 @@ export interface LookupTable {
  * @async
  */
 
-// rewrite the following to be more clear and efficient
+export const generateTable = async (
+  maximumMatchDistance?: number
+): Promise<LookupTable> => {
+  try {
+    console.time("generateTable");
+    const matchLimit = maximumMatchDistance || 2;
 
-export const generateTable = async (maximumMatchDistance?: number) => {
-  const matchLimit = maximumMatchDistance || 2;
+    // Get all the nebula videos that are matched
+    const nebulaVideos = await NebulaVideo.find({
+      youtubeVideoId: { $exists: true },
+      matchStrength: { $lte: matchLimit },
+    })
+      .select("youtubeVideoObjectId channelSlug slug")
+      .lean();
+    logger.debug(
+      `generateTable: Found ${nebulaVideos.length} matched nebula videos`
+    );
 
-  // Find all the nebula videos in the database
-  const nebulaVideos = await NebulaVideo.find({
-    youtubeVideoId: { $exists: true },
-    matchStrength: { $lte: matchLimit },
-  })
-    .select("youtubeVideoObjectId channelSlug slug")
-    .lean();
+    // Get all the youtube videos that are matched
+    const youtubeVideos = await YoutubeVideo.find({})
+      .select("youtubeVideoId channelSlug")
+      .lean();
+    logger.debug(`generateTable: Found ${youtubeVideos.length} youtube videos`);
 
-  logger.debug(
-    `generateTable: Found ${nebulaVideos.length} matched nebula videos`
-  );
-  // Find all youtube videos in the database
-  const youtubeVideos = await YoutubeVideo.find({})
-    .select("youtubeVideoId channelSlug")
-    .lean();
-  logger.debug(`generateTable: Found ${youtubeVideos.length} youtube videos`);
-
-  // Get a list of all the channels that have youtube videos in the database
-  const channelSlugs = [...new Set(nebulaVideos.map((v) => v.channelSlug))];
-  logger.debug(`generateTable: Found ${channelSlugs.length} channels`);
-
-  // Create a channel entry for each channel
-  const channelEntries: ChannelEntry[] = channelSlugs.map((slug) => {
-    return {
-      matched: [],
-      not_matched: [],
-      slug,
+    // Create a lookup table
+    const lookupTable: LookupTable = {
+      channels: [],
+      generatedAt: new Date(),
+      id: uuidv4(),
     };
-  });
 
-  // For each youtube video, find the matching nebula video and add it to the channel entry
-  youtubeVideos.forEach((youtubeVideo) => {
-    // Find the channel for the youtube video
-    const channelEntry = channelEntries.find(
-      (entry) => entry.slug === youtubeVideo.channelSlug
-    );
-    if (!channelEntry) {
-      logger.error(
-        `generateTable: Could not find channel entry for channel ${youtubeVideo.channelSlug}`
-      );
-      return;
-    }
+    const channels = await Channel.find({}).select("slug custom_url");
 
-    // Find the matching nebula video for the youtube video
-    const nebulaVideo = nebulaVideos.find(
-      (video) =>
-        video.youtubeVideoObjectId?.toString() === youtubeVideo._id.toString()
-    );
+    // Create a channel entry for each channel using promise.allSettled
+    const channelPromises = youtubeIds.map(async (channel) => {
+      return new Promise<ChannelEntry>((resolve, reject) => {
+        try {
+          // 4.1
+          // Create a channel entry
+          const channelSlug = channel.slug;
+          const channelEntry: ChannelEntry = {
+            slug: channelSlug,
+            custom_url:
+              channels.find((c) => c.slug === channelSlug)?.custom_url || "",
+            youtubeId: channel.youtubeId,
+            matched: [],
+            not_matched: [],
+          };
 
-    // If there is a matching nebula video, add it to the channel entry as a matched video
-    if (nebulaVideo) {
-      channelEntry.matched.push({
-        id: youtubeVideo.youtubeVideoId,
-        slug: nebulaVideo.slug,
+          // 4.2
+          // Get all the youtube videos for the channel
+          const channelYoutubeVideos = youtubeVideos.filter(
+            (video) => video.channelSlug === channelSlug
+          );
+
+          // 4.3
+          // Get all the nebula videos for the channel
+          const channelNebulaVideos = nebulaVideos.filter(
+            (video) => video.channelSlug === channelSlug
+          );
+
+          // 4.4
+          // Create a matched video entry for each matched video
+          channelYoutubeVideos.forEach((youtubeVideo) => {
+            const matchedNebulaVideo = channelNebulaVideos.find(
+              (nebulaVideo) =>
+                nebulaVideo.youtubeVideoObjectId?.toString() ===
+                youtubeVideo._id.toString()
+            );
+
+            if (matchedNebulaVideo) {
+              channelEntry.matched.push({
+                id: youtubeVideo.youtubeVideoId,
+                slug: matchedNebulaVideo.slug,
+              });
+            } else {
+              // 4.5
+              // Add the youtube video id to the not matched list
+              channelEntry.not_matched.push(youtubeVideo.youtubeVideoId);
+            }
+          });
+
+          // 4.6
+          // Resolve the channel entry
+          resolve(channelEntry);
+        } catch (error) {
+          reject(error);
+        }
       });
-    } else {
-      // If there is no matching nebula video, add the youtube video id to the channel entry as not matched
-      channelEntry.not_matched.push(youtubeVideo.youtubeVideoId);
-    }
-  });
+    });
 
-  // Generate a new id and assign it to the lookup table
-  const id = uuidv4();
-  const table: LookupTable = {
-    generatedAt: new Date(),
-    channels: channelEntries,
-    id,
-  };
+    // 5.
+    // Wait for all the channel entries to be created
+    console.time("generateTable: Promise.allSettled");
+    const channelEntries = await Promise.allSettled(channelPromises)
+      .then((results) => {
+        return results.map((result) => {
+          if (result.status === "fulfilled") {
+            return result.value;
+          } else {
+            logger.error(`generateTable: promise error: ${result.reason}`);
+            return null;
+          }
+        });
+      })
+      .catch((error) => {
+        logger.error(`generateTable: Cleaning up channel entries: ${error}`);
+        throw error;
+      });
+    console.timeEnd("generateTable: Promise.allSettled");
 
-  // Write the lookup table to disk
-  logger.debug(`generateTable: Saving lookup table`);
-  await fs.promises.writeFile(
-    path.join(__dirname, "/lookup_table.json"),
-    JSON.stringify(table),
-    "utf-8"
-  );
+    // 6.
+    // Add the channel entries to the lookup table
+    channelEntries.forEach((channelEntry) => {
+      if (channelEntry) {
+        lookupTable.channels.push(channelEntry);
+      }
+    });
 
-  logger.info("generateTable: Lookup table generated");
-  // Return the lookup table
-  return table;
+    // 7.
+    // Check that the lookup table has been generated correctly
+    const totalMatched = lookupTable.channels.reduce(
+      (total, channel) => total + channel.matched.length,
+      0
+    );
+    const totalNotMatched = lookupTable.channels.reduce(
+      (total, channel) => total + channel.not_matched.length,
+      0
+    );
+    logger.debug(
+      `generateTable: Generated lookup table with ${totalMatched} matched and ${totalNotMatched} not matched`
+    );
+
+    // 8.
+    // Save the lookup table to the json file
+    logger.debug(`generateTable: Saving lookup table`);
+    await fs.promises.writeFile(
+      path.join(__dirname, "/lookup_table.json"),
+      JSON.stringify(lookupTable),
+      "utf-8"
+    );
+
+    console.timeEnd("generateTable");
+
+    // 9.
+    // Return the lookup table
+    return lookupTable;
+  } catch (error) {
+    logger.error(`generateTable: ${error}`);
+    throw error;
+  }
 };
 
 export default generateTable;

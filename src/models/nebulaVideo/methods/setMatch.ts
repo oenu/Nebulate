@@ -13,7 +13,7 @@ import type { YoutubeVideoType } from "../../youtubeVideo/youtubeVideo";
 const setMatch = (nebulaVideoSchema.methods.setMatch = async function (
   youtubeVideo: YoutubeVideoType,
   strength: number
-) {
+): Promise<void> {
   // Update the video with the matched youtube video
   await NebulaVideo.findOneAndUpdate(
     { _id: this._id },

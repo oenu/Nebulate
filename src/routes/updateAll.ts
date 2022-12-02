@@ -8,7 +8,9 @@ import updateAll from "../batch/updateAll";
 // Mongo Models
 import { Channel } from "../models/channel/channel";
 
-app.put("/", async (_req: Request, res: Response) => {
+app.put("/:deepUpdate?", async (req: Request, res: Response) => {
+  const deepUpdate = req.params.deepUpdate ? true : false;
+
   try {
     const channels = await Channel.find({}).select(
       "lastScrapedNebula lastScrapedYoutube lastMatched slug"
@@ -18,7 +20,7 @@ app.put("/", async (_req: Request, res: Response) => {
       res.status(204).send("No channels found to update");
     } else {
       logger.info(`UpdateAll: Updating ${channels.length} channels`);
-      updateAll();
+      updateAll(deepUpdate);
       res.status(200).send("Updating all channels...");
     }
   } catch (err) {

@@ -1,5 +1,5 @@
 // Register channel in DB
-import axios from "axios";
+// import axios from "axios";
 import logger from "../utils/logger";
 import { youtube } from "@googleapis/youtube";
 const yt = youtube("v3");
@@ -13,6 +13,7 @@ import videosFromYoutube from "../scrape/videosFromYoutube";
 
 // Mongo Models
 import { Channel } from "../models/channel/channel";
+import axiosRetry from "../utils/axiosRetry";
 
 /**
  * @function register
@@ -22,7 +23,7 @@ import { Channel } from "../models/channel/channel";
  * @throws {Error} - If the channel already exists in the DB or if the channel does not have a youtube upload id
  * @async
  */
-const register = async (channelSlug: string) => {
+const register = async (channelSlug: string): Promise<void> => {
   // Check if channel exists in DB
   try {
     if (await Channel.exists({ slug: channelSlug })) {
@@ -35,9 +36,9 @@ const register = async (channelSlug: string) => {
   }
 
   // Get channel from Nebula
-  const channel_nebula = await channelFromNebula(channelSlug);
+
   const { id, slug, title, description, type, zypeId, merch_collection } =
-    channel_nebula.data.details;
+    await channelFromNebula(channelSlug);
 
   // Get channel youtube id from youtube mapping
   const channelYtId = await idFromYoutube(channelSlug);
@@ -66,6 +67,8 @@ const register = async (channelSlug: string) => {
     zypeId,
     youtubeId: channelYtId,
     merch_collection,
+    youtubeTitle: channel_youtube.channelTitle,
+    custom_url: channel_youtube.custom_url,
     youtubeUploadId: channel_youtube.upload_playlist_id,
   });
 
@@ -87,21 +90,62 @@ const register = async (channelSlug: string) => {
  * @throws {Error} - If the channel does not exist in Nebula
  * @async
  */
-export const channelFromNebula = async (channelSlug: string) => {
+export const channelFromNebula = async (
+  channelSlug: string
+): Promise<{
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  type: string;
+  zypeId: string;
+  merch_collection: string;
+}> => {
   try {
     const url = `https://content.watchnebula.com/video/channels/${channelSlug}/`;
-    const response = await axios.get(url, {
-      data: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response;
+    const response = await axiosRetry.get(url);
+    // id, slug, title, description, type, zypeId, merch_collection;
+    const { id, slug, title, description, type, zypeId, merch_collection } =
+      response.data.details;
+
+    // Things required for the channel schema
+    const errors = [];
+    if (!id) errors.push("id");
+    if (!slug) errors.push("slug");
+    if (!title) errors.push("title");
+    if (!type) errors.push("type");
+
+    // Things not required, but nice to have
+    const warnings = [];
+    if (!description) warnings.push("description");
+    // if (!zypeId) warnings.push("zypeId");
+    // if (!merch_collection) warnings.push("merch_collection");
+
+    if (warnings.length > 0) {
+      logger.warn(
+        `channelFromNebula: Channel ${channelSlug} does not have ${warnings.join(
+          ", "
+        )}, continuing...`
+      );
+    }
+
+    if (errors.length > 0) {
+      throw new Error(
+        `channelFromNebula: ${errors.join(
+          ", "
+        )} is missing from channel ${channelSlug}`
+      );
+    }
+
+    return { id, slug, title, description, type, zypeId, merch_collection };
   } catch (error: any) {
     if (error?.code === "ERR_BAD_REQUEST") {
-      logger.error(`Register: ${channelSlug} not valid slug`);
-      throw new Error(`Register: ${channelSlug} not valid slug`);
+      logger.error(`channelFromNebula: ${channelSlug} not valid slug`);
+      throw new Error(`channelFromNebula: ${channelSlug} not valid slug`);
     }
-    logger.info(`Register: Channel ${channelSlug} does not exist in Nebula`);
+    logger.info(
+      `channelFromNebula: error getting channel ${channelSlug} from Nebula: ${error}`
+    );
     throw error;
   }
 };
@@ -133,24 +177,45 @@ export const idFromYoutube = async (
  * @function channelFromYoutube
  * @description Get channel data from Youtube
  * @param {string} channelYtId - The channel's youtube id
- * @returns {Promise<{upload_playlist_id, channelTitle, custom_url}>} - Resolves with spcific channel data
+ * @returns {Promise<{upload_playlist_id, channelTitle, custom_url}>} - Resolves with specific channel data
  * @throws {Error} - If the channel does not exist in Youtube or the lookup fails
  * @async
  */
-export const channelFromYoutube = async (channelYtId: string) => {
+export const channelFromYoutube = async (
+  channelYtId: string
+): Promise<{
+  upload_playlist_id: string;
+  channelTitle: string;
+  custom_url: string;
+}> => {
   const response = await yt.channels.list({
     id: [channelYtId],
     auth: process.env.YOUTUBE_API_KEY as string,
-    part: ["contentDetails"],
+    part: ["contentDetails, snippet"],
   });
   if (!response?.data?.items || !response?.data?.items[0])
     throw new Error(
-      "Register: Could not get upload playlist id from youtube API"
+      "channelFromYoutube: Could not get upload playlist id from youtube API"
     );
+
   const channel = response?.data?.items[0];
   const upload_playlist_id = channel.contentDetails?.relatedPlaylists?.uploads;
   const channelTitle = channel.snippet?.title;
   const custom_url = channel.snippet?.customUrl;
+
+  const errors = [];
+
+  if (!upload_playlist_id) errors.push("upload_playlist_id");
+  if (!channelTitle) errors.push("channelTitle");
+  if (!custom_url) errors.push("custom_url");
+
+  if (!upload_playlist_id || !channelTitle || !custom_url) {
+    throw new Error(
+      `channelFromYoutube: ${errors.join(
+        ", "
+      )} is missing from channel ${channelYtId}`
+    );
+  }
 
   return { upload_playlist_id, channelTitle, custom_url };
 };

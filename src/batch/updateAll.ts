@@ -15,7 +15,7 @@ const matchInterval = 7 * 24 * 60 * 60 * 1000; // 7 days
  * @see {@link scrapeNebula} {@link scrapeYoutube} {@link matchVideos}
  */
 
-const updateAll = async () => {
+const updateAll = async (deepUpdate?: boolean): Promise<void> => {
   console.time("updateAll");
   // Get all channels
   const channels = await Channel.find({}).select(
@@ -66,9 +66,17 @@ const updateAll = async () => {
     }
   });
 
-  // If no channels need to be scraped, return
-  if (channelsToScrape.length === 0) {
-    logger.info("No channels need to be scraped");
+  // If no channels need to be scraped, return (unless deepUpdate is true)
+  if (channelsToScrape.length === 0 && !deepUpdate) {
+    logger.info("updateAll: No channels need to be scraped, updating table...");
+    await generateTable().catch((err) => {
+      logger.error(`updateAll: ${err}`);
+    });
+    logger.info("updateAll: Table generated, uploading table...");
+    await uploadTable().catch((err) => {
+      logger.error("updateAll:", err);
+    });
+    logger.info("updateAll: Table uploaded!");
     console.timeEnd("updateAll");
     return;
   } else {
@@ -83,11 +91,12 @@ const updateAll = async () => {
 
   // For each channel, check if it needs to be updated
   for await (const [index, channel] of channels.entries()) {
-    let status = {
-      needsYoutubeScrape: false, // If the channel needs to be scraped from youtube
-      needsNebulaScrape: false, // If the channel needs to be scraped from nebula
-      needsMatch: false, // If the channel needs to be matched
-      needsDeepScrape: false, // If the channel needs to be scraped deeply (i.e. all videos)
+    const status = {
+      // If deepUpdate is true, update all channels regardless of lastScrapedNebula and lastScrapedYoutube
+      needsYoutubeScrape: deepUpdate || false, // If the channel needs to be scraped from youtube
+      needsNebulaScrape: deepUpdate || false, // If the channel needs to be scraped from nebula
+      needsMatch: deepUpdate || false, // If the channel needs to be matched
+      needsDeepScrape: deepUpdate || false, // If the channel needs to be scraped deeply (i.e. all videos)
     };
 
     // Work out what needs to be done
@@ -135,20 +144,19 @@ const updateAll = async () => {
     // Scrape youtube (if needed)
     if (status.needsYoutubeScrape || status.needsDeepScrape) {
       newYoutubeVideos =
-        (await channel.scrapeYoutube(status.needsDeepScrape)) || [];
+        (await channel.scrapeYoutube(!status.needsDeepScrape)) || [];
       addedYoutube += newYoutubeVideos.length;
     }
 
     // Scrape nebula (if needed)
-    let scrapedNebula = false; // Used for rate limiting
+
     if (
       status.needsNebulaScrape ||
       status.needsDeepScrape ||
       newYoutubeVideos.length > 0
     ) {
       newNebulaVideos =
-        (await channel.scrapeNebula(status.needsDeepScrape)) || [];
-      scrapedNebula = true;
+        (await channel.scrapeNebula(!status.needsDeepScrape)) || [];
       addedNebula += newNebulaVideos.length;
     }
 
@@ -160,12 +168,6 @@ const updateAll = async () => {
     ) {
       await channel.matchVideos();
       ranMatch++;
-    }
-
-    // If nebula was scraped, sleep for 20 seconds to avoid rate limiting
-    if (scrapedNebula) {
-      logger.info("UpdateAll: Sleeping for 20 seconds to avoid rate limiting");
-      await new Promise((resolve) => setTimeout(resolve, 20000));
     }
   }
 

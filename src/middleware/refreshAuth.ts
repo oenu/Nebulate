@@ -20,7 +20,7 @@ const refreshAuth = async (
   _req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   // Check if the token is undefined, if so, get a new token
   if (global.token === undefined) {
     logger.error("Auth: Global token undefined, fetching from Nebula");
@@ -34,7 +34,7 @@ const refreshAuth = async (
   if (decode === null) {
     logger.error("Auth: Token Missing, Fetching");
     await jwtFromNebula();
-    decode = jwt.decode(token) as JwtPayload;
+    decode = jwt.decode(global.token) as JwtPayload;
   }
 
   // Check if the token is still invalid, if so, send an error

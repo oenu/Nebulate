@@ -14,7 +14,7 @@ import keyFromNebula from "./key";
  * @async
  */
 
-const init = async () => {
+const init = async (): Promise<void> => {
   // Key Handler
   if (global.key === undefined) {
     try {

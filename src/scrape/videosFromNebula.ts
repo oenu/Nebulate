@@ -1,17 +1,15 @@
 // Scrapes api for a channel and returns an array of video objects
 import mongoose from "mongoose";
-import axios from "axios";
+// import axios from "axios";
 import logger from "../utils/logger";
 
 // Types
-import type {
-  NebulaVideoInterface,
-  // NebulaVideoType,
-} from "../models/nebulaVideo/nebulaVideo";
+import type { NebulaVideoInterface } from "../models/nebulaVideo/nebulaVideo";
 
 // Mongo Models
 import { Channel } from "../models/channel/channel";
 import { NebulaVideo as VideoModel } from "../models/nebulaVideo/nebulaVideo";
+import axiosRetry from "../utils/axiosRetry";
 
 /**
  * @function videosFromNebula
@@ -26,8 +24,12 @@ export const videosFromNebula = async (
   channelSlug: string,
   onlyScrapeNew: boolean,
   videoScrapeLimit?: number
-) => {
+): Promise<any[] | undefined> => {
+  // TODO: Fix this type, it might need to get changed in the other functions too
   try {
+    // If onlyScrapeNew is false, then we want to scrape all videos
+    if (!onlyScrapeNew) videoScrapeLimit = 2000;
+
     // Default scrape limit if none is provided
     if (!videoScrapeLimit) videoScrapeLimit = 20;
 
@@ -92,7 +94,7 @@ export const scrapeNebula = async (
   onlyScrapeNew: boolean
 ): Promise<NebulaVideoInterface[]> => {
   let urlBuffer = "";
-  let videoBuffer = [];
+  const videoBuffer = [];
 
   // Get the channels object id
   const channel = await Channel.findOne({ slug: channelSlug });
@@ -111,24 +113,10 @@ export const scrapeNebula = async (
     // Get the next page of videos
     let response: any;
     try {
-      response = await axios.get(requestUrl, {
-        data: {
-          Authorization: `Bearer ${global.token}`,
-        },
-      });
+      response = await axiosRetry.get(requestUrl);
     } catch (error: any) {
-      if (error.status === 429) {
-        // If the request was rate limited, wait and try again
-        logger.debug(
-          `scrapeNebula: Rate limited, waiting and trying again in 1 minute`
-        );
-        await new Promise((resolve) => setTimeout(resolve, 60000));
-        response = await axios.get(requestUrl, {
-          data: {
-            Authorization: `Bearer ${global.token}`,
-          },
-        });
-      }
+      logger.error(`scrapeNebula: ${error}`);
+      return [];
     }
 
     // Add the videos from the response to the buffer
@@ -281,6 +269,12 @@ export const removeNebulaDuplicates = async (
       return existingVideo.slug === video.slug;
     });
   });
+
+  logger.info(
+    `removeNebulaDuplicates: ${
+      nebula_videos.length - nonConflictingVideos.length
+    } duplicates removed`
+  );
 
   return nonConflictingVideos;
 };

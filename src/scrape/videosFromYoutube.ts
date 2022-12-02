@@ -30,6 +30,9 @@ const videosFromYoutube = async (
   videoScrapeLimit?: number
 ): Promise<any[]> => {
   try {
+    // If onlyScrapeNew is false, then we want to scrape all videos
+    if (onlyScrapeNew === false) videoScrapeLimit = 2000;
+
     // Default scrape limit if none is provided
     if (!videoScrapeLimit) videoScrapeLimit = 20;
 
@@ -111,7 +114,7 @@ export const scrapeYoutube = async (
   videoScrapeLimit: number,
   onlyScrapeNew: boolean
 ): Promise<YoutubeVideoInterface[]> => {
-  let videoBuffer: any = [];
+  const videoBuffer: any = [];
   let pagetokenBuffer = "";
 
   // Get the channels object id
@@ -248,6 +251,12 @@ export const removeYoutubeDuplicates = async (
       return existingVideo.youtubeVideoId === video.youtubeVideoId;
     });
   });
+
+  logger.info(
+    `removeYoutubeDuplicates: ${
+      youtube_videos.length - nonConflictingVideos.length
+    } duplicate videos removed`
+  );
   return nonConflictingVideos;
 };
 
@@ -261,7 +270,7 @@ export const removeYoutubeDuplicates = async (
  */
 export const youtubeVideosToDb = async (
   youtube_videos: YoutubeVideoInterface[]
-) => {
+): Promise<void> => {
   // Insert the nonConflictingVideos into the database
   const mongoResponse = await VideoModel.insertMany(youtube_videos);
   logger.debug(`YtScrape: ${youtube_videos.length} videos inserted`);

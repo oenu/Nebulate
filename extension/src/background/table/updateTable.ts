@@ -1,13 +1,13 @@
 import downloadTable from "./downloadTable";
 
-export const refreshTable = async (): Promise<void> => {
+export const updateTable = async (): Promise<void> => {
   try {
     console.debug("background.js: refreshing lookup table");
     const data = await downloadTable();
     if (data) {
       console.debug("background.js: received lookup table, saving to storage");
       await chrome.storage.local.set({ lookupTable: data });
-      await chrome.storage.local.set({ lastUpdated: new Date() });
+      await chrome.storage.local.set({ lastUpdate: new Date().toString() });
     }
   } catch (error) {
     console.debug(error);

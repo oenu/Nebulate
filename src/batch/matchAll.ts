@@ -1,6 +1,5 @@
 import { Channel } from "../models/channel/channel";
 import logger from "../utils/logger";
-const hourMatchInterval = 6;
 
 /**
  * @function matchAll
@@ -12,19 +11,12 @@ const hourMatchInterval = 6;
  * @see {@link matchVideos}
  */
 
-const matchAll = async () => {
+const matchAll = async (): Promise<void> => {
   logger.warn("matchAll: Matching videos");
   console.time("matchAll");
 
   // Get all channels that have videos and are outside of the hourMatchInterval
-  const channels = await Channel.find({
-    $or: [
-      { lastMatched: { $exists: false } },
-      {
-        lastMatched: { $lt: Date.now() - hourMatchInterval * 60 * 60 * 1000 },
-      },
-    ],
-  });
+  const channels = await Channel.find({});
   logger.debug("matchAll: Found " + channels.length + " channels, matching");
 
   // Iterate through each channel and match their videos

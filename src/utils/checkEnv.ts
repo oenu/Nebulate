@@ -1,8 +1,8 @@
 // Check all environment variables are set
 
-const checkEnv = () => {
+const checkEnv = (): void => {
   console.log("Checking environment variables...");
-  let missingEnv: string[] = [];
+  const missingEnv: string[] = [];
   if (process.env.NODE_ENV === undefined) {
     missingEnv.push("NODE_ENV");
   }

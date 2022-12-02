@@ -15,7 +15,7 @@ import {
  */
 const removeMatch = (nebulaVideoSchema.methods.removeMatch = async function (
   replacementVideo?: NebulaVideoType
-) {
+): Promise<void> {
   logger.warn(
     `Removing match for ${this.slug}, replacing with ${replacementVideo?.slug} for video ${replacementVideo?.title}`
   );

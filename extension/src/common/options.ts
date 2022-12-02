@@ -154,17 +154,17 @@ export const defaultOptions: optionUtilityType = {
     value: "#3EBBF3",
   },
   homeShow: {
-    title: "Highlight on Home Page",
+    title: "Highlight Thumbnails on Home Page",
     description: "Highlight YouTube thumbnails on the home page",
     value: true,
   },
   subscriptionsShow: {
-    title: "Subscriptions Page Highlighting",
+    title: "Highlight Thumbnails on Subscriptions Page",
     description: "Highlight videos on the subscriptions page",
     value: true,
   },
   videoShow: {
-    title: "Video Page Highlighting",
+    title: "Highlight Thumbnails on Video Page",
     description: "Highlight videos on the video page",
     value: true,
   },

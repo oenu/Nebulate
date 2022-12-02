@@ -77,6 +77,8 @@ export enum OptionId {
   GRADIENT_START = "gradientStart",
   // eslint-disable-next-line no-unused-vars
   GRADIENT_END = "gradientEnd",
+  // eslint-disable-next-line no-unused-vars
+  BUTTON_COLOR = "buttonColor",
 }
 
 type Link = {
@@ -304,17 +306,18 @@ function Options() {
 
     // Create a map to order the options
     const optionOrderMap: Record<OptionId, number> = {
-      [OptionId.GRADIENT_START]: 0,
-      [OptionId.GRADIENT_END]: 1,
-      [OptionId.HIGHLIGHT_VIDEO]: 2,
-      [OptionId.HIGHLIGHT_CHANNEL]: 3,
-      [OptionId.ADD_VIDEO_BUTTON]: 4,
-      [OptionId.ADD_CHANNEL_BUTTON]: 5,
-      [OptionId.BULK_COLOR]: 6,
-      [OptionId.SHOW_ON_HOME]: 7,
-      [OptionId.SHOW_ON_SUBSCRIPTIONS]: 8,
-      [OptionId.SHOW_ON_VIDEO]: 9,
-      [OptionId.OPEN_IN_NEW_TAB]: 10,
+      [OptionId.OPEN_IN_NEW_TAB]: 0,
+      [OptionId.GRADIENT_START]: 1,
+      [OptionId.GRADIENT_END]: 2,
+      [OptionId.HIGHLIGHT_VIDEO]: 3,
+      [OptionId.HIGHLIGHT_CHANNEL]: 4,
+      [OptionId.BUTTON_COLOR]: 5,
+      [OptionId.ADD_VIDEO_BUTTON]: 6,
+      [OptionId.ADD_CHANNEL_BUTTON]: 7,
+      [OptionId.BULK_COLOR]: 8,
+      [OptionId.SHOW_ON_HOME]: 9,
+      [OptionId.SHOW_ON_SUBSCRIPTIONS]: 10,
+      [OptionId.SHOW_ON_VIDEO]: 11,
     };
 
     // Sort the options by the order map
@@ -372,16 +375,6 @@ function Options() {
                     setStringOption(option.key, color);
                   }}
                 />
-
-                {/* Thumbnail image of a recommended video from youtube.com with a border and title styled to match
-                   .nebulate-matched #thumbnail {
-                    box-shadow: 0 0 0 4px ${options.bulkColor.value} !important;
-                    
-                   }
-                  .nebulate-matched #video-title {
-                      color: ${options.bulkColor.value} !important;
-                  }
-                  */}
                 <Stack>
                   <Image
                     src="http://placekitten.com/280/158"
@@ -475,6 +468,57 @@ function Options() {
         } else if (option.key === OptionId.GRADIENT_END) {
           // Skip the end color picker, we already did it above
           return null;
+        } else if (option.key === OptionId.BUTTON_COLOR) {
+          return (
+            <Card key={option.key}>
+              <Text fz={"lg"}> {option.title} </Text>
+              <Divider mt={"sm"} />
+              <Group position="center" spacing={40}>
+                <ColorPicker
+                  mt="sm"
+                  color={option.stringValue}
+                  swatches={[
+                    "#3EBBF3", // Default
+                    "#25262b", // Dark
+                    "#868e96", // Light
+                    "#fa5252", // Red
+                    "#e64980", // Pink
+                    "#be4bdb", // Purple
+                    "#7950f2", // Violet
+                    "#4c6ef5", // Indigo
+                    "#15aabf", // Cyan
+                    "#12b886", // Teal
+                    "#40c057", // Green
+                    "#82c91e", // Lime
+                    "#fab005", // Yellow
+                    "#fd7e14", // Orange
+                  ]}
+                  swatchesPerRow={7}
+                  onChangeEnd={(color: string): void => {
+                    setStringOption(option.key, color);
+                  }}
+                />
+                {/* Example of the nebula button (png that needs to be recolored) */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  // class="icon icon-tabler icon-tabler-rocket"
+                  width="54"
+                  height="54"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke={option.stringValue}
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3" />
+                  <path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3" />
+                  <circle cx="15" cy="9" r="1" />
+                </svg>
+              </Group>
+            </Card>
+          );
         } else {
           // Res of the string options
           return (
@@ -496,21 +540,26 @@ function Options() {
     });
 
     if (optionElements) {
-      // Add divider before bulk color picker (based on the order map)
-      optionElements.splice(
-        optionOrderMap[OptionId.BULK_COLOR],
-        0,
-        <Divider key="divider" />
-      );
+      // Divider after newTab
+      // Divider before button color, gradient start, bulkColor
+      const optionsWithDividers = optionElements.map((optionElement) => {
+        if (
+          optionElement?.key === OptionId.BUTTON_COLOR ||
+          optionElement?.key === OptionId.GRADIENT_START ||
+          optionElement?.key === OptionId.BULK_COLOR
+        ) {
+          return (
+            <>
+              <Divider />
+              {optionElement}
+            </>
+          );
+        } else {
+          return optionElement;
+        }
+      });
 
-      // Add divider before last option (newTab)
-      optionElements.splice(
-        optionElements.length - 1,
-        0,
-        <Divider key="divider2" />
-      );
-
-      return optionElements;
+      return optionsWithDividers;
     } else {
       return <Loader />;
     }

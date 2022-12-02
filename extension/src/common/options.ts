@@ -128,23 +128,26 @@ export const defaultOptions: optionUtilityType = {
   },
   videoGlow: {
     title: "Highlight Nebula video",
-    description: "Highlight a YouTube video when it is available on Nebula",
+    description:
+      "When watching a YouTube video that is available on Nebula, highlight the video with a glow",
     value: true,
   },
   channelGlow: {
     title: "Highlight Nebula Channel",
     description:
-      "Highlight a channel when watching one of their videos on YouTube",
+      "Highlight a Nebula channel with a glow when watching one of their videos on YouTube",
     value: true,
   },
   channelButton: {
     title: "Redirect to Nebula Channel Button",
-    description: "Add a button if the channel is on Nebula",
+    description:
+      "When watching a YouTube video from a Nebula channel, add a button to redirect to that channel on Nebula",
     value: true,
   },
   videoButton: {
     title: "Redirect to Nebula Video Button",
-    description: "Add a button to video player if on Nebula",
+    description:
+      "When watching a YouTube video that is on Nebula, add a button to redirect to that video on Nebula",
     value: true,
   },
   bulkColor: {
@@ -155,17 +158,20 @@ export const defaultOptions: optionUtilityType = {
   },
   homeShow: {
     title: "Highlight Thumbnails on Home Page",
-    description: "Highlight YouTube thumbnails on the home page",
+    description:
+      "When on your home page, highlight YouTube thumbnails for videos available on Nebula",
     value: true,
   },
   subscriptionsShow: {
     title: "Highlight Thumbnails on Subscriptions Page",
-    description: "Highlight videos on the subscriptions page",
+    description:
+      "When viewing your subscriptions, highlight YouTube thumbnails that are available on Nebula",
     value: true,
   },
   videoShow: {
     title: "Highlight Thumbnails on Video Page",
-    description: "Highlight videos on the video page",
+    description:
+      "When watching a video, highlight other videos on the page if they are available on Nebula",
     value: true,
   },
   gradientStart: {

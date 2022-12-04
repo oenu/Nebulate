@@ -28,7 +28,7 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
       box-shadow: 0 0 20px 15px  ${options.bulkColor.value} !important;
     } */
     .nebulate-matched#content {
-      box-shadow: -10px 0 40px ${options.bulkColor.value} !important;
+      box-shadow: 0 0 20px 15px  ${options.bulkColor.value} !important;
     }
     
     /* Video Title Color */
@@ -64,39 +64,62 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           // eslint-disable-next-line no-undef
           document.querySelectorAll("[nebulate-video-id]");
 
-        // Check each existing match to see if it's href is equal to its [nebulate-video-id] attribute
-        existingMatches.forEach((match) => {
-          // eslint-disable-next-line no-undef
-          const videoId = match.getAttribute("nebulate-video-id");
-          // eslint-disable-next-line no-undef
-          const videoHref = match.querySelector(
-            "a#thumbnail"
+        // Check every video that has been checked to see if it's href is equal to its [nebulate-video-id] attribute
+        // existingMatches.forEach((match) => {
+        const existingMatchPromises = Array.from(existingMatches).map(
+          async (match) => {
+            return new Promise<boolean>((resolve, reject) => {
+              // eslint-disable-next-line no-undef
+              const videoId = match.getAttribute("nebulate-video-id");
+              // eslint-disable-next-line no-undef
+              const videoHrefId = match
+                .querySelector(
+                  "a#thumbnail"
+                  // eslint-disable-next-line no-undef
+                )
+                ?.getAttribute("href")
+                ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
+
+              if (!videoId || !videoHrefId) {
+                reject("Video ID or Href ID not found");
+                return;
+              }
+
+              // Extract the video id from the href .match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0]
+
+              if (videoHrefId && videoHrefId !== videoId) {
+                // console.debug(
+                // "watchHomePage: Removing video attributes as href has changed",
+                // match
+                // );
+
+                // Remove all attributes and classes that were added by Nebulate
+                match.removeAttribute("nebulate-video-id");
+                match.classList.remove("nebulate-scraped");
+                match.classList.remove("nebulate-matched");
+                match.removeAttribute("nebulate-video-slug");
+                match.querySelector("nebulate-thumbnail-button")?.remove();
+                resolve(true); // Return true to indicate that the video was removed
+              } else {
+                resolve(false); // Return false to indicate that the video was not removed
+              }
+            });
+          }
+        );
+
+        await Promise.allSettled(existingMatchPromises).then((results) => {
+          // Debugging, check how many videos were removed
+          const resolvedPromises = results.filter(
+            (result) => result.status === "fulfilled"
             // eslint-disable-next-line no-undef
-          ) as HTMLAnchorElement;
-
-          // Extract the video id from the href .match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0]
-          const videoIdFromHref = videoHref.href.match(
-            /(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/
-          )?.[0];
-
-          if (videoHref && videoIdFromHref !== videoId) {
+          ) as PromiseFulfilledResult<boolean>[];
+          const removedVideos = resolvedPromises.filter(
+            (result) => result.value === true
+          );
+          if (removedVideos.length > 0) {
             console.debug(
-              "watchHomePage: Removing match with incorrect href",
-              match
+              `watchHomePage: Removed ${removedVideos.length} videos from home page`
             );
-
-            // Remove match styling and attributes
-            // eslint-disable-next-line no-undef
-            match.removeAttribute("nebulate-video-id");
-            // eslint-disable-next-line no-undef
-            match.classList.remove("nebulate-matched");
-
-            // Remove the svg from the match
-            // eslint-disable-next-line no-undef
-            const svg = match.querySelector("svg");
-            if (svg) {
-              svg.remove();
-            }
           }
         });
 
@@ -106,14 +129,6 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           "ytd-rich-grid-renderer div#content:has(a#thumbnail[href]):not(.nebulate-scraped)"
         );
         if (newVideos.length > 0) {
-          /** Issue: When the page is resized, elements can have their video changed which causes an unknown video to have the styling, class and button
-           * Solution: Add an id to the video that contains the youtube video id, if the id is different to the href of the video, remove the styling and class
-           * - Pro: Fast
-           * - Con: More complex
-           *
-           *
-           */
-
           // Get the videoIDs from the videos
           const videoIds = Array.from(newVideos)
             .map((video) => {
@@ -123,8 +138,7 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
                   "ytd-rich-grid-renderer div#content:has(a#thumbnail[href]):not(.nebulate-scraped) a#thumbnail[href]"
                 )
                 ?.getAttribute("href")
-                ?.split("v=")[1]
-                ?.split("&")[0];
+                ?.match(/(?<=[=/&])[a-zA-Z0-9_-]{11}(?=[=/&?#\n\r]|$)/)?.[0];
               if (href) return href;
             })
             .filter((href) => href !== undefined) as string[];
@@ -159,86 +173,122 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           });
 
           // Check the videos against the database
-          const checkedVideos = await checkTable(filteredVideoIds);
+          checkTable(filteredVideoIds).then((checkedVideos) => {
+            console.debug(
+              "Checked videos: ",
+              checkedVideos.length,
+              "adding css"
+            );
 
-          // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
-          console.debug("Checked videos: ", checkedVideos.length, "adding css");
+            // Use promises to format videos
+            const videoFormatPromises = checkedVideos.map((video) => {
+              new Promise((resolve, reject) => {
+                // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
+                // eslint-disable-next-line no-undef
+                const videoElement = document.querySelector(
+                  `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${video.videoId}'])`
+                  // eslint-disable-next-line no-undef
+                ) as HTMLElement;
+                if (videoElement) {
+                  // To allow us to check if the videoId has been changed, set the videoId as an attribute
+                  videoElement.setAttribute("nebulate-video-id", video.videoId);
 
-          // eslint-disable-next-line no-undef
-          checkedVideos.forEach((video) => {
-            // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${video.videoId}'])`
-              // eslint-disable-next-line no-undef
-            ) as HTMLElement;
-            if (videoElement) {
-              // If the video is matched, add the nebulate-matched attribute
-              if (video.matched) videoElement.classList.add("nebulate-matched");
-              if (video.matched)
-                videoElement.setAttribute("nebulate-video-id", video.videoId);
-              if (video.matched && video.slug)
-                videoElement.setAttribute("nebulate-video-slug", video?.slug);
-
-              // If the video is matched add a button to the menu
-              if (video.matched) {
-                if (video.slug) {
-                  const button_root_element =
-                    videoElement.querySelector("#avatar-link");
-                  if (button_root_element) {
-                    // eslint-disable-next-line no-undef
-                    const svg_button = createStyledSvg(
-                      options.buttonColor.value as string
-                      // eslint-disable-next-line no-undef
+                  // If the video is matched, add the nebulate-matched attribute
+                  if (video.matched)
+                    videoElement.classList.add("nebulate-matched");
+                  if (video.matched)
+                    videoElement.setAttribute(
+                      "nebulate-video-id",
+                      video.videoId
                     );
-                    svg_button.classList.add("nebulate-thumbnail-button");
+                  if (video.matched && video.slug)
+                    videoElement.setAttribute(
+                      "nebulate-video-slug",
+                      video?.slug
+                    );
 
-                    // button.innerHTML = "Open In Nebula";
-                    svg_button.onclick = (event): void => {
-                      console.log(event);
+                  // If the video is matched add a button to the thumbnail to open the video on Nebula
+                  if (video.matched) {
+                    if (video.slug) {
+                      const button_root_element =
+                        videoElement.querySelector("#avatar-link");
 
-                      event.stopPropagation();
-                      event.preventDefault();
-
-                      // Get the slug from the actual video element
-                      const elementPath = event.composedPath();
-                      const elementWithSlug = elementPath.find((element) => {
+                      const existing_button =
+                        button_root_element?.querySelector(
+                          "nebulate-thumbnail-button"
+                        );
+                      if (button_root_element && !existing_button) {
                         // eslint-disable-next-line no-undef
-                        if (element instanceof HTMLElement) {
-                          return element.getAttribute("nebulate-video-slug");
-                        }
-                        // eslint-disable-next-line no-undef
-                      }) as HTMLElement;
+                        const svg_button = createStyledSvg(
+                          options.buttonColor.value as string
+                          // eslint-disable-next-line no-undef
+                        );
+                        svg_button.classList.add("nebulate-thumbnail-button");
 
-                      // If the element with the slug is found, open the video
-                      if (elementWithSlug) {
-                        console.log(
-                          `Found element with slug: `,
-                          elementWithSlug
-                        );
-                        const slugValue = elementWithSlug.getAttribute(
-                          "nebulate-video-slug"
-                        );
-                        if (slugValue) {
-                          console.log(`Opening slug: `, slugValue);
+                        // button.innerHTML = "Open In Nebula";
+                        svg_button.onclick = (event): void => {
+                          console.log(event);
 
-                          chrome.runtime.sendMessage({
-                            type: Messages.VIDEO_REDIRECT,
-                            video: slugValue,
-                          });
-                        }
-                      } else {
-                        console.error(
-                          "watchHomePage: Thumbnail Redirect: No element with slug found in path, event: "
-                        );
-                        console.error(event);
+                          event.stopPropagation();
+                          event.preventDefault();
+
+                          // Get the slug from the actual video element
+                          const elementPath = event.composedPath();
+                          const elementWithSlug = elementPath.find(
+                            (element) => {
+                              // eslint-disable-next-line no-undef
+                              if (element instanceof HTMLElement) {
+                                return element.getAttribute(
+                                  "nebulate-video-slug"
+                                );
+                              }
+                            }
+                            // eslint-disable-next-line no-undef
+                          ) as HTMLElement;
+
+                          // If the element with the slug is found, open the video
+                          if (elementWithSlug) {
+                            console.log(
+                              `Found element with slug: `,
+                              elementWithSlug
+                            );
+                            const slugValue = elementWithSlug.getAttribute(
+                              "nebulate-video-slug"
+                            );
+                            if (slugValue) {
+                              console.log(`Opening slug: `, slugValue);
+
+                              chrome.runtime.sendMessage({
+                                type: Messages.VIDEO_REDIRECT,
+                                video: slugValue,
+                              });
+                            }
+                          } else {
+                            console.error(
+                              "watchHomePage: Thumbnail Redirect: No element with slug found in path, event: "
+                            );
+                            console.error(event);
+                            reject("No element with slug found in path");
+                          }
+                        };
+
+                        button_root_element.appendChild(svg_button);
                       }
-                    };
-
-                    button_root_element.appendChild(svg_button);
+                    }
                   }
+                } else {
+                  console.error(
+                    "watchHomePage: Thumbnail Redirect: No video element found"
+                  );
+                  reject("No video element found");
                 }
-              }
-            }
+              });
+            });
+
+            // Wait for all the videos to be formatted
+            Promise.allSettled(videoFormatPromises).then(() => {
+              console.debug("All videos formatted");
+            });
           });
         }
       }

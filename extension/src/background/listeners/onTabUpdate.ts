@@ -31,7 +31,7 @@ export type CheckedUrlResult = {
 
 export const urlChecker = async (url: string, tabId: number): Promise<void> => {
   if (url.includes("youtube.com/watch?v=")) {
-    return checkTable([url]).then((video) => {
+    return checkTable({ urls: [url] }).then((video) => {
       if (video[0]) {
         const message: CheckedUrlResult = {
           type: Messages.CHECK_URL_RESULT,

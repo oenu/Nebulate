@@ -2,6 +2,7 @@ import { checkTable } from "../../../common/checkTable";
 import { createStyledSvg } from "../../../common/createStyledSvg";
 import { CSS_IDS, Messages } from "../../../common/enums";
 import { getOptions } from "../../../common/options";
+import { LookupTable } from "../../../common/parent_types";
 
 // Style Home Page Videos
 
@@ -47,6 +48,12 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
     // eslint-disable-next-line no-undef
     document.head.appendChild(styleElement);
     console.log("watchHomePage: Watching home page");
+
+    // Get the lookup table for fast lookup
+    const localLookupTable = (await chrome.storage.local.get(
+      "lookupTable"
+    )) as { lookupTable: LookupTable };
+
     // Mutation observer to watch for new videos, doesn't actually get the videos, just triggers a css selector to get the videos
     // eslint-disable-next-line no-undef
     const observer = new MutationObserver(async (mutations) => {
@@ -65,7 +72,7 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           document.querySelectorAll("[nebulate-video-id]");
 
         // Check every video that has been checked to see if it's href is equal to its [nebulate-video-id] attribute
-        // existingMatches.forEach((match) => {
+
         const existingMatchPromises = Array.from(existingMatches).map(
           async (match) => {
             return new Promise<boolean>((resolve, reject) => {
@@ -107,21 +114,23 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           }
         );
 
-        await Promise.allSettled(existingMatchPromises).then((results) => {
-          // Debugging, check how many videos were removed
-          const resolvedPromises = results.filter(
-            (result) => result.status === "fulfilled"
-            // eslint-disable-next-line no-undef
-          ) as PromiseFulfilledResult<boolean>[];
-          const removedVideos = resolvedPromises.filter(
-            (result) => result.value === true
-          );
-          if (removedVideos.length > 0) {
-            console.debug(
-              `watchHomePage: Removed ${removedVideos.length} videos from home page`
+        if (existingMatchPromises.length > 0) {
+          await Promise.allSettled(existingMatchPromises).then((results) => {
+            // Debugging, check how many videos were removed
+            const resolvedPromises = results.filter(
+              (result) => result.status === "fulfilled"
+              // eslint-disable-next-line no-undef
+            ) as PromiseFulfilledResult<boolean>[];
+            const removedVideos = resolvedPromises.filter(
+              (result) => result.value === true
             );
-          }
-        });
+            if (removedVideos.length > 0) {
+              console.debug(
+                `watchHomePage: Removed ${removedVideos.length} videos from home page`
+              );
+            }
+          });
+        }
 
         // Get all the videos that haven't been checked yet
         // eslint-disable-next-line no-undef
@@ -172,123 +181,147 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
             video.classList.add("nebulate-scraped");
           });
 
-          // Check the videos against the database
-          checkTable(filteredVideoIds).then((checkedVideos) => {
-            console.debug(
-              "Checked videos: ",
-              checkedVideos.length,
-              "adding css"
-            );
+          // Use promises to format videos
+          const videoFormatPromises = filteredVideoIds.map((videoId) => {
+            return new Promise<void>((resolve, reject) => {
+              // Check if the video is in the database
+              checkTable({
+                urls: [videoId],
+                inputTable: localLookupTable.lookupTable,
+                checkKnown: false,
+              })
+                .then((checkedVideos) => {
+                  if (checkedVideos.length === 0) {
+                    // console.debug("Video not found in database");
+                    resolve();
+                    return;
+                  } else {
+                    // console.debug("Video found in database");
+                    const video = checkedVideos[0];
+                    if (!video) {
+                      reject("Video not found in database");
+                      return;
+                    }
+                    // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
+                    // eslint-disable-next-line no-undef
+                    const videoElement = document.querySelector(
+                      `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${video.videoId}'])`
+                      // eslint-disable-next-line no-undef
+                    ) as HTMLElement;
+                    if (videoElement) {
+                      // To allow us to check if the videoId has been changed, set the videoId as an attribute
+                      videoElement.setAttribute(
+                        "nebulate-video-id",
+                        video.videoId
+                      );
 
-            // Use promises to format videos
-            const videoFormatPromises = checkedVideos.map((video) => {
-              new Promise((resolve, reject) => {
-                // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
-                // eslint-disable-next-line no-undef
-                const videoElement = document.querySelector(
-                  `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${video.videoId}'])`
-                  // eslint-disable-next-line no-undef
-                ) as HTMLElement;
-                if (videoElement) {
-                  // To allow us to check if the videoId has been changed, set the videoId as an attribute
-                  videoElement.setAttribute("nebulate-video-id", video.videoId);
-
-                  // If the video is matched, add the nebulate-matched attribute
-                  if (video.matched)
-                    videoElement.classList.add("nebulate-matched");
-                  if (video.matched)
-                    videoElement.setAttribute(
-                      "nebulate-video-id",
-                      video.videoId
-                    );
-                  if (video.matched && video.slug)
-                    videoElement.setAttribute(
-                      "nebulate-video-slug",
-                      video?.slug
-                    );
-
-                  // If the video is matched add a button to the thumbnail to open the video on Nebula
-                  if (video.matched) {
-                    if (video.slug) {
-                      const button_root_element =
-                        videoElement.querySelector("#avatar-link");
-
-                      const existing_button =
-                        button_root_element?.querySelector(
-                          "nebulate-thumbnail-button"
+                      // If the video is matched, add the nebulate-matched attribute
+                      if (video.matched)
+                        videoElement.classList.add("nebulate-matched");
+                      if (video.matched)
+                        videoElement.setAttribute(
+                          "nebulate-video-id",
+                          video.videoId
                         );
-                      if (button_root_element && !existing_button) {
-                        // eslint-disable-next-line no-undef
-                        const svg_button = createStyledSvg(
-                          options.buttonColor.value as string
-                          // eslint-disable-next-line no-undef
+                      if (video.matched && video.slug)
+                        videoElement.setAttribute(
+                          "nebulate-video-slug",
+                          video?.slug
                         );
-                        svg_button.classList.add("nebulate-thumbnail-button");
 
-                        // button.innerHTML = "Open In Nebula";
-                        svg_button.onclick = (event): void => {
-                          console.log(event);
+                      // If the video is matched add a button to the thumbnail to open the video on Nebula
+                      if (video.matched) {
+                        if (video.slug) {
+                          const button_root_element =
+                            videoElement.querySelector("#avatar-link");
 
-                          event.stopPropagation();
-                          event.preventDefault();
-
-                          // Get the slug from the actual video element
-                          const elementPath = event.composedPath();
-                          const elementWithSlug = elementPath.find(
-                            (element) => {
+                          const existing_button =
+                            button_root_element?.querySelector(
+                              "nebulate-thumbnail-button"
+                            );
+                          if (button_root_element && !existing_button) {
+                            // eslint-disable-next-line no-undef
+                            const svg_button = createStyledSvg(
+                              options.buttonColor.value as string
                               // eslint-disable-next-line no-undef
-                              if (element instanceof HTMLElement) {
-                                return element.getAttribute(
+                            );
+                            svg_button.classList.add(
+                              "nebulate-thumbnail-button"
+                            );
+
+                            // button.innerHTML = "Open In Nebula";
+                            svg_button.onclick = (event): void => {
+                              console.log(event);
+
+                              event.stopPropagation();
+                              event.preventDefault();
+
+                              // Get the slug from the actual video element
+                              const elementPath = event.composedPath();
+                              const elementWithSlug = elementPath.find(
+                                (element) => {
+                                  // eslint-disable-next-line no-undef
+                                  if (element instanceof HTMLElement) {
+                                    return element.getAttribute(
+                                      "nebulate-video-slug"
+                                    );
+                                  }
+                                }
+                                // eslint-disable-next-line no-undef
+                              ) as HTMLElement;
+
+                              // If the element with the slug is found, open the video
+                              if (elementWithSlug) {
+                                console.log(
+                                  `Found element with slug: `,
+                                  elementWithSlug
+                                );
+                                const slugValue = elementWithSlug.getAttribute(
                                   "nebulate-video-slug"
                                 );
+                                if (slugValue) {
+                                  console.log(`Opening slug: `, slugValue);
+
+                                  chrome.runtime.sendMessage({
+                                    type: Messages.VIDEO_REDIRECT,
+                                    video: slugValue,
+                                  });
+                                }
+                              } else {
+                                console.error(
+                                  "watchHomePage: Thumbnail Redirect: No element with slug found in path, event: "
+                                );
+                                console.error(event);
+                                reject("No element with slug found in path");
                               }
-                            }
-                            // eslint-disable-next-line no-undef
-                          ) as HTMLElement;
+                            };
 
-                          // If the element with the slug is found, open the video
-                          if (elementWithSlug) {
-                            console.log(
-                              `Found element with slug: `,
-                              elementWithSlug
-                            );
-                            const slugValue = elementWithSlug.getAttribute(
-                              "nebulate-video-slug"
-                            );
-                            if (slugValue) {
-                              console.log(`Opening slug: `, slugValue);
-
-                              chrome.runtime.sendMessage({
-                                type: Messages.VIDEO_REDIRECT,
-                                video: slugValue,
-                              });
-                            }
-                          } else {
-                            console.error(
-                              "watchHomePage: Thumbnail Redirect: No element with slug found in path, event: "
-                            );
-                            console.error(event);
-                            reject("No element with slug found in path");
+                            button_root_element.appendChild(svg_button);
                           }
-                        };
-
-                        button_root_element.appendChild(svg_button);
+                        }
                       }
+                    } else {
+                      console.error(
+                        "watchHomePage: Thumbnail Redirect: No video element found"
+                      );
+                      reject("No video element found");
                     }
                   }
-                } else {
-                  console.error(
-                    "watchHomePage: Thumbnail Redirect: No video element found"
-                  );
-                  reject("No video element found");
-                }
-              });
+                })
+                .finally(() => {
+                  resolve();
+                });
             });
+          });
 
-            // Wait for all the videos to be formatted
-            Promise.allSettled(videoFormatPromises).then(() => {
-              console.debug("All videos formatted");
-            });
+          // Wait for all the videos to be formatted
+
+          console.time("watchHomePage: Thumbnail Redirect: Formatting videos");
+          Promise.allSettled(videoFormatPromises).then(() => {
+            console.debug("All videos formatted");
+            console.timeEnd(
+              "watchHomePage: Thumbnail Redirect: Formatting videos"
+            );
           });
         }
       }

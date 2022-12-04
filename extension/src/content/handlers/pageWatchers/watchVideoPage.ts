@@ -49,6 +49,10 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
     // eslint-disable-next-line no-undef
     document.head.appendChild(styleElement);
 
+    // const localLookupTable = (await chrome.storage.local.get(
+    //   "lookupTable"
+    // )) as { lookupTable: LookupTable };
+
     // Mutation observer to watch for new videos, doesn't actually get the videos, just triggers a css selector to get the videos
     // eslint-disable-next-line no-undef
     const observer = new MutationObserver(async (mutations) => {
@@ -115,7 +119,7 @@ export const watchVideoPage = async (): Promise<MutationObserver> => {
           });
 
           // Check the videos against the database
-          const checkedVideos = await checkTable(filteredVideoIds);
+          const checkedVideos = await checkTable({ urls: filteredVideoIds });
 
           // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
           console.debug(

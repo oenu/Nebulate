@@ -112,7 +112,7 @@ export const watchSubscriptionPage = async (): Promise<MutationObserver> => {
           });
 
           // Check the videos against the database
-          const checkedVideos = await checkTable(filteredVideoIds);
+          const checkedVideos = await checkTable({ urls: filteredVideoIds });
 
           // Style the videos (assigns the nebulate-matched attribute which is used by the css selector)
           console.debug(

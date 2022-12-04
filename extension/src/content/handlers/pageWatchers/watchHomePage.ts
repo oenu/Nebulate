@@ -72,7 +72,7 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           document.querySelectorAll("[nebulate-video-id]");
 
         // Check every video that has been checked to see if it's href is equal to its [nebulate-video-id] attribute
-        // existingMatches.forEach((match) => {
+
         const existingMatchPromises = Array.from(existingMatches).map(
           async (match) => {
             return new Promise<boolean>((resolve, reject) => {
@@ -114,21 +114,23 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           }
         );
 
-        await Promise.allSettled(existingMatchPromises).then((results) => {
-          // Debugging, check how many videos were removed
-          const resolvedPromises = results.filter(
-            (result) => result.status === "fulfilled"
-            // eslint-disable-next-line no-undef
-          ) as PromiseFulfilledResult<boolean>[];
-          const removedVideos = resolvedPromises.filter(
-            (result) => result.value === true
-          );
-          if (removedVideos.length > 0) {
-            console.debug(
-              `watchHomePage: Removed ${removedVideos.length} videos from home page`
+        if (existingMatchPromises.length > 0) {
+          await Promise.allSettled(existingMatchPromises).then((results) => {
+            // Debugging, check how many videos were removed
+            const resolvedPromises = results.filter(
+              (result) => result.status === "fulfilled"
+              // eslint-disable-next-line no-undef
+            ) as PromiseFulfilledResult<boolean>[];
+            const removedVideos = resolvedPromises.filter(
+              (result) => result.value === true
             );
-          }
-        });
+            if (removedVideos.length > 0) {
+              console.debug(
+                `watchHomePage: Removed ${removedVideos.length} videos from home page`
+              );
+            }
+          });
+        }
 
         // Get all the videos that haven't been checked yet
         // eslint-disable-next-line no-undef
@@ -313,6 +315,7 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
           });
 
           // Wait for all the videos to be formatted
+
           console.time("watchHomePage: Thumbnail Redirect: Formatting videos");
           Promise.allSettled(videoFormatPromises).then(() => {
             console.debug("All videos formatted");
@@ -320,8 +323,6 @@ export const watchHomePage = async (): Promise<MutationObserver> => {
               "watchHomePage: Thumbnail Redirect: Formatting videos"
             );
           });
-
-          // });
         }
       }
     });

@@ -175,6 +175,25 @@ export const watchPage = async (
     }
 
     if (mutations.some((mutation) => mutation.type === "childList")) {
+      // Detect if hover event (div#mouseover-overlay.style-scope.ytd-thumbnail) as target of mutation
+      const isHoverEvent = mutations.some((mutation) => {
+        // eslint-disable-next-line no-undef
+        return (
+          // eslint-disable-next-line no-undef
+          mutation.target instanceof HTMLElement &&
+          mutation.target.id === "mouseover-overlay" &&
+          mutation.target.classList.contains("style-scope") &&
+          mutation.target.classList.contains("ytd-thumbnail")
+        );
+      });
+
+      // If the mutation is a hover event, don't do anything
+      if (isHoverEvent) {
+        console.debug("Hover event detected, not doing anything...");
+        return;
+      }
+
+      // console.time("watchPage: Mutation");
       // Get the video elements that already have been scraped
       const existingMatches =
         // eslint-disable-next-line no-undef
@@ -208,7 +227,6 @@ export const watchPage = async (
           });
         }
       );
-
       if (existingMatchPromises.length > 0) {
         await Promise.allSettled(existingMatchPromises).then((results) => {
           // Debugging, check how many videos were removed
@@ -227,17 +245,14 @@ export const watchPage = async (
         });
       }
 
-      // Check if any buttons are on unmatched videos
+      // Remove buttons from videos that have been removed from the page
       // eslint-disable-next-line no-undef
       document
         .querySelectorAll(".nebulate-not-matched .nebulate-thumbnail-button")
         .forEach((button) => {
           console.log("Removing erroneous button");
-
           button.remove();
         });
-
-      // Remove the buttons from the unmatched videos
 
       // Get the videos that haven't been scraped yet
       const newVideoElements = watchPageOptions.selectors.newVideoElements();
@@ -433,10 +448,13 @@ export const watchPage = async (
         });
 
         // Wait for all the videos to be formatted
+        console.time("watchPage: Formatted videos");
         Promise.allSettled(videoFormatPromises).then(() => {
+          console.timeEnd("watchPage: Formatted videos");
           console.debug("watchPage: All videos formatted");
         });
       }
+      // console.timeEnd("watchPage: Mutation");
     }
   });
 

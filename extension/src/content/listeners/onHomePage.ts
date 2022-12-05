@@ -1,6 +1,6 @@
 import { Messages } from "../../common/enums";
 import { getOptions } from "../../common/options";
-import { watchPage } from "../handlers/pageWatchers/watchHomePage";
+import { watchPage } from "../handlers/pageWatchers/watchPage";
 // import watchHomePage from "../handlers/pageWatchers/watchHomePage";
 
 // eslint-disable-next-line no-undef

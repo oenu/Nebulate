@@ -1,6 +1,6 @@
 import { Messages } from "../../common/enums";
 import { getOptions } from "../../common/options";
-import { watchSubscriptionPage } from "../handlers/pageWatchers/watchSubscriptionPage";
+import { watchPage } from "../handlers/pageWatchers/watchPage";
 
 // eslint-disable-next-line no-undef
 let observer: MutationObserver | undefined;
@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener(
           return;
         } else {
           console.debug("onSubscriptionPage: Starting to observe page");
-          observer = await watchSubscriptionPage();
+          observer = await watchPage("subscriptions");
         }
       } else {
         console.debug("onSubscriptionPage: Not on subscription page");

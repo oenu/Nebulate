@@ -1,5 +1,5 @@
 console.log("onNewPage: Loaded listener");
-import { pageTypes } from "./../handlers/pageWatchers/pageOptions";
+import { pageTypes } from "../handlers/pageWatchers/pageOptions";
 // // on new page, detect which type of page it is and start watching it
 
 import { Messages } from "../../common/enums";

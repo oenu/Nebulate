@@ -3,7 +3,7 @@ import { Messages } from "./common/enums";
 import { Channel, Video } from "./common/types";
 console.log("content script loaded");
 // Listeners
-import "./content/listeners/onNewPage.ts";
+import "./content/listeners/onNewThumbnails.ts";
 
 // // Runs in the context of the youtube tab
 

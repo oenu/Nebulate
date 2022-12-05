@@ -1,6 +1,7 @@
 import { Messages } from "../../common/enums";
 import { getOptions } from "../../common/options";
-import watchHomePage from "../handlers/pageWatchers/watchHomePage";
+import { watchPage } from "../handlers/pageWatchers/watchHomePage";
+// import watchHomePage from "../handlers/pageWatchers/watchHomePage";
 
 // eslint-disable-next-line no-undef
 let observer: MutationObserver | undefined;
@@ -36,7 +37,8 @@ chrome.runtime.onMessage.addListener(
           return;
         } else {
           console.debug("onHomePage: Starting to observe page");
-          observer = await watchHomePage();
+          // observer = await watchHomePage();
+          observer = await watchPage("home");
         }
       } else {
         console.debug("onHomePage: Not on home page");

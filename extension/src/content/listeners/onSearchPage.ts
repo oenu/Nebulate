@@ -1,5 +1,3 @@
-// console.log(`onSubscriptionPage: Loaded onSubscriptionPage.ts`);
-
 // import { Messages } from "../../common/enums";
 // import { getOptions } from "../../common/options";
 // import { watchPage } from "../handlers/pageWatchers/watchPage";
@@ -7,7 +5,7 @@
 // // eslint-disable-next-line no-undef
 // let observer: MutationObserver | undefined;
 
-// // Listen for the background script to tell us we are on a subscription page
+// // Listen for the background script to tell us we are on a search page
 // chrome.runtime.onMessage.addListener(
 //   async (
 //     message
@@ -16,28 +14,28 @@
 //     if (message.type === Messages.URL_UPDATE) {
 //       const options = await getOptions();
 
-//       if (!options.subscriptionsShow.value) {
-//         console.log("onSubscriptionPage: Disabled");
+//       if (!options.searchShow.value) {
+//         console.log("onSearchPage: Disabled");
 //         return;
 //       }
 
-//       console.debug("onSubscriptionPage: Received message: ", message);
+//       console.debug("onSearchPage: Received message: ", message);
 //       // eslint-disable-next-line no-undef
-//       if (window.location.href.includes("youtube.com/feed/subscriptions")) {
-//         console.debug("onSubscriptionPage: On subscription page");
+//       if (window.location.href.includes("youtube.com/results")) {
+//         console.debug("onSearchPage: On search page");
 
 //         // Check if we are already observing the page
 //         if (observer) {
-//           console.debug("onSubscriptionPage: Already observing page");
+//           console.debug("onSearchPage: Already observing page");
 //           return;
 //         } else {
-//           console.debug("onSubscriptionPage: Starting to observe page");
-//           observer = await watchPage("subscriptions");
+//           console.debug("onSearchPage: Starting to observe page");
+//           observer = await watchPage("search");
 //         }
 //       } else {
-//         console.debug("onSubscriptionPage: Not on subscription page");
+//         console.debug("onSearchPage: Not on search page");
 //         if (observer) {
-//           console.debug("onSubscriptionPage: Stopping observer");
+//           console.debug("onSearchPage: Stopping observer");
 //           observer.disconnect();
 //           observer = undefined;
 //         }

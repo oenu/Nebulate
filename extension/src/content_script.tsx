@@ -1,12 +1,9 @@
 // import { urlChanged } from "./content/page/update";
 import { Messages } from "./common/enums";
 import { Channel, Video } from "./common/types";
-
+console.log("content script loaded");
 // Listeners
-import "./content/listeners/onNewVideo";
-import "./content/listeners/onSubscriptionPage";
-import "./content/listeners/onVideoPage";
-import "./content/listeners/onHomePage";
+import "./content/listeners/onNewPage.ts";
 
 // // Runs in the context of the youtube tab
 

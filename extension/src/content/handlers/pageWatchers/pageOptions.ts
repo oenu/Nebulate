@@ -33,7 +33,7 @@ export const constructWatchPageOptions = async (
   const options = await getOptions();
 
   switch (pageType) {
-    case pageTypes.home:
+    case pageTypes.home: {
       // Only match the home page exactly (no query params): https://www.youtube.com/ regex: ^https://www.youtube.com/$
 
       return {
@@ -105,7 +105,8 @@ export const constructWatchPageOptions = async (
           },
         },
       };
-    case pageTypes.subscriptions:
+    }
+    case pageTypes.subscriptions: {
       return {
         pageType: pageTypes.subscriptions,
         styles: [
@@ -167,14 +168,151 @@ export const constructWatchPageOptions = async (
             if (videoLink) {
               // eslint-disable-next-line no-undef
               return videoLink as HTMLElement;
-              // eslint-disable-next-line no-undef
             } else {
               throw new Error("SubsPage: No thumbnail found for root element");
             }
           },
         },
       };
-
+    }
+    case pageTypes.video: {
+      return {
+        pageType: pageTypes.video,
+        styles: [
+          `.nebulate-matched #thumbnail {
+                box-shadow: 0px 0px 20px 10px ${options.bulkColor.value} !important;
+                borderRadius: 4px !important;
+              }`,
+          `.nebulate-matched #video-title {
+                color: ${options.bulkColor.value} !important;
+              }`,
+        ],
+        urlRegex: /^https:\/\/www.youtube.com\/watch\?v=/,
+        selectors: {
+          // eslint-disable-next-line no-undef
+          videoElements: (): HTMLElement[] => {
+            return Array.from(
+              // eslint-disable-next-line no-undef
+              document.querySelectorAll(
+                "div#contents ytd-compact-video-renderer:has(a[href])"
+              )
+            );
+          },
+          // eslint-disable-next-line no-undef
+          newVideoElements: (): HTMLElement[] => {
+            return Array.from(
+              // eslint-disable-next-line no-undef
+              document.querySelectorAll(
+                "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped)"
+              )
+            );
+          },
+          hrefFromRootElement: (videoElement): string | null => {
+            const videoLink = videoElement.querySelector("a[href]");
+            if (videoLink) {
+              return videoLink.getAttribute("href");
+            } else {
+              throw new Error(
+                "VideoPage: Thumbnail Redirect: No video link found"
+              );
+            }
+          },
+          // eslint-disable-next-line no-undef
+          videoElementFromId: (videoId): HTMLElement => {
+            // eslint-disable-next-line no-undef
+            const videoElement = document.querySelector(
+              `ytd-compact-video-renderer:has(a#thumbnail[href*="${videoId}"])`
+            );
+            if (videoElement) {
+              // eslint-disable-next-line no-undef
+              return videoElement as HTMLElement;
+            } else {
+              throw new Error("VideoPage: No video element found for videoId");
+            }
+          },
+          // eslint-disable-next-line no-undef
+          thumbnailFromRootElement: (videoElement): HTMLElement => {
+            const videoLink = videoElement.querySelector("a[href]");
+            if (videoLink) {
+              // eslint-disable-next-line no-undef
+              return videoLink as HTMLElement;
+            } else {
+              throw new Error("VideoPage: No thumbnail found for root element");
+            }
+          },
+        },
+      };
+    }
+    case pageTypes.search: {
+      return {
+        pageType: pageTypes.search,
+        styles: [
+          `.nebulate-matched #thumbnail {
+                box-shadow: 0px 0px 20px 10px ${options.bulkColor.value} !important;
+                borderRadius: 4px !important;
+              }`,
+          `.nebulate-matched #video-title {
+                color: ${options.bulkColor.value} !important;
+              }`,
+        ],
+        urlRegex: /^https:\/\/www.youtube.com\/results\?search_query=/,
+        selectors: {
+          // eslint-disable-next-line no-undef
+          videoElements: (): HTMLElement[] => {
+            return Array.from(
+              // eslint-disable-next-line no-undef
+              document.querySelectorAll(
+                "ytd-search ytd-video-renderer:has(a#thumbnail[href])"
+              )
+            );
+          },
+          // eslint-disable-next-line no-undef
+          newVideoElements: (): HTMLElement[] => {
+            return Array.from(
+              // eslint-disable-next-line no-undef
+              document.querySelectorAll(
+                "ytd-search ytd-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped)"
+              )
+            );
+          },
+          hrefFromRootElement: (videoElement): string | null => {
+            const videoLink = videoElement.querySelector("a#thumbnail[href]");
+            if (videoLink) {
+              return videoLink.getAttribute("href");
+            } else {
+              throw new Error(
+                "SearchPage: Thumbnail Redirect: No video link found"
+              );
+            }
+          },
+          // eslint-disable-next-line no-undef
+          videoElementFromId: (videoId): HTMLElement => {
+            // eslint-disable-next-line no-undef
+            const videoElement = document.querySelector(
+              `ytd-video-renderer:has(a#thumbnail[href*="${videoId}"])`
+            );
+            if (videoElement) {
+              // eslint-disable-next-line no-undef
+              return videoElement as HTMLElement;
+            } else {
+              throw new Error("SearchPage: No video element found for videoId");
+            }
+          },
+          // eslint-disable-next-line no-undef
+          thumbnailFromRootElement: (videoElement): HTMLElement => {
+            const videoLink = videoElement.querySelector("a#thumbnail[href]");
+            if (videoLink) {
+              // eslint-disable-next-line no-undef
+              return videoLink as HTMLElement;
+            } else {
+              throw new Error(
+                "SearchPage: No thumbnail found for root element"
+              );
+            }
+          },
+        },
+      };
+    }
     default:
       throw new Error("Page type not supported");
   }

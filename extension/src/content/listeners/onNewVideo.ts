@@ -1,27 +1,28 @@
 import { Video } from "../../common/types";
 import { CheckedUrlResult } from "../../background/listeners/onTabUpdate";
 import { Messages } from "../../common/enums";
-import {
-  addChannelButton,
-  checkChannelButton,
-  removeChannelButton,
-} from "../handlers/interface/channelButton";
-import {
-  addChannelStyle,
-  checkChannelStyle,
-  removeChannelStyle,
-} from "../handlers/interface/channelStyle";
-import {
-  addVideoButton,
-  checkVideoButton,
-  removeVideoButton,
-} from "../handlers/interface/videoButton";
-import {
-  addVideoStyle,
-  checkVideoStyle,
-  removeVideoStyle,
-} from "../handlers/interface/videoStyle";
+
 import { getOptions } from "../../common/options";
+import {
+  checkChannelButton,
+  addChannelButton,
+  removeChannelButton,
+} from "../handlers/interface/videoPage/channelButton";
+import {
+  checkChannelStyle,
+  addChannelStyle,
+  removeChannelStyle,
+} from "../handlers/interface/videoPage/channelStyle";
+import {
+  checkVideoButton,
+  addVideoButton,
+  removeVideoButton,
+} from "../handlers/interface/videoPage/videoButton";
+import {
+  checkVideoStyle,
+  addVideoStyle,
+  removeVideoStyle,
+} from "../handlers/interface/videoPage/videoStyle";
 
 let localVideo: Video;
 

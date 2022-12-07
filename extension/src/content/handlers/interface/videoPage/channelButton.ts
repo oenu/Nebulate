@@ -1,8 +1,8 @@
-import { createStyledSvg } from "./../../../common/createStyledSvg";
-import { BUTTON_IDS, Messages } from "../../../common/enums";
-import { Channel, ChannelRedirectMessage } from "../../../common/types";
+import { createStyledSvg } from "../../../../common/createStyledSvg";
+import { BUTTON_IDS, Messages } from "../../../../common/enums";
+import { Channel, ChannelRedirectMessage } from "../../../../common/types";
 
-import { getOptions } from "../../../common/options";
+import { getOptions } from "../../../../common/options";
 
 export const addChannelButton = async (channel: Channel): Promise<void> => {
   try {

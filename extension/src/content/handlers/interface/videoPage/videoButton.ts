@@ -1,7 +1,7 @@
-import { createStyledSvg } from "../../../common/createStyledSvg";
-import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../../common/enums";
-import { getOptions } from "../../../common/options";
-import { Video, VideoRedirectMessage } from "../../../common/types";
+import { createStyledSvg } from "../../../../common/createStyledSvg";
+import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../../../common/enums";
+import { getOptions } from "../../../../common/options";
+import { Video, VideoRedirectMessage } from "../../../../common/types";
 
 export const addVideoButton = async (video: Video): Promise<void> => {
   try {

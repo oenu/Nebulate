@@ -1,9 +1,8 @@
 // Adds styling to the active video if it is on Nebula
 
-import { CSS_IDS } from "../../../common/enums";
-import { getOptions } from "../../../common/options";
-// import { getOptions } from "../../../common/options";
-import { Video } from "../../../common/types";
+import { CSS_IDS } from "../../../../common/enums";
+import { getOptions } from "../../../../common/options";
+import { Video } from "../../../../common/types";
 
 // TODO: Add video identifier to css selectors to avoid conflicts
 export const addVideoStyle = async (video: Video): Promise<void> => {

@@ -1,8 +1,8 @@
 // Adds styling to the active channel if it is on Nebula
 
-import { CSS_IDS } from "../../../common/enums";
-import { getOptions } from "../../../common/options";
-import { Channel } from "../../../common/types";
+import { CSS_IDS } from "../../../../common/enums";
+import { getOptions } from "../../../../common/options";
+import { Channel } from "../../../../common/types";
 
 // TODO: Add channel identifier to css selectors to avoid conflicts - requires updating all channels to have custom_url property in lookup table
 export const addChannelStyle = async (channel: Channel): Promise<void> => {

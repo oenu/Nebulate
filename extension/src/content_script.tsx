@@ -4,6 +4,7 @@ import { Channel, Video } from "./common/types";
 console.log("content script loaded");
 // Listeners
 import "./content/listeners/onNewThumbnails.ts";
+import "./content/listeners/onNewVideo.ts";
 
 // // Runs in the context of the youtube tab
 

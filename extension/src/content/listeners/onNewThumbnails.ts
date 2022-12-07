@@ -39,7 +39,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
     else if (
       // eslint-disable-next-line no-undef
       window.location.href.match(
-        /^https:\/\/www\.youtube\.com\/(user|channel|c|@)\//
+        /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+\/featured|@[a-zA-Z0-9]+\/videos|@[a-zA-Z0-9]+|c\/[a-zA-Z0-9]+|user\/[a-zA-Z0-9]+)$/
       )
     ) {
       console.debug("onNewPage: Detected channel page");

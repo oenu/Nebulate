@@ -12,7 +12,7 @@ export const addVideoStyle = async (video: Video): Promise<void> => {
   // Check if adding video style is enabled
   const options = await getOptions();
 
-  if (!options.videoGlow.value) {
+  if (!options.highlightVideo.value) {
     throw new Error("Options are set to not show on video page");
   }
 

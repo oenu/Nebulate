@@ -1,7 +1,7 @@
 import { createStyledSvg } from "./../../../common/createStyledSvg";
 import { BUTTON_IDS, Messages } from "../../../common/enums";
-import { Channel } from "../../../common/types";
-import { ChannelRedirectMessage } from "../../../content_script";
+import { Channel, ChannelRedirectMessage } from "../../../common/types";
+
 import { getOptions } from "../../../common/options";
 
 export const addChannelButton = async (channel: Channel): Promise<void> => {
@@ -17,7 +17,7 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
     const options = await getOptions();
 
     // Check if the channel button is enabled
-    if (!options.channelButton.value) {
+    if (!options.addChannelButton.value) {
       console.debug("addChannelButton: Channel button is disabled");
       return;
     }

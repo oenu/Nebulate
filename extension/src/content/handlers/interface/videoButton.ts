@@ -1,15 +1,14 @@
 import { createStyledSvg } from "../../../common/createStyledSvg";
 import { BUTTON_IDS, CSS_CLASSES, Messages } from "../../../common/enums";
 import { getOptions } from "../../../common/options";
-import { Video } from "../../../common/types";
-import { VideoRedirectMessage } from "../../../content_script";
+import { Video, VideoRedirectMessage } from "../../../common/types";
 
 export const addVideoButton = async (video: Video): Promise<void> => {
   try {
     const options = await getOptions();
 
     // Check if the channel button is enabled
-    if (!options.videoButton.value) {
+    if (!options.addVideoButton.value) {
       console.debug("addVideoButton: Video button is disabled");
       return;
     }

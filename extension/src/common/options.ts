@@ -1,4 +1,4 @@
-import { OptionId } from "./../options";
+// import { OptionId } from "./../options";
 
 // First time setup
 chrome.storage.local.get("options").then((result) => {
@@ -110,9 +110,36 @@ chrome.storage.local.get("options").then((result) => {
   }
 });
 
+// Create a type for the options
+const optionList = [
+  // Active Video
+  "highlightVideo",
+  "addVideoButton",
+
+  // Active Channel
+  "highlightChannel",
+  "addChannelButton",
+
+  // Channel and Video
+  "buttonColor",
+  "gradientStart",
+  "gradientEnd",
+
+  // Thumbnail Pages
+  "thumbnailColor",
+  "homePageThumbnails",
+  "subPageThumbnails",
+  "videoPageThumbnails",
+  "channelPageThumbnails",
+  "searchPageThumbnails",
+
+  // Behavior
+  "preferNewTab",
+] as const;
+
 export type optionUtilityType = {
   // eslint-disable-next-line no-unused-vars
-  [key in OptionId]: {
+  [key in typeof optionList[number]]: {
     title: string;
     description: string;
     value: string | boolean;
@@ -121,54 +148,54 @@ export type optionUtilityType = {
 
 // Create a keyed object of options
 export const defaultOptions: optionUtilityType = {
-  newTab: {
+  preferNewTab: {
     title: "Open links in new tab",
     description: "Open links in a new tab instead of the current tab",
     value: false,
   },
-  videoGlow: {
+  highlightVideo: {
     title: "Highlight Nebula video",
     description:
       "When watching a YouTube video that is available on Nebula, highlight the video with a glow",
     value: true,
   },
-  channelGlow: {
+  highlightChannel: {
     title: "Highlight Nebula Channel",
     description:
       "Highlight a Nebula channel with a glow when watching one of their videos on YouTube",
     value: true,
   },
-  channelButton: {
+  addChannelButton: {
     title: "Redirect to Nebula Channel Button",
     description:
       "When watching a YouTube video from a Nebula channel, add a button to redirect to that channel on Nebula",
     value: true,
   },
-  videoButton: {
+  addVideoButton: {
     title: "Redirect to Nebula Video Button",
     description:
       "When watching a YouTube video that is on Nebula, add a button to redirect to that video on Nebula",
     value: true,
   },
-  bulkColor: {
+  thumbnailColor: {
     title: "Thumbnail Highlight Color",
     description:
       "Color to highlight thumbnails with when videos are available on Nebula",
     value: "#3EBBF3",
   },
-  homeShow: {
+  homePageThumbnails: {
     title: "Highlight Thumbnails on Home Page",
     description:
       "When on your home page, highlight YouTube thumbnails for videos available on Nebula",
     value: true,
   },
-  subscriptionsShow: {
+  subPageThumbnails: {
     title: "Highlight Thumbnails on Subscriptions Page",
     description:
       "When viewing your subscriptions, highlight YouTube thumbnails that are available on Nebula",
     value: true,
   },
-  videoShow: {
+  videoPageThumbnails: {
     title: "Highlight Thumbnails on Video Page",
     description:
       "When watching a video, highlight other videos on the page if they are available on Nebula",
@@ -189,7 +216,21 @@ export const defaultOptions: optionUtilityType = {
     description: "Color of the Nebula buttons",
     value: "#3EBBF3",
   },
+  channelPageThumbnails: {
+    title: "Highlight Thumbnails on Channel Page",
+    description:
+      "When viewing a channel, highlight YouTube thumbnails that are available on Nebula",
+    value: true,
+  },
+  searchPageThumbnails: {
+    title: "Highlight Thumbnails on Search Page",
+    description:
+      "When searching, highlight YouTube thumbnails that are available on Nebula",
+    value: true,
+  },
 } as const;
+
+export type OptionId = keyof typeof defaultOptions;
 
 export const getOptions = (): Promise<optionUtilityType> => {
   return new Promise((resolve) => {

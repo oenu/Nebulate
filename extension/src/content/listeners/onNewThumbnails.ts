@@ -1,11 +1,10 @@
 console.log("onNewPage: Loaded listener");
 import { pageTypes } from "../handlers/pageWatchers/pageOptions";
-// // on new page, detect which type of page it is and start watching it
+// on new page, detect which type of page it is and start watching it
 
 import { Messages } from "../../common/enums";
 import { getOptions } from "../../common/options";
 import { watchPage } from "../handlers/pageWatchers/watchPage";
-// import { watchPage } from "../handlers/pageWatchers/watchPage";
 
 let observer:
   | {
@@ -16,7 +15,7 @@ let observer:
   | undefined;
 
 // Listen for the background script to tell us a new page has loaded
-chrome.runtime.onMessage.addListener(async (message) => {
+export const thing = chrome.runtime.onMessage.addListener(async (message) => {
   if (message.type === Messages.URL_UPDATE) {
     // Detect which type of page it is and start watching it
 
@@ -29,7 +28,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
     if (window.location.href === "https://www.youtube.com/") {
       console.debug("onNewPage: Detected home page");
       page = "home";
-      if (!options.homeShow.value) {
+      if (!options.homePageThumbnails.value) {
         console.log("homePage: Options are set to not show on home page");
         return;
       }
@@ -44,13 +43,13 @@ chrome.runtime.onMessage.addListener(async (message) => {
     ) {
       console.debug("onNewPage: Detected channel page");
       page = "channel";
-      // if (!options.channelShow.value) {
-      // console.log("channelPage: Options are set to not show on channel page");
-      // return;
-      // } else {
-      await checkObserver(observer, page);
+      if (!options.channelPageThumbnails.value) {
+        console.log("channelPage: Options are set to not show on channel page");
+        return;
+      } else {
+        await checkObserver(observer, page);
+      }
     }
-    // }
     // Video
     else if (
       // eslint-disable-next-line no-undef
@@ -58,12 +57,12 @@ chrome.runtime.onMessage.addListener(async (message) => {
     ) {
       console.debug("onNewPage: Detected video page");
       page = "video";
-      // if (!options.videoShow.value) {
-      // console.log("videoPage: Options are set to not show on video page");
-      // return;
-      // } else {
-      await checkObserver(observer, page);
-      // }
+      if (!options.videoPageThumbnails.value) {
+        console.log("videoPage: Options are set to not show on video page");
+        return;
+      } else {
+        await checkObserver(observer, page);
+      }
     }
     // Search
     else if (
@@ -74,12 +73,12 @@ chrome.runtime.onMessage.addListener(async (message) => {
     ) {
       console.debug("onNewPage: Detected search page");
       page = "search";
-      // if (!options.searchShow.value) {
-      // console.log("searchPage: Options are set to not show on search page");
-      // return;
-      // } else {
-      await checkObserver(observer, page);
-      // }
+      if (!options.searchPageThumbnails.value) {
+        console.log("searchPage: Options are set to not show on search page");
+        return;
+      } else {
+        await checkObserver(observer, page);
+      }
     }
     // Subscriptions
     else if (
@@ -90,7 +89,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
     ) {
       console.debug("onNewPage: Detected subscriptions page");
       page = "subscriptions";
-      if (!options.subscriptionsShow.value) {
+      if (!options.subPageThumbnails.value) {
         console.log(
           "subscriptionsPage: Options are set to not show on subscriptions page"
         );
@@ -104,35 +103,31 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
     console.log("onNewPage: Detected page type: ", page);
     console.log("onNewPage: observer", observer);
-    // Check if options are set to show on this page
 
-    // Convert page to pageOptions
-
-    // }
     console.debug(`onNewPage: Received message: `, message);
 
     // Check if we are already observing the page
-    //   if (observer) {
-    //     if (observer.pageType === page) {
-    //       console.debug(`onNewPage: Already observing ${page} page`);
-    //       return;
-    //     } else {
-    //       console.debug(
-    //         `onNewPage: Stopping observer for ${observer.pageType} page`
-    //       );
-    //       observer.MutationObserver.disconnect();
-    //       observer = {
-    //         MutationObserver: await watchPage(page),
-    //         pageType: page,
-    //       };
-    //     }
-    //   } else {
-    //     console.debug(`onNewPage: Starting to observe ${page} page`);
-    //     observer = {
-    //       MutationObserver: await watchPage(page),
-    //       pageType: page,
-    //     };
-    //   }
+    if (observer) {
+      if (observer.pageType === page) {
+        console.debug(`onNewPage: Already observing ${page} page`);
+        return;
+      } else {
+        console.debug(
+          `onNewPage: Stopping observer for ${observer.pageType} page`
+        );
+        observer.MutationObserver.disconnect();
+        observer = {
+          MutationObserver: await watchPage(page),
+          pageType: page,
+        };
+      }
+    } else {
+      console.debug(`onNewPage: Starting to observe ${page} page`);
+      observer = {
+        MutationObserver: await watchPage(page),
+        pageType: page,
+      };
+    }
   }
 });
 

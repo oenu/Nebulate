@@ -10,7 +10,7 @@ export const pageTypes = {
 
 // A set of options that can be used to configure the script to match on many different pages (using the above home script as an example)
 export type watchPageOptions = {
-  pageType: typeof pageTypes[keyof typeof pageTypes];
+  pageType: typeof pageTypes[keyof typeof pageTypes]; // The type of page this options object is for
   styles: string[]; // An array of styles to apply to the page
   urlRegex: RegExp; // A regex to match the url
   selectors: {
@@ -40,12 +40,12 @@ export const constructWatchPageOptions = async (
         pageType: pageTypes.home,
         styles: [
           `.nebulate-matched #thumbnail {
-            box-shadow: 0px 0px 20px 10px ${options.bulkColor.value} !important;
+            box-shadow: 0px 0px 20px 10px ${options.thumbnailColor.value} !important;
             clip-path: inset(-100% -100% 0 -100%);
           }`,
 
           `.nebulate-matched #video-title {
-             color: ${options.bulkColor.value} !important;
+             color: ${options.thumbnailColor.value} !important;
             }`,
         ],
         urlRegex: /^https:\/\/www.youtube.com\/$/,
@@ -111,11 +111,11 @@ export const constructWatchPageOptions = async (
         pageType: pageTypes.subscriptions,
         styles: [
           `.nebulate-matched #thumbnail {
-               box-shadow: 0px 0px 20px 10px ${options.bulkColor.value} !important;
+               box-shadow: 0px 0px 20px 10px ${options.thumbnailColor.value} !important;
               clip-path: inset(-100% 0 -100% 0);
             }`,
           `.nebulate-matched #video-title {
-              color: ${options.bulkColor.value} !important;
+              color: ${options.thumbnailColor.value} !important;
             }`,
         ],
         urlRegex: /^https:\/\/www.youtube.com\/feed\/subscriptions$/,
@@ -180,11 +180,11 @@ export const constructWatchPageOptions = async (
         pageType: pageTypes.video,
         styles: [
           `.nebulate-matched #thumbnail {
-                box-shadow: 0px 0px 20px 10px ${options.bulkColor.value} !important;
+                box-shadow: 0px 0px 20px 10px ${options.thumbnailColor.value} !important;
                 borderRadius: 4px !important;
               }`,
           `.nebulate-matched #video-title {
-                color: ${options.bulkColor.value} !important;
+                color: ${options.thumbnailColor.value} !important;
               }`,
         ],
         urlRegex: /^https:\/\/www.youtube.com\/watch\?v=/,
@@ -248,11 +248,11 @@ export const constructWatchPageOptions = async (
         pageType: pageTypes.search,
         styles: [
           `.nebulate-matched #thumbnail {
-                box-shadow: 0px 0px 20px 10px ${options.bulkColor.value} !important;
+                box-shadow: 0px 0px 20px 10px ${options.thumbnailColor.value} !important;
                 borderRadius: 4px !important;
               }`,
           `.nebulate-matched #video-title {
-                color: ${options.bulkColor.value} !important;
+                color: ${options.thumbnailColor.value} !important;
               }`,
         ],
         urlRegex: /^https:\/\/www.youtube.com\/results\?search_query=/,

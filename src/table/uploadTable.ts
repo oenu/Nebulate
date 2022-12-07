@@ -6,7 +6,7 @@ import fs = require("fs");
 import path = require("path");
 import hash from "object-hash";
 // Use AWS S3 to upload the table to cloudflare R2 CDN
-const uploadTable = async () => {
+const uploadTable = async (): Promise<void> => {
   // Check that env variables are set
   if (!process.env.ACCESS_KEY_ID) {
     throw new Error("ACCESS_KEY_ID not set");
@@ -83,8 +83,21 @@ const uploadTable = async () => {
       excludeKeys: (key) => key === "generatedAt" || key === "id",
     });
     if (existingTableHash === newTableHash) {
-      logger.info("uploadTable: Table is up to date");
-      return;
+      logger.info("uploadTable: Hash is the same, table is up to date");
+
+      // Check how old the table is and if it's older than 24 hours, update it anyway
+      const now = new Date();
+      const generatedAt = new Date(existingTableObject.generatedAt);
+      const diff = now.getTime() - generatedAt.getTime();
+      const diffHours = Math.floor(diff / 1000 / 60 / 60);
+      if (diffHours < 24) {
+        logger.info("uploadTable: Table is up to date");
+        return;
+      } else {
+        logger.info(
+          "uploadTable: Table hash matches, but hasn't been updated in 24 hours, updating table..."
+        );
+      }
     } else {
       logger.info("uploadTable: Table is out of date, updating table...");
     }
@@ -105,7 +118,7 @@ const uploadTable = async () => {
     Body: newTable,
   };
 
-  s3.upload(params, function (err: Error, data: any) {
+  s3.upload(params).send((err, data) => {
     if (err) {
       throw err;
     }

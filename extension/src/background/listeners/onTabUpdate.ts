@@ -1,6 +1,5 @@
-import { UrlUpdateMessage } from "../../content_script";
 import { Messages } from "../../common/enums";
-import { Video } from "../../common/types";
+import { UrlUpdateMessage, Video } from "../../common/types";
 import { checkTable } from "../../common/checkTable";
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {

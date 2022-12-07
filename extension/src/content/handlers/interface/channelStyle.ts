@@ -8,7 +8,7 @@ import { Channel } from "../../../common/types";
 export const addChannelStyle = async (channel: Channel): Promise<void> => {
   const options = await getOptions();
 
-  if (!options.channelGlow.value) {
+  if (!options.highlightChannel.value) {
     throw new Error("Options are set to not show on channel page");
   }
 

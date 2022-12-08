@@ -1,8 +1,6 @@
 # Nebulate
 
-> This project is currently is in active development. The outdated readme can be found [here](_readme.md).
-
-> If you install this Extension please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) to help us test it and give us feedback.
+> If you install this Extension please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) to help me test it and provide feedback.
 
 <p align="center">
   <img src="https://github.com/oenu/Nebulate/blob/dev/screenshots/v0.2.png">
@@ -22,7 +20,13 @@ The Nebulate Chrome Extension is a simple, easy-to-use tool that makes it easy t
 
 ## Installation
 
-Download the latest release from the [Chrome Web Store](https://chrome.google.com/webstore/detail/nebulate/gdjnphjblhbahaidifindimahccaagbf)
+<p align="center">
+<a href="https://chrome.google.com/webstore/detail/nebulate/gdjnphjblhbahaidifindimahccaagbf" >
+   <img src="https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4ybeBTsZt43U4xis.png">
+</a>
+</p>
+
+Download the latest release from the [Chrome Web Store](https://chrome.google.com/webstore/detail/nebulate/gdjnphjblhbahaidifindimahccaagbf), other browsers coming soon...
 
 > Alternatively, you can install the extension manually by following these steps:
 >
@@ -47,3 +51,7 @@ Download the latest release from the [Chrome Web Store](https://chrome.google.co
 The Nebulate Database is a node script that scrapes data from both Nebula and YouTube and builds a local lookup table that is used by the Nebulate Chrome Extension to match videos and show the correct information. It is run automatically on a regular basis to keep the lookup table up-to-date.
 
 > At the moment the database is open source but not yet documented. If you would like to contribute to the project please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) and I can help you get started.
+
+## Notes
+
+- This project is currently is in active development. The outdated readme can be found [here](_readme.md) which contains more information about the project and how it works.

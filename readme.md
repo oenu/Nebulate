@@ -1,6 +1,6 @@
 # Nebulate
 
-> This project is currently is in active development. The outdated readme can be found [here](https://github.com/oenu/Nebulate/blob/main/_readme.md).
+> This project is currently is in active development. The outdated readme can be found [here](_readme.md).
 
 ## Installation
 

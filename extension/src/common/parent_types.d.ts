@@ -36,6 +36,6 @@ export interface ChannelEntry {
  */
 export interface LookupTable {
   channels: ChannelEntry[];
-  generatedAt: Date;
+  generatedAt: string; // Date
   id: string;
 }

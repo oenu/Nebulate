@@ -1,6 +1,5 @@
-import { UrlUpdateMessage } from "../../content_script";
 import { Messages } from "../../common/enums";
-import { Video } from "../../common/types";
+import { UrlUpdateMessage, Video } from "../../common/types";
 import { checkTable } from "../../common/checkTable";
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
@@ -31,7 +30,7 @@ export type CheckedUrlResult = {
 
 export const urlChecker = async (url: string, tabId: number): Promise<void> => {
   if (url.includes("youtube.com/watch?v=")) {
-    return checkTable([url]).then((video) => {
+    return checkTable({ urls: [url] }).then((video) => {
       if (video[0]) {
         const message: CheckedUrlResult = {
           type: Messages.CHECK_URL_RESULT,

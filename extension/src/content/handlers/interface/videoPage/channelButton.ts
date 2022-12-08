@@ -1,8 +1,8 @@
-import { createStyledSvg } from "./../../../common/createStyledSvg";
-import { BUTTON_IDS, Messages } from "../../../common/enums";
-import { Channel } from "../../../common/types";
-import { ChannelRedirectMessage } from "../../../content_script";
-import { getOptions } from "../../../common/options";
+import { createStyledSvg } from "../../../../common/createStyledSvg";
+import { BUTTON_IDS, Messages } from "../../../../common/enums";
+import { Channel, ChannelRedirectMessage } from "../../../../common/types";
+
+import { getOptions } from "../../../../common/options";
 
 export const addChannelButton = async (channel: Channel): Promise<void> => {
   try {
@@ -17,7 +17,7 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
     const options = await getOptions();
 
     // Check if the channel button is enabled
-    if (!options.channelButton.value) {
+    if (!options.addChannelButton.value) {
       console.debug("addChannelButton: Channel button is disabled");
       return;
     }
@@ -57,7 +57,7 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
     // Wait for the subscribe button to load (max 20 seconds)
     let subscribe_timeout = 20000;
     // eslint-disable-next-line no-undef
-    const waitForSubscribeButton = (): Promise<Element | null> => {
+    const waitForChannelBox = (): Promise<Element | null> => {
       return new Promise((resolve) => {
         const interval = setInterval(() => {
           if (subscribe_timeout <= 0) {
@@ -65,16 +65,14 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
             resolve(null);
           }
           // eslint-disable-next-line no-undef
-          const subscribeButton = document.querySelector(
-            "#subscribe-button:not(.skeleton-bg-color)"
+          const channel_box = document.querySelector(
+            "#top-row > ytd-video-owner-renderer"
           );
-          if (subscribeButton) {
-            resolve(subscribeButton);
+          if (channel_box) {
+            resolve(channel_box);
             clearInterval(interval);
           } else {
-            console.debug(
-              "addChannelButton: Subscribe button not found, retrying"
-            );
+            console.debug("addChannelButton: Channel box not found, retrying");
           }
           subscribe_timeout -= 200;
         }, 200);
@@ -82,10 +80,10 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
     };
 
     // eslint-disable-next-line no-undef
-    const subscribeButton = await waitForSubscribeButton();
+    const channelBox = await waitForChannelBox();
 
-    if (!subscribeButton) {
-      console.warn("ChannelButton: No subscribe button found");
+    if (!channelBox) {
+      console.warn("ChannelButton: No channel box found");
       return Promise.reject();
     }
 
@@ -96,9 +94,14 @@ export const addChannelButton = async (channel: Channel): Promise<void> => {
       button.remove();
     });
 
-    // console.debug("addChannelButton: Adding button to DOM");
-    subscribeButton.insertAdjacentElement("afterend", nebulate_svg);
-    // console.debug("addChannelButton: Button added to DOM");
+    // Add the button to the page (inside the channel_box flexBox container) in the last position
+    // Style to vertically center the button
+    nebulate_svg.style.margin = "auto";
+
+    // eslint-disable-next-line no-undef
+    channelBox && channelBox.appendChild(nebulate_svg);
+
+    // channelBox.insertAdjacentElement("afterend", nebulate_svg);
     return Promise.resolve();
   } catch (error) {
     console.error("addChannelButton: " + error);

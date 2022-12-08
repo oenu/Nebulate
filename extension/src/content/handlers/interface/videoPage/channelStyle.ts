@@ -32,9 +32,11 @@ export const addChannelStyle = async (channel: Channel): Promise<void> => {
         "addChannelStyle: adding channel style for channel: ",
         channel
       );
-      const channelStyle = `div#owner 
-      { transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
-      box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important; }`;
+      const channelStyle = `#top-row > ytd-video-owner-renderer {
+        transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+        box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important; 
+        border-radius: 10px !important;
+      }`;
       // eslint-disable-next-line no-undef
       let channelStyleElement = document.getElementById(
         CSS_IDS.CHANNEL
@@ -58,12 +60,14 @@ export const addChannelStyle = async (channel: Channel): Promise<void> => {
 const waitForChannelBox = async (msDelay: number): Promise<void> => {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line no-undef
-    if (document.querySelector("div#owner")) resolve();
+    if (document.querySelector("div#meta-contents div#top-row")) resolve();
 
     // eslint-disable-next-line no-undef
     const channelBoxObserver = new MutationObserver(() => {
       // eslint-disable-next-line no-undef
-      const channelBox = document.querySelector("div#owner");
+      const channelBox = document.querySelector(
+        "div#meta-contents div#top-row"
+      );
       if (channelBox) {
         channelBoxObserver.disconnect();
         console.timeEnd("Channel box loaded in");
@@ -74,10 +78,10 @@ const waitForChannelBox = async (msDelay: number): Promise<void> => {
 
     // Check that the channel box is not already loaded
     // eslint-disable-next-line no-undef
-    const channelBox = document.querySelector("div#owner");
+    const channelBox = document.querySelector("div#meta-contents div#top-row");
     if (channelBox) resolve();
 
-    // Set a timeout to 10 seconds
+    // Set a timeout
     const timeout = setTimeout(() => {
       console.log(`Timed out waiting ${msDelay}ms for channel box to load`);
       reject();

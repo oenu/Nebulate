@@ -1,12 +1,16 @@
 # Nebulate
 
+
 > If you install this Extension please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) to help me test it and provide feedback.
+
 
 <p align="center">
   <img src="https://github.com/oenu/Nebulate/blob/dev/screenshots/v0.2.png">
 </p>
 
+
 _Example of Nebulate highlighting a Nebula video and Thumbnails on YouTube_
+
 
 # Nebulate Chrome Extension
 

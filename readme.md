@@ -5,7 +5,7 @@
 > If you install this Extension please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) to help us test it and give us feedback.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/51684443/176912666-f47000a9-439c-41cf-9ae9-fd4de93b8092.gif">
+  <img src="https://github.com/oenu/Nebulate/blob/dev/screenshots/v0.2.png">
 </p>
 
 _Demonstration of the Chrome extension recognizing a Nebula video and the server providing a redirect_

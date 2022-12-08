@@ -5,6 +5,7 @@ import { pageTypes } from "../handlers/pageWatchers/pageOptions";
 import { Messages } from "../../common/enums";
 import { getOptions } from "../../common/options";
 import { watchPage } from "../handlers/pageWatchers/watchPage";
+import channelPageStyle from "../handlers/interface/channelPage/channelStyle";
 
 let observer:
   | {
@@ -34,11 +35,11 @@ export const thing = chrome.runtime.onMessage.addListener(async (message) => {
       }
       await checkObserver(observer, page);
     }
-    // Channel
+    // Channel - default channel page
     else if (
       // eslint-disable-next-line no-undef
       window.location.href.match(
-        /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+\/featured|@[a-zA-Z0-9]+\/videos|@[a-zA-Z0-9]+|c\/[a-zA-Z0-9]+|user\/[a-zA-Z0-9]+)$/
+        /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+)$/
       )
     ) {
       console.debug("onNewPage: Detected channel page");
@@ -47,6 +48,44 @@ export const thing = chrome.runtime.onMessage.addListener(async (message) => {
         console.log("channelPage: Options are set to not show on channel page");
         return;
       } else {
+        // eslint-disable-next-line no-undef
+        channelPageStyle(window.location.href);
+        await checkObserver(observer, page);
+      }
+    }
+    // Channel - video page
+    else if (
+      // eslint-disable-next-line no-undef
+      window.location.href.match(
+        /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+)\/videos$/
+      )
+    ) {
+      console.debug("onNewPage: Detected channel page");
+      page = "channel_videos";
+      if (!options.channelPageThumbnails.value) {
+        console.log("channelPage: Options are set to not show on channel page");
+        return;
+      } else {
+        // eslint-disable-next-line no-undef
+        channelPageStyle(window.location.href);
+        await checkObserver(observer, page);
+      }
+    }
+    // Channel - featured page
+    else if (
+      // eslint-disable-next-line no-undef
+      window.location.href.match(
+        /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+)\/featured$/
+      )
+    ) {
+      console.debug("onNewPage: Detected channel page");
+      page = "channel_featured";
+      if (!options.channelPageThumbnails.value) {
+        console.log("channelPage: Options are set to not show on channel page");
+        return;
+      } else {
+        // eslint-disable-next-line no-undef
+        channelPageStyle(window.location.href);
         await checkObserver(observer, page);
       }
     }

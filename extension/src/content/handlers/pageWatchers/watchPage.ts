@@ -173,8 +173,6 @@ export const watchPage = async (
           (videoId, index) => videoIds.indexOf(videoId) === index
         );
 
-        // const uniqueVideoIds = [...new Set(videoIds)];
-
         console.debug("watchPage: Found videos: ", uniqueVideoIds);
         if (!uniqueVideoIds) {
           console.debug("watchPage: No unique videos found");

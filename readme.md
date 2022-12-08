@@ -8,7 +8,7 @@
   <img src="https://github.com/oenu/Nebulate/blob/dev/screenshots/v0.2.png">
 </p>
 
-_Demonstration of the Chrome extension recognizing a Nebula video and the server providing a redirect_
+_Example of Nebulate highlighting a Nebula video and Thumbnails on YouTube_
 
 # Nebulate Chrome Extension
 

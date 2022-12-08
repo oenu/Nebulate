@@ -1,9 +1,10 @@
 import { Messages } from "../../common/enums";
 import { getOptions, optionUtilityType } from "../../common/options";
 import {
-  VideoRedirectMessage,
   ChannelRedirectMessage,
-} from "../../content_script";
+  VideoRedirectMessage,
+} from "../../common/types";
+
 import { PopupRedirectMessage } from "../../popup";
 import { channelRedirect } from "../handlers/channelRedirect";
 import { reportIssue } from "../handlers/reportIssue";
@@ -19,7 +20,7 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
       // Open the Nebula page for a video
       case Messages.VIDEO_REDIRECT: {
         const options = (await getOptions()) as optionUtilityType;
-        const newTab = options.newTab.value as boolean;
+        const newTab = options.preferNewTab.value as boolean;
         const message = request as VideoRedirectMessage;
         if (request.video) videoRedirect(message.video, newTab, sender.tab?.id);
         break;
@@ -29,7 +30,7 @@ chrome.runtime.onMessage.addListener(async (request, sender) => {
       case Messages.CHANNEL_REDIRECT: {
         const message = request as ChannelRedirectMessage;
         const options = (await getOptions()) as optionUtilityType;
-        const newTab = options.newTab.value as boolean;
+        const newTab = options.preferNewTab.value as boolean;
         if (request.channel)
           channelRedirect(message.channel, newTab, sender.tab?.id);
         break;

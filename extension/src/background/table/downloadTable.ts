@@ -14,6 +14,8 @@ const downloadTable = async (): Promise<LookupTable | void> => {
       return;
     } else if (response.status === 200) {
       const data = await response.json();
+      console.log("downloadTable: new table downloaded");
+      console.log(data);
       return data as LookupTable;
     }
   } catch (error) {

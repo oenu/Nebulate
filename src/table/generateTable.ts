@@ -45,7 +45,7 @@ export interface ChannelEntry {
  */
 export interface LookupTable {
   channels: ChannelEntry[];
-  generatedAt: Date;
+  generatedAt: string;
   id: string;
 }
 
@@ -86,7 +86,7 @@ export const generateTable = async (
     // Create a lookup table
     const lookupTable: LookupTable = {
       channels: [],
-      generatedAt: new Date(),
+      generatedAt: new Date().toISOString(),
       id: uuidv4(),
     };
 

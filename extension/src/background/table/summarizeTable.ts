@@ -43,16 +43,14 @@ export const summarizeTable = async (
   // 2.
   // Check if the table is formatted correctly
   const lastUpdate = await chrome.storage.local.get("lastUpdate");
-  const lastUpdatedDate = new Date(lastUpdate.lastUpdate);
-
   const tableSummary: TableSummary = {
     totalMatches: 0,
     totalUnmatched: 0,
     totalVideos: 0,
     totalChannels: 0,
     channelMatchedVideos: {},
-    generatedAt: table.generatedAt,
-    lastUpdated: lastUpdatedDate,
+    generatedAt: new Date(Date.parse(table.generatedAt)),
+    lastUpdated: new Date(Date.parse(lastUpdate.lastUpdate)),
     id: table.id,
   };
 

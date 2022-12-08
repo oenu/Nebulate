@@ -1,27 +1,28 @@
 import { Video } from "../../common/types";
 import { CheckedUrlResult } from "../../background/listeners/onTabUpdate";
 import { Messages } from "../../common/enums";
-import {
-  addChannelButton,
-  checkChannelButton,
-  removeChannelButton,
-} from "../handlers/interface/channelButton";
-import {
-  addChannelStyle,
-  checkChannelStyle,
-  removeChannelStyle,
-} from "../handlers/interface/channelStyle";
-import {
-  addVideoButton,
-  checkVideoButton,
-  removeVideoButton,
-} from "../handlers/interface/videoButton";
-import {
-  addVideoStyle,
-  checkVideoStyle,
-  removeVideoStyle,
-} from "../handlers/interface/videoStyle";
+
 import { getOptions } from "../../common/options";
+import {
+  checkChannelButton,
+  addChannelButton,
+  removeChannelButton,
+} from "../handlers/interface/videoPage/channelButton";
+import {
+  checkChannelStyle,
+  addChannelStyle,
+  removeChannelStyle,
+} from "../handlers/interface/videoPage/channelStyle";
+import {
+  checkVideoButton,
+  addVideoButton,
+  removeVideoButton,
+} from "../handlers/interface/videoPage/videoButton";
+import {
+  checkVideoStyle,
+  addVideoStyle,
+  removeVideoStyle,
+} from "../handlers/interface/videoPage/videoStyle";
 
 let localVideo: Video;
 
@@ -44,10 +45,10 @@ export const onNewVideo = async (video: Video): Promise<void> => {
 
   // Check if any of the options are enabled
   if (
-    !options.videoButton.value &&
-    !options.videoGlow.value &&
-    !options.channelButton.value &&
-    !options.channelGlow.value
+    !options.addVideoButton.value &&
+    !options.highlightVideo.value &&
+    !options.addChannelButton.value &&
+    !options.highlightChannel.value
   ) {
     console.log("onNewVideo: Disabled");
     return;
@@ -60,7 +61,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     // Create array of promises
     const promises = [];
     if (video.matched) {
-      options.videoButton.value &&
+      options.addVideoButton.value &&
         promises.push(
           checkVideoButton(video)
             .then((exists) => {
@@ -70,7 +71,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
               console.error("onNewVideo: Error checking video button", err);
             })
         );
-      options.videoGlow.value &&
+      options.highlightVideo.value &&
         promises.push(
           checkVideoStyle(video)
             .then((exists) => {
@@ -83,7 +84,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     }
 
     if (video.channel.known) {
-      options.channelButton.value &&
+      options.addChannelButton.value &&
         promises.push(
           checkChannelButton(video.channel)
             .then((exists) => {
@@ -93,7 +94,7 @@ export const onNewVideo = async (video: Video): Promise<void> => {
               console.error("onNewVideo: Error checking channel button: ", err);
             })
         );
-      options.channelGlow.value &&
+      options.highlightChannel.value &&
         promises.push(
           checkChannelStyle(video.channel)
             .then((exists) => {
@@ -122,22 +123,22 @@ export const onNewVideo = async (video: Video): Promise<void> => {
     );
 
     // Add the channel button if the channel is known
-    video.channel.known && options.channelButton.value
+    video.channel.known && options.addChannelButton.value
       ? addChannelButton(video.channel)
       : removeChannelButton();
 
     // Style the channel box if the channel is known
-    video.channel.known && options.channelGlow.value
+    video.channel.known && options.highlightChannel.value
       ? addChannelStyle(video.channel)
       : removeChannelStyle();
 
     // Add the video button if the video is matched
-    video.matched && options.videoButton.value
+    video.matched && options.addVideoButton.value
       ? addVideoButton(video)
       : removeVideoButton();
 
     // Style the video box if the video is matched
-    video.matched && options.videoGlow.value
+    video.matched && options.highlightVideo.value
       ? addVideoStyle(video)
       : removeVideoStyle();
   }

@@ -41,7 +41,7 @@ import { Messages } from "./common/enums";
 import { TableSummary } from "./background/table/summarizeTable";
 import { PopupRedirectMessage } from "./popup";
 import { PopupSummarizeMessageResponse } from "./popup";
-import { getOptions, optionUtilityType } from "./common/options";
+import { getOptions, OptionId, optionUtilityType } from "./common/options";
 const optionRedirect = (url: string): void => {
   console.debug("Redirecting to url " + url);
 
@@ -52,34 +52,6 @@ const optionRedirect = (url: string): void => {
 
   chrome.runtime.sendMessage(message);
 };
-
-// Options enum
-export enum OptionId {
-  // eslint-disable-next-line no-unused-vars
-  OPEN_IN_NEW_TAB = "newTab",
-  // eslint-disable-next-line no-unused-vars
-  HIGHLIGHT_VIDEO = "videoGlow",
-  // eslint-disable-next-line no-unused-vars
-  HIGHLIGHT_CHANNEL = "channelGlow",
-  // eslint-disable-next-line no-unused-vars
-  BULK_COLOR = "bulkColor",
-  // eslint-disable-next-line no-unused-vars
-  ADD_VIDEO_BUTTON = "videoButton",
-  // eslint-disable-next-line no-unused-vars
-  ADD_CHANNEL_BUTTON = "channelButton",
-  // eslint-disable-next-line no-unused-vars
-  SHOW_ON_VIDEO = "videoShow",
-  // eslint-disable-next-line no-unused-vars
-  SHOW_ON_SUBSCRIPTIONS = "subscriptionsShow",
-  // eslint-disable-next-line no-unused-vars
-  SHOW_ON_HOME = "homeShow",
-  // eslint-disable-next-line no-unused-vars
-  GRADIENT_START = "gradientStart",
-  // eslint-disable-next-line no-unused-vars
-  GRADIENT_END = "gradientEnd",
-  // eslint-disable-next-line no-unused-vars
-  BUTTON_COLOR = "buttonColor",
-}
 
 type Link = {
   title: string;
@@ -306,18 +278,20 @@ function Options() {
 
     // Create a map to order the options
     const optionOrderMap: Record<OptionId, number> = {
-      [OptionId.OPEN_IN_NEW_TAB]: 0,
-      [OptionId.GRADIENT_START]: 1,
-      [OptionId.GRADIENT_END]: 2,
-      [OptionId.HIGHLIGHT_VIDEO]: 3,
-      [OptionId.HIGHLIGHT_CHANNEL]: 4,
-      [OptionId.BUTTON_COLOR]: 5,
-      [OptionId.ADD_VIDEO_BUTTON]: 6,
-      [OptionId.ADD_CHANNEL_BUTTON]: 7,
-      [OptionId.BULK_COLOR]: 8,
-      [OptionId.SHOW_ON_HOME]: 9,
-      [OptionId.SHOW_ON_SUBSCRIPTIONS]: 10,
-      [OptionId.SHOW_ON_VIDEO]: 11,
+      preferNewTab: 0,
+      gradientStart: 1,
+      gradientEnd: 2,
+      highlightVideo: 3,
+      highlightChannel: 4,
+      buttonColor: 5,
+      addVideoButton: 6,
+      addChannelButton: 7,
+      thumbnailColor: 8,
+      homePageThumbnails: 9,
+      subPageThumbnails: 10,
+      videoPageThumbnails: 11,
+      channelPageThumbnails: 12,
+      searchPageThumbnails: 13,
     };
 
     // Sort the options by the order map
@@ -345,7 +319,7 @@ function Options() {
         );
       } else if (option.stringValue !== undefined) {
         // Special cases for the color pickers
-        if (option.key === OptionId.BULK_COLOR) {
+        if (option.key === "thumbnailColor") {
           return (
             <Card key={option.key}>
               <Text fz={"lg"}> {option.title} </Text>
@@ -397,16 +371,14 @@ function Options() {
               </Group>
             </Card>
           );
-        } else if (option.key === OptionId.GRADIENT_START) {
+        } else if (option.key === "gradientStart") {
           // Special case for the gradient picker, it has two values (start and end) so we skip the end one later
           return (
             <Card
               key={option.key}
               //  box-shadow: -10px 0 20px rgb(62, 187, 243), 10px 0 20px rgb(88, 80, 209); }`;
               style={{
-                boxShadow: `-10px 0 20px ${option.stringValue}, 10px 0 20px ${
-                  options[OptionId.GRADIENT_END].value
-                }`,
+                boxShadow: `-10px 0 20px ${option.stringValue}, 10px 0 20px ${options["gradientEnd"].value}`,
               }}
             >
               <Text fz={"lg"}>Video Card Gradient</Text>
@@ -439,7 +411,7 @@ function Options() {
                   />
                   <ColorPicker
                     mt="sm"
-                    color={options[OptionId.GRADIENT_END].value as string}
+                    color={options["gradientEnd"].value as string}
                     swatches={[
                       "#5850D1", // Default
                       "#25262b", // Dark
@@ -458,17 +430,17 @@ function Options() {
                     ]}
                     swatchesPerRow={7}
                     onChangeEnd={(color: string): void => {
-                      setStringOption(OptionId.GRADIENT_END, color);
+                      setStringOption("gradientEnd", color);
                     }}
                   />
                 </Group>
               </Center>
             </Card>
           );
-        } else if (option.key === OptionId.GRADIENT_END) {
+        } else if (option.key === "gradientEnd") {
           // Skip the end color picker, we already did it above
           return null;
-        } else if (option.key === OptionId.BUTTON_COLOR) {
+        } else if (option.key === "buttonColor") {
           return (
             <Card key={option.key}>
               <Text fz={"lg"}> {option.title} </Text>
@@ -544,9 +516,9 @@ function Options() {
       // Divider before button color, gradient start, bulkColor
       const optionsWithDividers = optionElements.map((optionElement) => {
         if (
-          optionElement?.key === OptionId.BUTTON_COLOR ||
-          optionElement?.key === OptionId.GRADIENT_START ||
-          optionElement?.key === OptionId.BULK_COLOR
+          optionElement?.key === "buttonColor" ||
+          optionElement?.key === "gradientStart" ||
+          optionElement?.key === "thumbnailColor"
         ) {
           return (
             <>

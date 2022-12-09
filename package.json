@@ -68,6 +68,8 @@
     "test:extension": "cd extension && yarn test",
     "dev:extension": "cd extension && yarn watch",
     "build:extension": "cd extension && yarn build",
+    "build:firefox": "cd extension && yarn build:firefox",
+    "run:firefox": "cd extension && yarn run:firefox",
     "test:ci": "jest --ci"
   }
 }

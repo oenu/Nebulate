@@ -66,8 +66,10 @@
     "test": "jest --watch --detectOpenHandles --runInBand",
     "install:extension": "cd extension && yarn install",
     "test:extension": "cd extension && yarn test",
-    "dev:extension": "cd extension && yarn watch",
-    "build:extension": "cd extension && yarn build",
+    "dev:chrome": "cd extension && yarn watch:chrome",
+    "build:chrome": "cd extension && yarn build:chrome",
+    "dev:firefox": "cd extension && yarn run:firefox",
+    "build:firefox": "cd extension && yarn build:firefox",
     "test:ci": "jest --ci"
   }
 }

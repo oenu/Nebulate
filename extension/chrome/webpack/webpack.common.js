@@ -1,7 +1,8 @@
 const webpack = require("webpack");
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
-const srcDir = path.join(__dirname, "..", "src");
+const srcDir = path.join(__dirname, "..", "..", "src");
+const outputPath = path.join(__dirname, "../dist");
 
 module.exports = {
   entry: {
@@ -11,17 +12,11 @@ module.exports = {
     content_script: path.join(srcDir, "content_script.tsx"),
   },
   output: {
-    path: path.join(__dirname, "../dist/js"),
+    path: path.join(outputPath, "js"),
     filename: "[name].js",
   },
   optimization: {
     minimize: false,
-    // splitChunks: {
-    // name: "vendor",
-    // chunks(chunk) {
-    // return chunk.name !== "background";
-    // },
-    // },
   },
   module: {
     rules: [
@@ -44,9 +39,29 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"],
   },
   plugins: [
+    // Copy the public directory to the dist directory (except the manifest.json file)
     new CopyPlugin({
-      patterns: [{ from: ".", to: "../", context: "public" }],
-      options: {},
+      patterns: [
+        {
+          from: path.join(__dirname, "..", "..", "public"),
+          to: outputPath,
+          filter: (resourcePath) => {
+            return (
+              resourcePath !==
+              path.join(__dirname, "..", "..", "public", "manifest.json")
+            );
+          },
+        },
+      ],
+    }),
+    // Copy the manifest.json file from the parent directory to the dist directory
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, "../manifest.json"),
+          to: outputPath,
+        },
+      ],
     }),
   ],
 };

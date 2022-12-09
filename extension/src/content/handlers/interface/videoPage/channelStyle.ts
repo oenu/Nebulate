@@ -32,11 +32,12 @@ export const addChannelStyle = async (channel: Channel): Promise<void> => {
         "addChannelStyle: adding channel style for channel: ",
         channel
       );
-      const channelStyle = `#top-row > ytd-video-owner-renderer {
-        transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
-        box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important; 
-        border-radius: 10px !important;
-      }`;
+      const channelStyle = `
+      #top-row > ytd-video-owner-renderer {
+          transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+          box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important; 
+          border-radius: 10px !important;
+        }`;
       // eslint-disable-next-line no-undef
       let channelStyleElement = document.getElementById(
         CSS_IDS.CHANNEL
@@ -47,11 +48,14 @@ export const addChannelStyle = async (channel: Channel): Promise<void> => {
         // eslint-disable-next-line no-undef
         channelStyleElement = document.createElement("style");
         channelStyleElement.id = CSS_IDS.CHANNEL;
-        channelStyleElement.innerHTML = channelStyle;
+        // eslint-disable-next-line no-undef
+        channelStyleElement.appendChild(document.createTextNode(channelStyle));
         // eslint-disable-next-line no-undef
         document.head.appendChild(channelStyleElement);
       } else {
-        channelStyleElement.innerHTML = channelStyle;
+        channelStyleElement.removeChild(channelStyleElement.childNodes[0]);
+        // eslint-disable-next-line no-undef
+        channelStyleElement.appendChild(document.createTextNode(channelStyle));
       }
     });
 };

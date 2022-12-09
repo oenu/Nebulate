@@ -1,26 +1,35 @@
 {
-  "name": "chrome-extension-typescript-starter",
+  "name": "nebulate-chrome-extension",
   "version": "1.0.0",
-  "description": "chrome-extension-typescript-starter",
+  "description": "Chrome extension for YouTube and Nebula",
   "main": "index.js",
   "scripts": {
-    "watch": "webpack --config webpack/webpack.dev.js --watch",
-    "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\""
+    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "watch:chrome": "webpack --config chrome/webpack/webpack.dev.js --watch",
+    "run:chrome": "web-ext run --source-dir chrome/dist --target chromium --start-url \"https://www.youtube.com/results?search_query=notjustbikes\" --chromium-binary \"/Applications/Google Chrome Dev.app/Contents/MacOS/Google Chrome Dev\" --devtools",
+    "build:chrome": "webpack --config chrome/webpack/webpack.prod.js",
+    "watch:firefox": "webpack --config firefox/webpack/webpack.dev.js --watch",
+    "run:firefox": "web-ext run --source-dir firefox/dist --firefox=firefoxdeveloperedition --firefox-preview --devtools --start-url \"https://www.youtube.com/results?search_query=notjustbikes\"",
+    "lint:firefox": "web-ext lint --source-dir firefox/dist --ignore-files \"**/*.map\"",
+    "build:firefox": "webpack --config firefox/webpack/webpack.prod.js",
+    "zip:firefox": "web-ext build --source-dir firefox/dist --overwrite-dest --artifacts-dir firefox/dist --ignore-files \"**/*.map\"",
+    "sign:firefox": "web-ext sign --api-key $AMO_JWT_ISSUER --api-secret $AMO_JWT_SECRET --source-dir firefox/dist --artifacts-dir firefox/dist --ignore-files \"**/*.map\""
   },
+
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
+    "url": "https://github.com/oenu/Nebulate.git"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@mantine/core": "^5.8.3",
     "@mantine/hooks": "^5.8.3",
     "@tabler/icons": "^1.112.0",
+    "@types/firefox-webext-browser": "^94.0.1",
     "csstype": "^3.1.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
@@ -44,6 +53,7 @@
     "ts-jest": "^27.0.5",
     "ts-loader": "^8.0.0",
     "typescript": "^4.4.3 ",
+    "web-ext": "^7.4.0",
     "webpack": "^5.61.0",
     "webpack-cli": "^4.0.0",
     "webpack-merge": "^5.0.0"

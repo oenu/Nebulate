@@ -21,7 +21,7 @@ chrome.runtime.onStartup.addListener(async function () {
         await updateTable();
       } else {
         // If the lookup table is out of date, fetch it
-        const updateInterval = await chrome.storage.sync.get("updateInterval");
+        const updateInterval = await chrome.storage.local.get("updateInterval");
         const interval =
           updateInterval.updateInterval ?? defaults.updateInterval;
         if (now.getTime() - lastUpdatedDate.getTime() >= interval) {

@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Nebulate",
   "description": "Nebulate links YouTube and Nebula videos",
   "version": "0.2",
@@ -8,7 +8,7 @@
     "open_in_tab": true
   },
 
-  "action": {
+  "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
@@ -23,18 +23,20 @@
     "scripts": ["js/background.js"]
   },
   "web_accessible_resources": [
-    {
-      "matches": ["*://*.youtube.com/*"],
-      "resources": ["assets/icon.png", "css/video.css", "css/channel.css"]
-    }
+    "assets/icon.png",
+    "css/video.css",
+    "css/channel.css"
   ],
 
-  "permissions": ["storage", "unlimitedStorage", "tabs", "alarms"],
-  "host_permissions": [
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "alarms",
     "*://*.youtube.com/*",
     "*://table.oenu.org/neb-table/lookup_table.json"
   ],
-  "browser_specific_settings": {
+  "applications": {
     "gecko": {
       "id": "nebulate@oenu.org"
     }

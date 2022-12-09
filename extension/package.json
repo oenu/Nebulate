@@ -9,8 +9,8 @@
     "clean": "rimraf dist",
     "test": "npx jest",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "run:firefox": "web-ext run --source-dir dist --firefox=firefoxdeveloperedition --devtools",
-    "build:firefox": "web-ext build --source-dir dist --artifacts-dir dist/firefox"
+    "run:firefox": "web-ext run --source-dir dist --firefox=firefoxdeveloperedition --firefox-preview --devtools",
+    "build:firefox": "web-ext build --source-dir dist --artifacts-dir dist/firefox "
   },
   "author": "",
   "license": "MIT",

@@ -2,24 +2,36 @@ console.log("Background: Running background script");
 
 // Detect if running in Firefox
 console.log("Background: Detecting browser from manifest");
-const manifest = chrome.runtime.getManifest();
-console.log(manifest);
-// Check if the browser is Firefox
-let isFirefox = false;
-try {
-  if (!manifest?.minimum_chrome_version) {
-    console.log("Background: Browser is not Chrome, assuming Firefox");
-    isFirefox = true;
-  } else {
-    console.log("Background: Browser is Chrome");
-  }
-} catch (e) {
-  console.log("Background: Error detecting browser, assuming Firefox");
-  isFirefox = true;
-}
 
-// Set the browser name
-export const browserName = isFirefox ? "firefox" : "chrome";
+try {
+  chrome.runtime.getBackgroundPage(function (page) {
+    console.log("Background: Got getBackgroundPage() -> Running in Firefox");
+
+    // Firefox specific code
+    // Permissions
+
+    browser.permissions.getAll().then((permissions) => {
+      permissions?.origins?.forEach((origin) => {
+        console.log("Background: Permission: " + origin);
+      });
+
+      permissions?.permissions?.forEach((permission) => {
+        console.log("Background: Permission: " + permission);
+      });
+    });
+
+    // Request permissions
+    // browser.permissions.request(permissionsToRequest).then((granted) => {
+    //   if (granted) {
+    //     console.log("Background: Permissions granted");
+    //   } else {
+    //     console.log("Background: Permissions not granted");
+    //   }
+    // });
+  });
+} catch (e) {
+  console.log("Background: Caught getBackgroundPage() -> Running in Chrome");
+}
 
 // Alarms
 console.log("Background: Loading alarm module");

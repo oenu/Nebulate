@@ -65,11 +65,16 @@ export const addVideoStyle = async (video: Video): Promise<void> => {
         // eslint-disable-next-line no-undef
         videoStyleElement = document.createElement("style");
         videoStyleElement.id = CSS_IDS.VIDEO;
-        videoStyleElement.innerHTML = videoStyle;
+
+        // eslint-disable-next-line no-undef
+        videoStyleElement.appendChild(document.createTextNode(videoStyle));
         // eslint-disable-next-line no-undef
         document.head.appendChild(videoStyleElement);
       } else {
-        videoStyleElement.innerHTML = videoStyle;
+        // eslint-disable-next-line no-undef
+        videoStyleElement.removeChild(videoStyleElement.childNodes[0]);
+        // eslint-disable-next-line no-undef
+        videoStyleElement.appendChild(document.createTextNode(videoStyle));
       }
     });
 };

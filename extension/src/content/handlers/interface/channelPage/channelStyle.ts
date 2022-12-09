@@ -140,7 +140,7 @@ const applyChannelPageStyle = async (
     }
   }
 
-  // Create a new style element
+  // Create a style element
   // eslint-disable-next-line no-undef
   const channelBoxStyle = document.createElement("style");
   channelBoxStyle.setAttribute(
@@ -148,10 +148,12 @@ const applyChannelPageStyle = async (
     channel.custom_url as string
   );
   channelBoxStyle.id = CSS_IDS.CHANNEL_PAGE_STYLE;
-  channelBoxStyle.innerHTML = `
-        #channel-header #avatar {
-         box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important;
-        }`;
+  // eslint-disable-next-line no-undef
+  const channelBoxStyleText = document.createTextNode(`
+  #channel-header #avatar {
+    box-shadow: -10px 0 20px ${options.gradientStart.value}, 10px 0 20px ${options.gradientEnd.value} !important;
+  }`);
+  channelBoxStyle.appendChild(channelBoxStyleText);
   channelBox.appendChild(channelBoxStyle);
 
   // Add button to inner-header-container

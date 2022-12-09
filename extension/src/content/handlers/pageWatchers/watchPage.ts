@@ -29,7 +29,11 @@ export const watchPage = async (
   // eslint-disable-next-line no-undef
   const styleElement = document.createElement("style");
   styleElement.id = CSS_IDS.MASS_VIDEO;
-  styleElement.innerHTML = watchPageOptions.styles.join("\n");
+
+  styleElement.appendChild(
+    // eslint-disable-next-line no-undef
+    document.createTextNode(watchPageOptions.styles.join("\n"))
+  );
 
   // eslint-disable-next-line no-undef
   document.head.appendChild(styleElement);

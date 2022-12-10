@@ -21,15 +21,15 @@ export type watchPageOptions = {
   urlRegex: RegExp; // A regex to match the url
   selectors: {
     // eslint-disable-next-line no-undef
-    videoElements: () => HTMLElement[]; // A function that returns an array of all the root video elements on the page
+    videoElements: () => Element[]; // A function that returns an array of all the root video elements on the page
     // eslint-disable-next-line no-undef
-    newVideoElements: () => HTMLElement[]; // A function that returns an array of new video elements on the page
+    newVideoElements: () => Element[]; // A function that returns an array of new video elements on the page
     // eslint-disable-next-line no-undef, no-unused-vars
-    hrefFromRootElement: (videoElement: HTMLElement) => string | null; // A function that returns the videoId of a video element
+    hrefFromRootElement: (videoElement: Element) => string | null; // A function that returns the videoId of a video element
     // eslint-disable-next-line no-undef, no-unused-vars
-    videoElementFromId: (videoId: string) => HTMLElement; // A function that returns the video element with the given videoId
+    videoElementFromId: (videoId: string) => Element; // A function that returns the video element with the given videoId
     // eslint-disable-next-line no-undef, no-unused-vars
-    thumbnailFromRootElement: (videoElement: HTMLElement) => HTMLElement; // A function that returns the thumbnail element of a video element
+    thumbnailFromRootElement: (videoElement: Element) => Element; // A function that returns the thumbnail element of a video element
   };
 };
 
@@ -69,22 +69,28 @@ export const constructWatchPageOptions = async (
         urlRegex: /^https:\/\/www.youtube.com\/$/,
         selectors: {
           // eslint-disable-next-line no-undef
-          videoElements: (): HTMLElement[] => {
+          videoElements: (): Element[] => {
+            // eslint-disable-next-line no-undef
+            // document.querySelectorAll(
+            // "ytd-rich-grid-renderer div#content:has(a#thumbnail[href])"
+            // )
+            console.debug("HomePage: Thumbnails: Getting video elements");
             return Array.from(
-              // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "ytd-rich-grid-renderer div#content:has(a#thumbnail[href])"
-              )
+              document.querySelectorAll("ytd-rich-grid-renderer div#content")
             );
           },
           // eslint-disable-next-line no-undef
-          newVideoElements: (): HTMLElement[] => {
+          newVideoElements: (): Element[] => {
+            console.debug("HomePage: Thumbnails: Getting new video elements");
             return Array.from(
-              // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "ytd-rich-grid-renderer div#content:has(a#thumbnail[href]):not(.nebulate-scraped)"
-              )
+              document.querySelectorAll("ytd-rich-grid-renderer div#content")
+            ).filter(
+              (element) => !element.classList.contains("nebulate-scraped")
             );
+            // eslint-disable-next-line no-undef
+            // document.querySelectorAll(
+            // "ytd-rich-grid-renderer div#content:has(a#thumbnail[href]):not(.nebulate-scraped)"
+            // )
           },
           hrefFromRootElement: (videoElement): string | null => {
             const videoLink = videoElement.querySelector("a#thumbnail[href]");
@@ -97,25 +103,32 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          videoElementFromId: (videoId): HTMLElement => {
+          videoElementFromId: (videoId): Element => {
             // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${videoId}'])`
-            );
+            // const videoElement = document.querySelector(
+            // `ytd-rich-grid-renderer div#content:has(a#thumbnail[href*='v=${videoId}'])`
+            // );
+
+            const videoElement = Array.from(
+              document.querySelectorAll("ytd-rich-grid-renderer div#content")
+            ).find((element) => {
+              return element.querySelector(`a#thumbnail[href*='v=${videoId}']`);
+            });
+
             if (videoElement) {
               // eslint-disable-next-line no-undef
-              return videoElement as HTMLElement;
+              return videoElement as Element;
               // eslint-disable-next-line no-undef
             } else {
               throw new Error("HomePage: No video element found for videoId");
             }
           },
           // eslint-disable-next-line no-undef
-          thumbnailFromRootElement: (videoElement): HTMLElement => {
+          thumbnailFromRootElement: (videoElement): Element => {
             const videoLink = videoElement.querySelector("a#thumbnail[href]");
             if (videoLink) {
               // eslint-disable-next-line no-undef
-              return videoLink as HTMLElement;
+              return videoLink as Element;
               // eslint-disable-next-line no-undef
             } else {
               throw new Error("HomePage: No thumbnail found for root element");
@@ -141,21 +154,25 @@ export const constructWatchPageOptions = async (
         urlRegex: /^https:\/\/www.youtube.com\/feed\/subscriptions$/,
         selectors: {
           // eslint-disable-next-line no-undef
-          videoElements: (): HTMLElement[] => {
+          videoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "ytd-grid-video-renderer:has(a#thumbnail[href])"
-              )
+              // document.querySelectorAll(
+              // "ytd-grid-video-renderer:has(a#thumbnail[href])"
+              // )
+              document.querySelectorAll("ytd-grid-video-renderer")
             );
           },
           // eslint-disable-next-line no-undef
-          newVideoElements: (): HTMLElement[] => {
+          newVideoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "ytd-grid-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped)"
-              )
+              // document.querySelectorAll(
+              // "ytd-grid-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped)"
+              // )
+              document.querySelectorAll("ytd-grid-video-renderer")
+            ).filter(
+              (element) => !element.classList.contains("nebulate-scraped")
             );
           },
           hrefFromRootElement: (videoElement): string | null => {
@@ -169,25 +186,31 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          videoElementFromId: (videoId): HTMLElement => {
+          videoElementFromId: (videoId): Element => {
             // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-grid-video-renderer:has(a#thumbnail[href*="${videoId}"])`
-            );
+            // const videoElement = document.querySelector(
+            // `ytd-grid-video-renderer:has(a#thumbnail[href*="${videoId}"])`
+            // );
+            const videoElement = Array.from(
+              document.querySelectorAll("ytd-grid-video-renderer")
+            ).find((element) => {
+              return element.querySelector(`a#thumbnail[href*="${videoId}"]`);
+            });
+
             if (videoElement) {
               // eslint-disable-next-line no-undef
-              return videoElement as HTMLElement;
+              return videoElement as Element;
               // eslint-disable-next-line no-undef
             } else {
               throw new Error("SubsPage: No video element found for videoId");
             }
           },
           // eslint-disable-next-line no-undef
-          thumbnailFromRootElement: (videoElement): HTMLElement => {
+          thumbnailFromRootElement: (videoElement): Element => {
             const videoLink = videoElement.querySelector("a#thumbnail[href]");
             if (videoLink) {
               // eslint-disable-next-line no-undef
-              return videoLink as HTMLElement;
+              return videoLink as Element;
             } else {
               throw new Error("SubsPage: No thumbnail found for root element");
             }
@@ -212,21 +235,29 @@ export const constructWatchPageOptions = async (
         urlRegex: /^https:\/\/www.youtube.com\/watch\?v=/,
         selectors: {
           // eslint-disable-next-line no-undef
-          videoElements: (): HTMLElement[] => {
+          videoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
+              // document.querySelectorAll(
+              // "div#contents ytd-compact-video-renderer:has(a[href])"
+              // )
               document.querySelectorAll(
-                "div#contents ytd-compact-video-renderer:has(a[href])"
+                "div#contents ytd-compact-video-renderer"
               )
             );
           },
           // eslint-disable-next-line no-undef
-          newVideoElements: (): HTMLElement[] => {
+          newVideoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
+              // document.querySelectorAll(
+              // "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped)"
+              // )
               document.querySelectorAll(
-                "div#contents ytd-compact-video-renderer:has(a[href]):not(.nebulate-scraped)"
+                "div#contents ytd-compact-video-renderer"
               )
+            ).filter(
+              (element) => !element.classList.contains("nebulate-scraped")
             );
           },
           hrefFromRootElement: (videoElement): string | null => {
@@ -240,24 +271,30 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          videoElementFromId: (videoId): HTMLElement => {
+          videoElementFromId: (videoId): Element => {
             // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-compact-video-renderer:has(a#thumbnail[href*="${videoId}"])`
-            );
+            // const videoElement = document.querySelector(
+            // `ytd-compact-video-renderer:has(a#thumbnail[href*="${videoId}"])`
+            // );
+            const videoElement = Array.from(
+              document.querySelectorAll("ytd-compact-video-renderer")
+            ).find((element) => {
+              return element.querySelector(`a[href*="${videoId}"]`);
+            });
+
             if (videoElement) {
               // eslint-disable-next-line no-undef
-              return videoElement as HTMLElement;
+              return videoElement as Element;
             } else {
               throw new Error("VideoPage: No video element found for videoId");
             }
           },
           // eslint-disable-next-line no-undef
-          thumbnailFromRootElement: (videoElement): HTMLElement => {
+          thumbnailFromRootElement: (videoElement): Element => {
             const videoLink = videoElement.querySelector("a[href]");
             if (videoLink) {
               // eslint-disable-next-line no-undef
-              return videoLink as HTMLElement;
+              return videoLink as Element;
             } else {
               throw new Error("VideoPage: No thumbnail found for root element");
             }
@@ -281,21 +318,25 @@ export const constructWatchPageOptions = async (
         urlRegex: /^https:\/\/www.youtube.com\/results\?search_query=/,
         selectors: {
           // eslint-disable-next-line no-undef
-          videoElements: (): HTMLElement[] => {
+          videoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "ytd-search ytd-video-renderer:has(a#thumbnail[href])"
-              )
+              // document.querySelectorAll(
+              // "ytd-search ytd-video-renderer:has(a#thumbnail[href])"
+              // )
+              document.querySelectorAll("ytd-search ytd-video-renderer")
             );
           },
           // eslint-disable-next-line no-undef
-          newVideoElements: (): HTMLElement[] => {
+          newVideoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "ytd-search ytd-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped)"
-              )
+              // document.querySelectorAll(
+              // "ytd-search ytd-video-renderer:has(a#thumbnail[href]):not(.nebulate-scraped)"
+              // )
+              document.querySelectorAll("ytd-search ytd-video-renderer")
+            ).filter(
+              (element) => !element.classList.contains("nebulate-scraped")
             );
           },
           hrefFromRootElement: (videoElement): string | null => {
@@ -309,24 +350,30 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          videoElementFromId: (videoId): HTMLElement => {
+          videoElementFromId: (videoId): Element => {
             // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-video-renderer:has(a#thumbnail[href*="${videoId}"])`
-            );
+            // const videoElement = document.querySelector(
+            // `ytd-video-renderer:has(a#thumbnail[href*="${videoId}"])`
+            // );
+            const videoElement = Array.from(
+              document.querySelectorAll("ytd-video-renderer")
+            ).find((element) => {
+              return element.querySelector(`a[href*="${videoId}"]`);
+            });
+
             if (videoElement) {
               // eslint-disable-next-line no-undef
-              return videoElement as HTMLElement;
+              return videoElement as Element;
             } else {
               throw new Error("SearchPage: No video element found for videoId");
             }
           },
           // eslint-disable-next-line no-undef
-          thumbnailFromRootElement: (videoElement): HTMLElement => {
+          thumbnailFromRootElement: (videoElement): Element => {
             const videoLink = videoElement.querySelector("a#thumbnail[href]");
             if (videoLink) {
               // eslint-disable-next-line no-undef
-              return videoLink as HTMLElement;
+              return videoLink as Element;
             } else {
               throw new Error(
                 "SearchPage: No thumbnail found for root element"
@@ -353,21 +400,25 @@ export const constructWatchPageOptions = async (
           /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+\/featured|@[a-zA-Z0-9]+\/videos|@[a-zA-Z0-9]+|c\/[a-zA-Z0-9]+|user\/[a-zA-Z0-9]+)$/,
         selectors: {
           // eslint-disable-next-line no-undef
-          videoElements: (): HTMLElement[] => {
+          videoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "div#contents ytd-grid-video-renderer:has(a[href])"
-              )
+              // document.querySelectorAll(
+              // "div#contents ytd-grid-video-renderer:has(a[href])"
+              // )
+              document.querySelectorAll("div#contents ytd-grid-video-renderer")
             );
           },
           // eslint-disable-next-line no-undef
-          newVideoElements: (): HTMLElement[] => {
+          newVideoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "div#contents ytd-grid-video-renderer:has(a[href]):not(.nebulate-scraped)"
-              )
+              // document.querySelectorAll(
+              // "div#contents ytd-grid-video-renderer:has(a[href]):not(.nebulate-scraped)"
+              // )
+              document.querySelectorAll("div#contents ytd-grid-video-renderer")
+            ).filter(
+              (element) => !element.classList.contains("nebulate-scraped")
             );
           },
           hrefFromRootElement: (videoElement): string | null => {
@@ -381,14 +432,19 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          videoElementFromId: (videoId): HTMLElement => {
+          videoElementFromId: (videoId): Element => {
             // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-grid-video-renderer:has(a#thumbnail[href*="${videoId}"])`
-            );
+            // const videoElement = document.querySelector(
+            // `ytd-grid-video-renderer:has(a#thumbnail[href*="${videoId}"])`
+            // );
+            const videoElement = Array.from(
+              document.querySelectorAll("ytd-grid-video-renderer")
+            ).find((element) => {
+              return element.querySelector(`a[href*="${videoId}"]`);
+            });
             if (videoElement) {
               // eslint-disable-next-line no-undef
-              return videoElement as HTMLElement;
+              return videoElement as Element;
             } else {
               throw new Error(
                 "ChannelPage: No video element found for videoId"
@@ -396,11 +452,11 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          thumbnailFromRootElement: (videoElement): HTMLElement => {
+          thumbnailFromRootElement: (videoElement): Element => {
             const videoLink = videoElement.querySelector("a[href]");
             if (videoLink) {
               // eslint-disable-next-line no-undef
-              return videoLink as HTMLElement;
+              return videoLink as Element;
             } else {
               throw new Error(
                 "ChannelPage: No thumbnail found for root element"
@@ -427,21 +483,25 @@ export const constructWatchPageOptions = async (
           /^https:\/\/www\.youtube\.com\/(@[a-zA-Z0-9]+\/featured|@[a-zA-Z0-9]+\/videos|@[a-zA-Z0-9]+|c\/[a-zA-Z0-9]+|user\/[a-zA-Z0-9]+)$/,
         selectors: {
           // eslint-disable-next-line no-undef
-          videoElements: (): HTMLElement[] => {
+          videoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "div#contents ytd-rich-item-renderer:has(a[href])"
-              )
+              // document.querySelectorAll(
+              // "div#contents ytd-rich-item-renderer:has(a[href])"
+              // )
+              document.querySelectorAll("div#contents ytd-rich-item-renderer")
             );
           },
           // eslint-disable-next-line no-undef
-          newVideoElements: (): HTMLElement[] => {
+          newVideoElements: (): Element[] => {
             return Array.from(
               // eslint-disable-next-line no-undef
-              document.querySelectorAll(
-                "div#contents ytd-rich-item-renderer:has(a[href]):not(.nebulate-scraped)"
-              )
+              // document.querySelectorAll(
+              // "div#contents ytd-rich-item-renderer:has(a[href]):not(.nebulate-scraped)"
+              // )
+              document.querySelectorAll("div#contents ytd-rich-item-renderer")
+            ).filter(
+              (element) => !element.classList.contains("nebulate-scraped")
             );
           },
           hrefFromRootElement: (videoElement): string | null => {
@@ -455,14 +515,19 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          videoElementFromId: (videoId): HTMLElement => {
+          videoElementFromId: (videoId): Element => {
             // eslint-disable-next-line no-undef
-            const videoElement = document.querySelector(
-              `ytd-rich-item-renderer:has(a#thumbnail[href*="${videoId}"])`
-            );
+            // const videoElement = document.querySelector(
+            // `ytd-rich-item-renderer:has(a#thumbnail[href*="${videoId}"])`
+            // );
+            const videoElement = Array.from(
+              document.querySelectorAll("ytd-rich-item-renderer")
+            ).find((element) => {
+              return element.querySelector(`a[href*="${videoId}"]`);
+            });
             if (videoElement) {
               // eslint-disable-next-line no-undef
-              return videoElement as HTMLElement;
+              return videoElement as Element;
             } else {
               throw new Error(
                 "ChannelPage: No video element found for videoId"
@@ -470,11 +535,11 @@ export const constructWatchPageOptions = async (
             }
           },
           // eslint-disable-next-line no-undef
-          thumbnailFromRootElement: (videoElement): HTMLElement => {
+          thumbnailFromRootElement: (videoElement): Element => {
             const videoLink = videoElement.querySelector("a[href]");
             if (videoLink) {
               // eslint-disable-next-line no-undef
-              return videoLink as HTMLElement;
+              return videoLink as Element;
             } else {
               throw new Error(
                 "ChannelPage: No thumbnail found for root element"

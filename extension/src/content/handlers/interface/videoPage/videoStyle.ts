@@ -36,21 +36,21 @@ export const addVideoStyle = async (video: Video): Promise<void> => {
       /* Nebulate Video Style ${video.videoId} */
 
   /* Mini Player */
-  .miniplayer #container:has(video) {
+  .miniplayer #container {
     box-shadow: -10px 0 40px ${options.gradientStart.value}, 10px 0 40px ${options.gradientEnd.value} !important;
     transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
     clip-path: inset(-100% -100% 0 -100%);
   }
   
   /* Theatre Player */
-  #player-theater-container #container:has(video) {
+  #player-theater-container #container {
     box-shadow: -10px 0 40px ${options.gradientStart.value}, 10px 0 40px ${options.gradientEnd.value} !important;
     transition: box-shadow 1s cubic-bezier(0.165, 0.84, 0.44, 1) 1s
     /* clip-path: inset(0px -100vw 0px -100vw); */;
   }
     
   /* Normal Player */
-  :not(.ytd-page-manager[theater]) #container:has(video) {
+  :not(.ytd-page-manager[theater]) #movie_player {
     box-shadow: -10px 0 40px ${options.gradientStart.value}, 10px 0 40px ${options.gradientEnd.value} !important;
     transition: box-shadow 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
     transition-delay: 0.5s;
@@ -105,15 +105,11 @@ const waitForVideo = async (msDelay: number): Promise<void> => {
     const checker = (): void => {
       if (
         // eslint-disable-next-line no-undef
-        document.querySelector(".miniplayer #container:has(video)") ||
+        document.querySelector(".miniplayer #container") ||
         // eslint-disable-next-line no-undef
-        document.querySelector(
-          "#player-theater-container #container:has(video)"
-        ) ||
+        document.querySelector("#player-theater-container #container") ||
         // eslint-disable-next-line no-undef
-        document.querySelector(
-          ":not(.ytd-page-manager[theater]) #container:has(video)"
-        )
+        document.querySelector(":not(.ytd-page-manager[theater]) #movie_player")
       ) {
         videoObserver.disconnect();
         console.timeEnd("Video loaded in");

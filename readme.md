@@ -1,5 +1,7 @@
 # Nebulate
 
+Modernization work on this branch is tracked in [the extension modernization plan](Documentation/modernization-plan.md). Agents should read [AGENTS.md](AGENTS.md) first. The instructions below describe the historical release; the new extension-only toolchain is not implemented yet.
+
 > If you install this Extension please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) to help me test it and provide feedback.
 
 <p align="center">

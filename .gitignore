@@ -31,6 +31,8 @@ docs/
 # Misc
 .DS_Store
 .env
+.env.*
+!.env.example
 
 yarn-error.log
 json_token.txt

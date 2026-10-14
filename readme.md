@@ -1,59 +1,68 @@
 # Nebulate
 
-Modernization work on this branch is tracked in [the extension modernization plan](Documentation/modernization-plan.md). Agents should read [AGENTS.md](AGENTS.md) first. The instructions below describe the historical release; the new extension-only toolchain is not implemented yet.
+Nebulate finds confirmed Nebula videos while you browse YouTube. The Chrome/Firefox Manifest V3 extension fetches metadata, matches videos and stores results inside your browser. It preserves the rocket button and blue/purple highlighting. No Node helper, database, hosted lookup table or backend is required at runtime.
 
-> If you install this Extension please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) to help me test it and provide feedback.
+The [modernization plan](Documentation/modernization-plan.md) records evidence and remaining acceptance gaps; contributors must read [AGENTS.md](AGENTS.md). The [historical release instructions](Documentation/historical-setup.md) describe the retired application.
 
-<p align="center">
-  <img src="https://github.com/oenu/Nebulate/blob/dev/screenshots/v0.2.png">
-</p>
+## Install and use
 
-_Example of Nebulate highlighting a Nebula video and Thumbnails on YouTube_
+Build locally using the commands below, then load `.output/chrome-mv3` with **Load unpacked** on Chrome's extensions page. In Firefox's `about:debugging` → **This Firefox** → **Load Temporary Add-on**, select `.output/firefox-mv3/manifest.json`. Firefox temporary installation must be repeated after restart. No signed or store-distributed package is produced.
 
-# Nebulate Chrome Extension
+The manifest targets Chrome 120+ and Firefox 140+. Automated live checks used Chrome for Testing 156.0.8078.4 and Firefox Nightly 157.0; manual stable-release browser acceptance was not performed.
 
-The Nebulate Chrome Extension is a simple, easy-to-use tool that makes it easy to find and watch videos from your favorite creators on Nebula, all from within YouTube.
+Open Nebulate's popup or settings for optional Nebula sign-in. Public catalogue metadata currently works without an account; Nebula playback still follows Nebula's own access rules. Passwords are submitted directly to Nebula and never saved. Session keys/tokens stay in privileged `storage.session`, unavailable to YouTube content scripts, and disappear on browser restart. Sign out clears the local session immediately and attempts server revocation; an offline revocation failure is reported.
 
-## Usage
+Browse a YouTube watch page, search, channel videos, home/subscriptions or recommendations. A rocket appears only for a confirmed match and opens its canonical Nebula video URL. Unknown or ambiguous videos receive no redirect. The verified seeds are Not Just Bikes and Wendover Productions; other creators need a confirmed mapping in settings. Home/subscriptions acceptance limitations are listed below.
 
-- Navigate to YouTube and begin browsing for videos.
-- The extension will automatically detect and highlight Nebula videos, as well as show a "Watch on Nebula" button on YouTube videos that are also available on Nebula.
-- Click the Nebulate rocket button or the thumbnail rocket button on a thumbnail to be redirected to the Nebula version of the video.
+Settings include appearance preferences, creator refresh progress/backoff, cached match counts, manual video confirmations/exclusions and creator mappings. To correct a video, enter its YouTube watch URL or ID, inspect candidates, then save a canonical Nebula URL or a manual exclusion. Positive corrections must belong to the verified creator. Creator mapping changes require your confirmation and validate the public YouTube identity and Nebula channel.
 
-## Installation
+Metadata, decisions, creator mappings, corrections and preferences stay on this device; nothing is written to browser sync. Clearing the cache removes catalogue videos, automatic decisions and refresh jobs while retaining mappings, preferences, corrections and sign-in. Select **Also remove manual video corrections** to erase corrections too. Logout retains the cache and settings. Automatic decisions expire (negative matches after 15 minutes, confirmed matches after seven days); matching cached confirmations remain usable offline. Retention bounds automatic decisions to 2,000/90 days and catalogue metadata to 5,000 records, preserving videos referenced by corrections.
 
-<p align="center">
-<a href="https://chrome.google.com/webstore/detail/nebulate/gdjnphjblhbahaidifindimahccaagbf" >
-   <img src="https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4ybeBTsZt43U4xis.png">
-</a>
-</p>
+## Troubleshooting
 
-Download the latest release from the [Chrome Web Store](https://chrome.google.com/webstore/detail/nebulate/gdjnphjblhbahaidifindimahccaagbf), other browsers coming soon...
+- No rocket: check the recent state and creator mapping in settings. Unverified identity, ambiguous titles, an incomplete catalogue or unavailable metadata remain unresolved. A creator refresh reads at most five pages of 100 episodes, so older videos may need a manual correction.
+- Checking or unavailable: the extension fetches only relevant creators, limits concurrent work and honors retry backoff. Reconnect and retry after the displayed time. Interrupted jobs resume from local checkpoints through browser alarms. A forced refresh also respects service backoff.
+- Sign-in required: sign in again after a browser restart or rejected session. Passwords are never recovered from local storage. Public metadata may still work while signed out.
+- Background unavailable after updating an unpacked build: reload the extension, then reload the YouTube tab. Firefox temporary add-ons need to be reloaded after restart.
 
-> Alternatively, you can install the extension manually by following these steps:
->
-> - Clone this repository to your local machine.
-> - In Google Chrome, go to chrome://extensions.
-> - Enable "Developer mode" by clicking the toggle in the top-right corner of the page.
-> - `cd` into `/extension` and run `yarn` to install dependencies.
-> - Run `yarn build` to build the extension in `/extension/dist`.
-> - Click the "Load unpacked" button and select the `/extension/dist` folder.
-> - The extension should now be installed and enabled.
-> - By default the extension will use the official table server, if you want to build your own please see the [Nebulate Database](#nebulate-database) section.
+## Local development
 
-## Features
+Use Bun 1.4.3+ and Node 26+ (verified Node 26.8.2). Bun manages dependencies and runs scripts; the toolchain and Node fixture suite retain Node. From the repository root:
 
-- Shows a "Watch on Nebula" button on YouTube videos that are also available on Nebula, so you can easily switch to watching them there
-- Highlights Nebula videos on YouTube's search, channel, home, featured, and subscription pages, as well as in recommended videos, so you can quickly find them
-- Adds a redirect rocket button to YouTube thumbnails for Nebula videos, so you can jump straight to the Nebula version of the video with just one click
-- Uses a local lookup table that is regularly updated with the latest information from both Nebula and YouTube, so you can be sure you're always seeing the most accurate and up-to-date data
+```sh
+bun install --frozen-lockfile
+bun run --no-env-file check
+```
 
-# Nebulate Database
+The root `bun.lock` is the sole active lockfile. `backend/` is inactive reference source and is never installed or checked by these commands. The [dependency inventory](Documentation/dependencies.md) records registry-resolved stable versions and migration decisions.
 
-The Nebulate Database is a node script that scrapes data from both Nebula and YouTube and builds a local lookup table that is used by the Nebulate Chrome Extension to match videos and show the correct information. It is run automatically on a regular basis to keep the lookup table up-to-date.
+`bun run --no-env-file lint`, `bun run --no-env-file typecheck`, `bun run --no-env-file test`, `bun run --no-env-file build:chrome`, and `bun run --no-env-file build:firefox` work separately. `check` runs all of them and validates the generated manifests, asset references and runtime artifacts. They use sanitized fixtures and need no account or installed browser. Builds run WXT from an empty environment directory; Vite public environment exposure is disabled.
 
-> At the moment the database is open source but not yet documented. If you would like to contribute to the project please join the [Nebulate Discord](https://discord.gg/6JtPxnQbbG) and I can help you get started.
+Development variants are `bun run --no-env-file dev:chrome` and `bun run --no-env-file dev:firefox`; install the chosen browser locally for these. All checks run locally. No signing, store upload, hosted CI or publication is configured.
 
-## Notes
+## Explicit live checks
 
-- This project is currently is in active development. The outdated readme can be found [here](_readme.md) which contains more information about the project and how it works.
+Read [Nebula access evidence](Documentation/nebula-access.md) before running `bun run --no-env-file probe:nebula`. That command explicitly reads the ignored `.env.local` and tests account access, with sanitized output and logout. Copy `.env.example` for placeholder names; never source environment files or expose account values with a public build prefix. The extension uses its own runtime sign-in, separate from development probes.
+
+Local browser automation additionally needs development binaries:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.local/browsers" bunx --no-env-file playwright install chromium firefox
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.local/browsers" node scripts/browser-shell.mjs chrome
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.local/browsers" node scripts/browser-shell.mjs firefox
+```
+
+The Firefox harness also obtains geckodriver and uses isolated macOS app data under `.local/` to work around the upstream development-browser startup issue. Browser binaries, profiles and generated artifacts are ignored; no browser traces, account responses or screenshots are captured by acceptance scripts.
+
+Explicit account-backed tests read `.env.local` only when invoked with `--live`. Run each target sequentially; replace `chrome` with `firefox` for the other build:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.local/browsers" node scripts/browser-watch.mjs chrome --live
+PLAYWRIGHT_BROWSERS_PATH="$PWD/.local/browsers" node scripts/browser-acceptance.mjs chrome --live
+```
+
+The watch test checks rejected-bearer renewal, a real match, an unmatched promotion, one correct watch button, logout and restart persistence. Expanded acceptance checks real click-through, search/channel/recommendation cards, corrections, cache controls, local preferences and runtime request counters without logging account data. Network inspection found first-party Nebula API and public YouTube lookups, with no unexpected background destinations, old lookup requests or misplaced authorization/cookie headers. Natural token expiry, rate limits, offline recovery and worker interruption use deterministic simulations where noted in the plan.
+
+**Remaining acceptance:** loaded-extension checks on signed-in YouTube home/subscriptions and manual stable-release browser UI acceptance were not performed. Signed-in in-app inspection verified subscription card markup and an empty home grid, but that browser cannot load Nebulate. The user explicitly requested that the signed-in feed gap remain documented. P6.1/P7.2 stay unchecked; full phase acceptance is not claimed.
+
+For a future explicitly requested signed-in feed run, `scripts/browser-feed-acceptance.mjs chrome --live --interactive` (and `firefox`) opens a disposable headed browser for Google sign-in. This is separate from ordinary checks and was stopped when the user deferred the check. See the plan work log for exact performed scenarios and limitations.

@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  background: #141b29 url("/assets/stars.png") repeat;
+}
+.nebulate-shell {
+  padding: 24px;
+  min-height: 280px;
+}
+.nebulate-shell.compact {
+  width: 370px;
+}
+h1 {
+  color: #3ebbf3;
+}

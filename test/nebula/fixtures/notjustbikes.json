@@ -1,0 +1,58 @@
+{
+  "source": "First-party public catalogue; allowlisted fields only",
+  "retrievedOn": "2026-10-14",
+  "creator": {
+    "id": "video_channel:8714203d-6950-4536-be0b-78196a599cf6",
+    "slug": "notjustbikes",
+    "title": "Not Just Bikes",
+    "source": "https://content.api.nebula.app/video_channels/notjustbikes/"
+  },
+  "videos": [
+    {
+      "id": "video_episode:c066ab40-4d21-48a3-b83e-cc80a1c34cdb",
+      "slug": "daypass-season-2-trailer",
+      "title": "Day Pass Season 2 — Official Trailer",
+      "channelId": "video_channel:a6858620-1aa0-4048-b6a8-67a880655391",
+      "channelSlug": "daypass",
+      "publishedAt": "2026-10-07T16:00:01Z",
+      "durationSeconds": 66,
+      "url": "https://nebula.tv/videos/daypass-season-2-trailer/",
+      "primaryCreatorMatches": false
+    },
+    {
+      "id": "video_episode:1ad73ca4-68bb-4a19-9967-086b42b4b95a",
+      "slug": "notjustbikes-the-best-of-singapore-cycling-with-a-local",
+      "title": "The Best of Singapore Cycling (with a local)",
+      "channelId": "video_channel:8714203d-6950-4536-be0b-78196a599cf6",
+      "channelSlug": "notjustbikes",
+      "publishedAt": "2026-09-24T12:22:20Z",
+      "durationSeconds": 2354,
+      "url": "https://nebula.tv/videos/notjustbikes-the-best-of-singapore-cycling-with-a-local/",
+      "primaryCreatorMatches": true
+    },
+    {
+      "id": "video_episode:abbf6633-62a5-473b-ae4a-de59056c099d",
+      "slug": "notjustbikes-cycling-made-difficult-but-its-getting-better",
+      "title": "Cycling Made Difficult (but it's getting better!)",
+      "channelId": "video_channel:8714203d-6950-4536-be0b-78196a599cf6",
+      "channelSlug": "notjustbikes",
+      "publishedAt": "2026-09-24T12:21:53Z",
+      "durationSeconds": 955,
+      "url": "https://nebula.tv/videos/notjustbikes-cycling-made-difficult-but-its-getting-better/",
+      "primaryCreatorMatches": true
+    },
+    {
+      "id": "video_episode:bc0ea7a7-c9cd-4e8d-b2d8-2c03cb1aa63d",
+      "slug": "daypass-season-2-teaser",
+      "title": "Day Pass Season 2 — Official Teaser",
+      "channelId": "video_channel:a6858620-1aa0-4048-b6a8-67a880655391",
+      "channelSlug": "daypass",
+      "publishedAt": "2026-09-23T16:00:05Z",
+      "durationSeconds": 49,
+      "url": "https://nebula.tv/videos/daypass-season-2-teaser/",
+      "primaryCreatorMatches": false
+    }
+  ],
+  "pages": 2,
+  "hasMore": true
+}

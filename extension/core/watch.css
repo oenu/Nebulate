@@ -1,0 +1,38 @@
+.nebulate-rocket {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 40px;
+  vertical-align: middle;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+.nebulate-rocket svg {
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+}
+.nebulate-rocket:focus-visible {
+  outline: 2px solid #3ebbf3;
+  outline-offset: 2px;
+}
+.nebulate-confirmed-player {
+  box-shadow:
+    -10px 0 40px rgb(62, 187, 243),
+    10px 0 40px rgb(88, 80, 209);
+}
+.nebulate-card-confirmed {
+  position: relative;
+  border-radius: 12px;
+  box-shadow: 0 0 12px #3ebbf3;
+}
+.nebulate-card-link {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border-radius: 8px;
+  background: #141b29e8;
+  z-index: 2;
+}

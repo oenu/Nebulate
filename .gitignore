@@ -45,3 +45,10 @@ globalConfig.json
 junit.xml
 src/lookup/key.pem
 extension/dist.zip
+
+# Disposable local feasibility probes and browser profiles
+.local/
+probes/nebula-extension/chrome/
+probes/nebula-extension/firefox/
+.output/
+.wxt/

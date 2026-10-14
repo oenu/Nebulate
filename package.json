@@ -1,0 +1,50 @@
+{
+  "name": "nebulate",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local YouTube and Nebula matching browser extension",
+  "license": "MIT",
+  "engines": {
+    "node": ">=26.0.0",
+    "bun": ">=1.4.3"
+  },
+  "packageManager": "bun@1.4.3",
+  "scripts": {
+    "postinstall": "node scripts/wxt.mjs prepare",
+    "lint": "biome check extension/entrypoints extension/core test/modern wxt.config.ts vitest.config.ts scripts/check-artifacts.mjs",
+    "format": "biome check --write extension/entrypoints extension/core test/modern wxt.config.ts vitest.config.ts scripts/check-artifacts.mjs",
+    "typecheck": "node scripts/wxt.mjs prepare && tsc --noEmit",
+    "test": "node --test test/nebula/api.test.mjs && vitest run",
+    "build:chrome": "node scripts/wxt.mjs build chrome",
+    "build:firefox": "node scripts/wxt.mjs build firefox",
+    "check": "bun run --no-env-file lint && bun run --no-env-file typecheck && bun run --no-env-file test && bun run --no-env-file build:chrome && bun run --no-env-file build:firefox && node scripts/check-artifacts.mjs",
+    "dev:chrome": "node scripts/wxt.mjs dev chrome",
+    "dev:firefox": "node scripts/wxt.mjs dev firefox",
+    "probe:nebula": "node scripts/nebula/probe.mjs --live",
+    "probe:build": "node scripts/nebula/build-extension.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "@mantine/core": "9.7.2",
+    "@mantine/hooks": "9.7.2",
+    "@tabler/icons-react": "3.49.0",
+    "idb": "8.0.4"
+  },
+  "devDependencies": {
+    "wxt": "0.21.4",
+    "@wxt-dev/module-react": "1.2.2",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4",
+    "fake-indexeddb": "6.2.5",
+    "happy-dom": "21.0.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/node": "26.6.5",
+    "@biomejs/biome": "2.5.15",
+    "playwright": "1.64.1",
+    "selenium-webdriver": "4.51.0",
+    "geckodriver": "8.0.0"
+  }
+}

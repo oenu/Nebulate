@@ -159,8 +159,11 @@ export class BrowsingController {
     }
   }
   private schedule = (): void => {
-    clearTimeout(this.timer);
-    this.timer = setTimeout(() => void this.sync(), 150);
+    if (this.timer !== undefined) return;
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      void this.sync();
+    }, 150);
   };
   private startNavigation = (): void => {
     this.navigating = true;
@@ -192,6 +195,7 @@ export class BrowsingController {
     this.observer = undefined;
     this.revision++;
     clearTimeout(this.timer);
+    this.timer = undefined;
     this.document.removeEventListener('yt-navigate-start', this.startNavigation);
     this.document.removeEventListener('yt-navigate-finish', this.finishNavigation);
     this.document.defaultView?.removeEventListener('scroll', this.schedule);

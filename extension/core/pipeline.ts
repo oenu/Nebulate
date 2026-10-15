@@ -11,8 +11,9 @@ export class Pipeline {
     private readonly store: LocalStore,
     client: NebulaClient,
     private readonly now = Date.now,
+    onUpdated?: () => void,
   ) {
-    this.scheduler = new RefreshScheduler(store, client, now);
+    this.scheduler = new RefreshScheduler(store, client, now, onUpdated);
   }
   async clearCache(includeOverrides = false): Promise<void> {
     this.revision++;
@@ -23,14 +24,28 @@ export class Pipeline {
     const started = this.now();
     const override = await this.store.db.get('overrides', observation.videoId);
     const mapping = resolveCreator(observation, await this.store.db.getAll('creators'));
-    if (override) return matchVideo(observation, mapping, [], started, override);
     const cached = await this.store.db.get('decisions', observation.videoId);
-    if (cached && isFresh(cached, observation, started)) return cached;
-    if (!mapping) return this.store.saveDecision(matchVideo(observation, undefined, [], started));
-    const job = await this.scheduler.refresh(
-      mapping,
-      Boolean(cached && cached.state !== 'confirmed' && cached.expiresAtMs <= started),
-    );
+    // Every encountered mapped creator gets a freshness check. Cached/manual
+    // video decisions can render immediately while the bounded refresh proceeds.
+    const refresh = mapping
+      ? this.scheduler.refresh(
+          mapping,
+          Boolean(
+            !override && cached && cached.state !== 'confirmed' && cached.expiresAtMs <= started,
+          ),
+        )
+      : undefined;
+    if (override) {
+      void refresh?.catch(() => {});
+      return matchVideo(observation, mapping, [], started, override);
+    }
+    if (cached && isFresh(cached, observation, started)) {
+      void refresh?.catch(() => {});
+      return cached;
+    }
+    if (!mapping || !refresh)
+      return this.store.saveDecision(matchVideo(observation, undefined, [], started));
+    const job = await refresh;
     const videos = await this.store.db.getAllFromIndex('videos', 'creator', mapping.nebulaId);
     let decision = matchVideo(observation, mapping, videos, started);
     if (decision.state !== 'confirmed' && decision.state !== 'ambiguous' && !job.complete) {

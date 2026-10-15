@@ -4,6 +4,7 @@ import {
   Card,
   Checkbox,
   Group,
+  ScrollArea,
   Stack,
   Switch,
   Text,
@@ -46,6 +47,7 @@ export function Settings() {
   const [handle, setHandle] = useState('');
   const [slug, setSlug] = useState('');
   const [confirmed, setConfirmed] = useState(false);
+  const [creatorSearch, setCreatorSearch] = useState('');
   const load = useCallback(async () => {
     const status = await browser.runtime.sendMessage({ type: 'status' });
     if (!status.error) setSummary(status);
@@ -146,35 +148,86 @@ export function Settings() {
         <Stack>
           <Title order={2}>Creator refresh</Title>
           <Text size="sm">
-            Only creators encountered while browsing are fetched. Refreshes use at most five pages
-            of 100 episodes, with automatic backoff and restart recovery.
+            A creator's latest videos are fetched when you encounter their videos, including cached
+            matches. Successful fetches are reused for four hours; failures retry with backoff.
+            Refreshes use at most five pages of 100 episodes, with restart recovery.
           </Text>
-          {summary?.creators.map((creator) => {
-            const job = summary.jobs.find((j) => j.slug === creator.slug);
-            return (
-              <Group key={creator.youtubeChannelId} justify="space-between">
-                <div>
-                  <Text>{creator.title}</Text>
-                  <Text size="sm">
-                    {job
-                      ? `${job.status} · ${job.pages} page(s)${job.complete ? '' : ' · catalogue may be incomplete'}`
-                      : 'Not fetched yet'}
-                  </Text>
-                  {job?.error && <Text size="sm">{reasonLabel(job.error)}</Text>}
-                  {job?.retryAtMs ? (
-                    <Text size="sm">Retry after {new Date(job.retryAtMs).toLocaleString()}</Text>
-                  ) : null}
-                </div>
-                <Button
-                  size="xs"
-                  disabled={busy}
-                  onClick={() => void run({ type: 'refresh', slug: creator.slug })}
-                >
-                  Refresh
-                </Button>
-              </Group>
-            );
-          })}
+          <Text size="sm">
+            {summary?.directory.length ?? 0} Nebula channels · {summary?.creators.length ?? 0}{' '}
+            verified YouTube mappings. Directory updated{' '}
+            {summary ? new Date(summary.registryUpdatedAtMs).toLocaleDateString() : '…'}. Unmapped
+            channels need identity confirmation; some Nebula originals have no YouTube counterpart.
+          </Text>
+          <TextInput
+            label="Find a creator"
+            value={creatorSearch}
+            onChange={(event) => setCreatorSearch(event.currentTarget.value)}
+          />
+          <ScrollArea h={360}>
+            <Stack>
+              {summary?.creators
+                .filter(
+                  (creator) =>
+                    creator.title.toLowerCase().includes(creatorSearch.toLowerCase()) ||
+                    creator.slug.includes(creatorSearch.toLowerCase()),
+                )
+                .map((creator) => {
+                  const job = summary.jobs.find((j) => j.slug === creator.slug);
+                  return (
+                    <Group key={creator.youtubeChannelId} justify="space-between">
+                      <div>
+                        <Text>{creator.title}</Text>
+                        <Text size="sm">
+                          {job
+                            ? `${job.status} · ${job.pages} page(s)${job.complete ? '' : ' · catalogue may be incomplete'}`
+                            : 'Not fetched yet'}
+                        </Text>
+                        {job?.error && <Text size="sm">{reasonLabel(job.error)}</Text>}
+                        {job?.retryAtMs ? (
+                          <Text size="sm">
+                            Retry after {new Date(job.retryAtMs).toLocaleString()}
+                          </Text>
+                        ) : null}
+                      </div>
+                      <Button
+                        size="xs"
+                        disabled={busy}
+                        onClick={() => void run({ type: 'refresh', slug: creator.slug })}
+                      >
+                        Refresh
+                      </Button>
+                    </Group>
+                  );
+                })}
+              {summary?.directory
+                .filter(
+                  (entry) =>
+                    !entry.mapped &&
+                    (entry.title.toLowerCase().includes(creatorSearch.toLowerCase()) ||
+                      entry.slug.includes(creatorSearch.toLowerCase())),
+                )
+                .map((entry) => (
+                  <Group key={entry.id} justify="space-between">
+                    <div>
+                      <Text>{entry.title}</Text>
+                      <Text size="sm">YouTube channel not verified · {entry.slug}</Text>
+                    </div>
+                    <Button
+                      size="xs"
+                      variant="subtle"
+                      onClick={() => {
+                        setSlug(entry.slug);
+                        document
+                          .getElementById('nebulate-creator-mappings')
+                          ?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+                      }}
+                    >
+                      Prepare mapping
+                    </Button>
+                  </Group>
+                ))}
+            </Stack>
+          </ScrollArea>
         </Stack>
       </Card>
       <Card withBorder>
@@ -251,7 +304,7 @@ export function Settings() {
           </Group>
         </Stack>
       </Card>
-      <Card withBorder>
+      <Card withBorder id="nebulate-creator-mappings">
         <Stack>
           <Title order={2}>Creator mappings</Title>
           <Text size="sm">

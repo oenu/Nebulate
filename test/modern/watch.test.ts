@@ -149,3 +149,25 @@ test('a failed runtime request retries without navigation and cleanup cancels re
   await vi.advanceTimersByTimeAsync(120_000);
   expect(failedCalls).toBe(1);
 });
+
+test('continuous page mutations cannot postpone the first observation after metadata arrives', async () => {
+  vi.useFakeTimers();
+  document.body.innerHTML = '';
+  let calls = 0;
+  controller = new WatchController(
+    document,
+    () => href,
+    async (observation) => {
+      calls++;
+      return decision(observation);
+    },
+  );
+  controller.start();
+  page();
+  for (let i = 0; i < 12; i++) {
+    document.body.append(document.createElement('span'));
+    await vi.advanceTimersByTimeAsync(50);
+  }
+  expect(calls).toBe(1);
+  expect(document.querySelectorAll('#nebulate-video-button')).toHaveLength(1);
+});

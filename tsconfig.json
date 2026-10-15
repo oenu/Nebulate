@@ -8,6 +8,6 @@
     "noUnusedParameters": true,
     "types": ["node", "vitest/globals", "vite/client"]
   },
-  "include": [".wxt/**/*.d.ts", "extension/entrypoints", "extension/core", "test/modern", "wxt.config.ts", "vitest.config.ts"],
+  "include": [".wxt/**/*.d.ts", "extension/entrypoints", "extension/core", "test/modern", "scripts/update-creators.ts", "wxt.config.ts", "vitest.config.ts"],
   "exclude": ["backend", "extension/src", "node_modules", ".output", ".local"]
 }

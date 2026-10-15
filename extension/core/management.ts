@@ -1,4 +1,5 @@
 import { type NebulaClient, ServiceError } from './client';
+import { CREATOR_DIRECTORY, REGISTRY_UPDATED_AT_MS } from './creators';
 import { matchVideo, resolveCreator } from './matching';
 import { parseCreator, parseVideo, record, text } from './metadata';
 import type { Pipeline } from './pipeline';
@@ -17,13 +18,19 @@ export class Management {
 
   async status() {
     const all = await this.store.db.getAllFromIndex('decisions', 'checked');
+    const creators = await this.store.db.getAll('creators');
     return {
       state: 'ready',
       signedIn: await this.client.signedIn(),
       matches: all.filter((d) => d.state === 'confirmed').length,
       videos: await this.store.db.count('videos'),
       overrides: await this.store.db.count('overrides'),
-      creators: await this.store.db.getAll('creators'),
+      creators,
+      directory: CREATOR_DIRECTORY.map((entry) => ({
+        ...entry,
+        mapped: creators.some((mapping) => mapping.nebulaId === entry.id),
+      })),
+      registryUpdatedAtMs: REGISTRY_UPDATED_AT_MS,
       jobs: await this.store.db.getAll('jobs'),
       recent: all
         .reverse()

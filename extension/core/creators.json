@@ -1,0 +1,3576 @@
+{
+  "schemaVersion": 1,
+  "updatedAtMs": 1792022576765,
+  "entries": [
+    {
+      "id": "video_channel:deb1097d-43db-4673-95e2-f2a9fb3f6433",
+      "slug": "12tone",
+      "title": "12tone",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCTUtqcDkzw7bisadh6AOx5w",
+        "handle": "@12tone",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021971468
+      }
+    },
+    {
+      "id": "video_channel:19c04dbf-b6e7-45e8-99e4-ad1318ce6b52",
+      "slug": "16daysinberlin",
+      "title": "Real Time History — 16 Days in Berlin",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:62e177fd-be90-47cd-89ef-f87fc4ca7600",
+      "slug": "17pages",
+      "title": "17 Pages",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6d1743c5-87e5-4d1a-975d-4aa3d8348daf",
+      "slug": "abbycox",
+      "title": "Abby Cox",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCiXol9ugjOxHHrpkdD0fZZg",
+        "handle": "@AbbyCox",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022099776
+      }
+    },
+    {
+      "id": "video_channel:6b55a52e-fda2-433c-b72c-b306cf2d9bc1",
+      "slug": "abitfrank",
+      "title": "abitfrank",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCnmlAM-7-2J4YdSM4LOt2_Q",
+        "handle": "@abitfrank",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022104168
+      }
+    },
+    {
+      "id": "video_channel:3240d4c1-2664-4098-b3d1-160dbfff0465",
+      "slug": "abitlate",
+      "title": "a bit late",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCQMs3sM1JaVr_4mP2yCg6AA",
+        "handle": "@abitlate",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022108594
+      }
+    },
+    {
+      "id": "video_channel:5aa5fed9-585f-4fbd-afb0-286c874a5731",
+      "slug": "abolish",
+      "title": "Abolish Everything!",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:1dcf0b3b-53d5-4806-873d-4675616929d6",
+      "slug": "abstract",
+      "title": "ABSTRACT",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCIPfjC8FVLdul4-35JekB1g",
+        "handle": "@Abstract",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022112996
+      }
+    },
+    {
+      "id": "video_channel:79df0d9a-60a3-4007-9e9e-7a02d4581ae8",
+      "slug": "acollieralso",
+      "title": "acollieralso",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC5E_q3-du7mrDZIyETFZ_Xw",
+        "handle": "@acollieralso",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022117375
+      }
+    },
+    {
+      "id": "video_channel:6358c08f-f9a4-4883-a6c7-e40219105a5b",
+      "slug": "adam-neely",
+      "title": "Adam Neely",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCnkp4xDOwqqJD7sSM3xdUiQ",
+        "handle": "@AdamNeely",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021971622
+      }
+    },
+    {
+      "id": "video_channel:b0614d44-620a-49a8-b1dd-f80e4987ee5f",
+      "slug": "additionalilyalexandre",
+      "title": "AdditionaLily Alexandre",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:db7c828c-d8c7-4970-9caf-43b12119fb18",
+      "slug": "ahilltodieon",
+      "title": "A Hill to Die On",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC_EzCruiFF-QNJCkBOSCYhA",
+        "handle": "@aHillToDieOn",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021971774
+      }
+    },
+    {
+      "id": "video_channel:26be8e30-1687-4bd7-8dd6-888ed5ede10e",
+      "slug": "aimeenolte",
+      "title": "Aimee Nolte Music",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCZIB_p5AgVVdxgkYWHeUy-Q",
+        "handle": "@AimeeNolte",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021971927
+      }
+    },
+    {
+      "id": "video_channel:2cf5b90d-b6ad-49c5-8e5c-09259cca49f0",
+      "slug": "airplane-mode",
+      "title": "Airplane Mode",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCmmtZ28wLMH2wBcCmB7w4mA",
+        "handle": "@AirplaneMode",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021972079
+      }
+    },
+    {
+      "id": "video_channel:276b4d44-658d-4d60-9491-a04d1143936a",
+      "slug": "alaskassilentsummer",
+      "title": "Wendover — Alaska’s Silent Summer",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a1523607-d02f-4845-9fac-502dab90a49e",
+      "slug": "alex-goes-bananas",
+      "title": "Alex Goes Bananas",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6c479b3d-3b9a-4f5b-9fab-8a0a6ed6da76",
+      "slug": "alexisdahl",
+      "title": "Alexis Dahl",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCTzI0MzwEEImh4BOUUGGhKg",
+        "handle": "@AlexisDahl",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022125095
+      }
+    },
+    {
+      "id": "video_channel:bc436a82-c7f2-495e-aa65-37c7b0911d86",
+      "slug": "alexscorner",
+      "title": "Alex's Corner",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCnbtlei4RJMHWSUq4LKn_SQ",
+        "handle": "@AlexsCorner",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021972231
+      }
+    },
+    {
+      "id": "video_channel:1ead7e38-f379-4e22-9805-8f8074908806",
+      "slug": "alicecappelle",
+      "title": "Alice Cappelle",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCrCTC5_t-HaVJ025DbYITiw",
+        "handle": "@AliceCappelle",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022129486
+      }
+    },
+    {
+      "id": "video_channel:93e81168-9e27-4033-93d2-2b9c6fdc2f6a",
+      "slug": "altschwiftx",
+      "title": "Alt Schwift X",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC0r29hWF31MAwgfilNTUrbA",
+        "handle": "@AltSchwiftX",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022133911
+      }
+    },
+    {
+      "id": "video_channel:547c9615-0c8f-4ac9-acda-44506d9225bc",
+      "slug": "altshiftx",
+      "title": "Alt Shift X",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCveZqqGewoyPiacooywP5Ig",
+        "handle": "@AltShiftX",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021972382
+      }
+    },
+    {
+      "id": "video_channel:0b321fea-d984-4cc6-bbdf-76f36aaeb436",
+      "slug": "amirmoini",
+      "title": "Slashr",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2601d385-c22e-46a0-9a00-5c9e4a3eb65b",
+      "slug": "an-argument-against-reality",
+      "title": "Up and Atom — An Argument Against Reality",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2f5fe844-bfd4-4824-900a-3cc1438b01e0",
+      "slug": "angelacollier",
+      "title": "Angela Collier",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:935e63e1-312e-48d0-9134-ef9c175bfce2",
+      "slug": "apple-talk",
+      "title": "Apple Talk",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:8d037f95-20a5-4f98-bf9f-b9734d91ee76",
+      "slug": "archeologyquest",
+      "title": "Real Science — Archeology Quest",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:d607b8cb-1f5c-43e7-88ef-2c5db8c1756a",
+      "slug": "archivedive",
+      "title": "Archive Dive",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:20f18123-77a6-4cb9-b5e9-350cacda2123",
+      "slug": "astropro",
+      "title": "Astro Pro",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:5d4d4d39-42e6-4e1a-a23f-fa9b7f3e5cea",
+      "slug": "atlaspro",
+      "title": "Atlas Pro",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCz1oFxMrgrQ82-276UCOU9w",
+        "handle": "@AtlasPro1",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021972865
+      }
+    },
+    {
+      "id": "video_channel:2964e965-c9a1-4ed3-b356-eae127e8c8b4",
+      "slug": "atomicfrontier",
+      "title": "Atomic Frontier",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCbCq5Y0WPGimG2jNXhoQxGw",
+        "handle": "@AtomicFrontier",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022146014
+      }
+    },
+    {
+      "id": "video_channel:702b7b9b-2d1e-405b-ada0-1346add422d0",
+      "slug": "austinmcconnell",
+      "title": "Austin McConnell",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCbxQcz9k0NRRuy0ukgQTDQQ",
+        "handle": "@austinmcconnell",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021973019
+      }
+    },
+    {
+      "id": "video_channel:d04b8647-5307-4173-90e1-14997955d20b",
+      "slug": "avgts",
+      "title": "Sam From Wendover's 'A Very Good Trivia Show'",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:5f116338-f80b-40d7-86d6-4ff1c599f198",
+      "slug": "avoidclimatechange",
+      "title": "Can We Avoid a Climate Change Disaster?",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:5d8f6122-e0a2-4c39-914b-9f56850ebcde",
+      "slug": "badlawwordsgood",
+      "title": "LegalEagle — Bad Law Words Good",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:345d423a-2005-4b40-89c6-7bb645bb8510",
+      "slug": "battleofbritain",
+      "title": "Real Engineering — Battle of Britain",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:bb91d9b9-8d61-4ee6-bbc5-e1457f5d4ed1",
+      "slug": "beckystern",
+      "title": "Becky Stern",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCsI_41SZafKtB5qE46WjlQQ",
+        "handle": "@BeckyStern",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022154831
+      }
+    },
+    {
+      "id": "video_channel:dc5cc3e8-5f62-484d-b55e-9949f9b74775",
+      "slug": "becominghuman",
+      "title": "Real Science — Becoming Human",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:727a5e82-fb17-4394-93fb-1f7fccff26c1",
+      "slug": "bekindrewind",
+      "title": "Be Kind Rewind",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:94cad840-7cfa-476f-94b0-d837233c6381",
+      "slug": "bernadettebanner",
+      "title": "Bernadette Banner",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCSHtaUm-FjUps090S7crO4Q",
+        "handle": "@bernadettebanner",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022161406
+      }
+    },
+    {
+      "id": "video_channel:322f5485-ed65-469a-8bb9-9b5b52340df7",
+      "slug": "betterelevation",
+      "title": "Better Elevation",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:76e38386-424b-48a7-86d5-4444bd1540b4",
+      "slug": "beyondthebleachers",
+      "title": "Beyond the Bleachers",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:cf2dd7fe-8f64-46b0-8bf8-1a9884d06efb",
+      "slug": "beyondthescreenplay",
+      "title": "Beyond the Screenplay",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCOpHnp46ORZwdrpoXuhzYMg",
+        "handle": "@BeyondTheScreenplay",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021973171
+      }
+    },
+    {
+      "id": "video_channel:d3d636c9-54a2-4810-a371-b33a4603b27a",
+      "slug": "bigjoel",
+      "title": "Big Joel",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCaN8DZdc8EHo5y1LsQWMiig",
+        "handle": "@BigJoel",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021973326
+      }
+    },
+    {
+      "id": "video_channel:d92686eb-7d1c-429c-b2be-bd4d83eb7366",
+      "slug": "bioark",
+      "title": "BioArk",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:277e2509-5f9d-4c92-a447-9ba904a97f5c",
+      "slug": "bobbybroccoli",
+      "title": "BobbyBroccoli",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCSPLhwvj0gBufjDRzSQb3GQ",
+        "handle": "@BobbyBroccoli",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021974980
+      }
+    },
+    {
+      "id": "video_channel:e1457361-72ad-4c11-87a8-4430a61f1ccb",
+      "slug": "boomers",
+      "title": "Boomers",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:728e0087-ab62-400f-8814-90961f7e2844",
+      "slug": "brancheducation",
+      "title": "Branch Education",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCdp4_l1vPmpN-gDbUwhaRUQ",
+        "handle": "@BranchEducation",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022168021
+      }
+    },
+    {
+      "id": "video_channel:0f22e033-2ffd-4527-b887-d02a8c2c349e",
+      "slug": "breakingtaps",
+      "title": "Breaking Taps",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC06HVrkOL33D5lLnCPjr6NQ",
+        "handle": "@BreakingTaps",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022172418
+      }
+    },
+    {
+      "id": "video_channel:a972a50e-cb1a-4635-ab81-3d719fd5516f",
+      "slug": "brewmarkets",
+      "title": "Brew Markets",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC6BvLmElb0jmDaZrkcrkkyA",
+        "handle": "@BrewMarkets",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022176845
+      }
+    },
+    {
+      "id": "video_channel:6fb5d443-d926-48ea-b453-cce2c565e045",
+      "slug": "brick-facade",
+      "title": "Half as Interesting — The Brick Facade",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c9f9f841-35a5-4ea6-857f-1c00cad8029b",
+      "slug": "bright-sun-films",
+      "title": "Bright Sun Films",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC5k3Kc0avyDJ2nG9Kxm9JmQ",
+        "handle": "@BrightSunFilms",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021975133
+      }
+    },
+    {
+      "id": "video_channel:ee531945-5bc6-4918-b420-b5aafe38fb8f",
+      "slug": "brightsuntravels",
+      "title": "Bright Sun Travels",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCHudN_9O_OD5KQIueahpYvg",
+        "handle": "@BrightSunTravels",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022182361
+      }
+    },
+    {
+      "id": "video_channel:71a85915-3c01-4dff-831b-fdaa1a84165a",
+      "slug": "broeydeschanel",
+      "title": "Broey Deschanel",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCl8W0iKeGjXnGYwOxV8BUOg",
+        "handle": "@BroeyDeschanel",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022186738
+      }
+    },
+    {
+      "id": "video_channel:ab1f1d71-6dfb-4d63-a2b6-6a38b5f27552",
+      "slug": "captaindisillusion",
+      "title": "Captain Disillusion",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCEOXxzW2vU0P-0THehuIIeg",
+        "handle": "@CaptainDisillusion",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022191138
+      }
+    },
+    {
+      "id": "video_channel:ae36e0c3-f0a0-4669-b001-12ca01e0731b",
+      "slug": "captainmidnight",
+      "title": "Captain Midnight",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCROQqK3_z79JuTetNP3pIXQ",
+        "handle": "@captainmidnight",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021975285
+      }
+    },
+    {
+      "id": "video_channel:180d14d5-b665-4d1f-a830-c058999c2983",
+      "slug": "chainbear",
+      "title": "Chain Bear",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC7u-Dg0jb7g9s7XjmtJrtpg",
+        "handle": "@chainbear",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021975437
+      }
+    },
+    {
+      "id": "video_channel:ab0ce6f6-ee76-4a16-9c0c-8316618cad96",
+      "slug": "chaoscorp",
+      "title": "Chaos Corp",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:086ada3a-8fb4-4e3f-a0cc-b8fa0f528e66",
+      "slug": "charlescornell",
+      "title": "Charles Cornell",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC4PIiYewI1YGyiZvgNlJNrA",
+        "handle": "@CharlesCornellStudios",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021975588
+      }
+    },
+    {
+      "id": "video_channel:07e4a8cb-db58-48a7-a410-57613aa97b95",
+      "slug": "chefpk",
+      "title": "Paul Karyakos",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:1139880d-b9f6-4dbd-b284-2bce74821345",
+      "slug": "chillout",
+      "title": "The Friday Chillout",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:d96d774d-597b-4b9d-b113-02dad39a3451",
+      "slug": "chinaactually",
+      "title": "PolyMatter — China, Actually",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:35addea9-4f8c-495a-8301-add66d189ab8",
+      "slug": "chubbyemu",
+      "title": "Chubbyemu",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCKOvOaJv4GK-oDqx-sj7VVg",
+        "handle": "@chubbyemu",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022201054
+      }
+    },
+    {
+      "id": "video_channel:a5f4edc2-9493-4114-a43a-23c3c461117b",
+      "slug": "cinemastix",
+      "title": "CinemaStix",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:47348e82-59fb-4de3-972c-3fab25f51ac9",
+      "slug": "cinemawins",
+      "title": "CinemaWins",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCL8h3ri2WN_-IbviBlWtUcQ",
+        "handle": "@CinemaWins",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021975739
+      }
+    },
+    {
+      "id": "video_channel:1bd18fa2-0373-40b5-8791-0c43e6d3c8e4",
+      "slug": "city-beautiful-best-city-awards",
+      "title": "City Beautiful — Best City Awards",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:7a8d3e20-6893-4edc-ac43-e2686906d2f2",
+      "slug": "citybeautiful",
+      "title": "City Beautiful",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCGc8ZVCsrR3dAuhvUbkbToQ",
+        "handle": "@CityBeautiful",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021975891
+      }
+    },
+    {
+      "id": "video_channel:6def3d63-e1f1-4687-8abd-3244123a44ae",
+      "slug": "citynerd",
+      "title": "CityNerd",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:bc66eb5f-fc6d-414c-9977-e8e761682bbd",
+      "slug": "climatetown",
+      "title": "Climate Town",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCuVLG9pThvBABcYCm7pkNkA",
+        "handle": "@ClimateTown",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022209897
+      }
+    },
+    {
+      "id": "video_channel:30efe2d2-65c2-4492-af56-0e7729f396e0",
+      "slug": "codingtrain",
+      "title": "The Coding Train",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCvjgXvBlbQiydffZU7m1_aw",
+        "handle": "@TheCodingTrain",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976042
+      }
+    },
+    {
+      "id": "video_channel:39dc9dfb-6999-4ac2-b31e-11fe947d3aa5",
+      "slug": "cogito",
+      "title": "Cogito",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCKMnl27hDMKvch--noWe5CA",
+        "handle": "@CogitoEdu",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976193
+      }
+    },
+    {
+      "id": "video_channel:ad7c6480-0234-45f2-998f-9a0d38196398",
+      "slug": "comradekroupsky",
+      "title": "Comrade Kroupsky",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC8UGKChwBsjwIbtxYT2FUlQ",
+        "handle": "@ComradeKroupsky",
+        "verifiedBy": "first-party-nebula-website",
+        "verifiedAtMs": 1792022210050
+      }
+    },
+    {
+      "id": "video_channel:5d373c7f-f601-405e-868e-88dd843ab57e",
+      "slug": "conversations-with-joe",
+      "title": "Conversations with Joe",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCJzc7TiJ2nnuyJkUpOZ8RKA",
+        "handle": "@conversationswithjoe",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976345
+      }
+    },
+    {
+      "id": "video_channel:bdecfeaa-a536-4b14-ac48-134d9a5e9a78",
+      "slug": "creatorsinterrogate",
+      "title": "Creators Interrogate",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:65c7404f-b3fe-4425-a14a-a0e575f05129",
+      "slug": "culttennis",
+      "title": "CULT TENNIS",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCeNyqKqfgv1HJBuD1DavHOQ",
+        "handle": "@CULTTENNIS",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976496
+      }
+    },
+    {
+      "id": "video_channel:11807da9-34c8-4b8b-a1a3-95ccd7cafcfd",
+      "slug": "curiousarchive",
+      "title": "Curious Archive",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCweDKPSF65wRw5VHFUJYiow",
+        "handle": "@CuriousArchive",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022215366
+      }
+    },
+    {
+      "id": "video_channel:f01ef19c-9b35-4899-baff-818f1f8d5422",
+      "slug": "d-day",
+      "title": "Real Engineering — The Logistics of D-Day",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:5967308a-0301-48ba-9f83-10ba9a7d181d",
+      "slug": "dangermusic",
+      "title": "Volksgeist — Danger Music",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a6858620-1aa0-4048-b6a8-67a880655391",
+      "slug": "daypass",
+      "title": "Day Pass",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:1360481e-d142-4bf8-ad63-2fa3d0f5befa",
+      "slug": "dex",
+      "title": "Dracula's Ex-Girlfriend",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:7c6c581c-744d-42c6-9a78-2f0c3bcbc5cd",
+      "slug": "dinnerplan",
+      "title": "The Dinner Plan",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:ef62131e-f7b2-4f9a-962e-5cac92e36fe4",
+      "slug": "domburgess",
+      "title": "Dom Burgess",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCGI000V6ZIAQf97MNybAaLQ",
+        "handle": "@DomBurgess",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976647
+      }
+    },
+    {
+      "id": "video_channel:b33c575f-b427-45af-9438-b6e0f6428c19",
+      "slug": "dominicnoble",
+      "title": "Dominic Noble",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:eb38fd48-7720-4dbd-87b5-70d0b247f005",
+      "slug": "downieexpress",
+      "title": "Downie Express",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:1c48f991-351f-4db5-9d20-e3394f2d182a",
+      "slug": "downielive",
+      "title": "DownieLive",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCvjJzc-UcTv2P5LR6NGP2lg",
+        "handle": "@DownieLive",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022224170
+      }
+    },
+    {
+      "id": "video_channel:9657c3c5-fc91-4b95-893e-6fe878d99c02",
+      "slug": "drawcuriosity",
+      "title": "Draw Curiosity",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCOs_jEnQF2ePJzjJTgRtunA",
+        "handle": "@DrawCuriosity",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976799
+      }
+    },
+    {
+      "id": "video_channel:e7708bea-42f8-4953-899e-031d76cfab39",
+      "slug": "dreamhouse",
+      "title": "Amy’s Dead-End Dreamhouse",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:32001fcd-2ee4-4c6a-9f11-c43c4d79f87c",
+      "slug": "drugs",
+      "title": "Drugs",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:7a3401c9-82d1-4e5c-a4e6-0ee69d29ea38",
+      "slug": "dwiskus",
+      "title": "Dave Wiskus",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCNwJDNN4ib8zqp5Apcj4I9w",
+        "handle": "@dwiskus",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021976951
+      }
+    },
+    {
+      "id": "video_channel:55099455-e38d-4952-a8b8-b9d11c7b97ca",
+      "slug": "echozero",
+      "title": "ECHOZERO",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:3622d613-c9f6-4017-968a-8c06354331df",
+      "slug": "eddache",
+      "title": "Eddache",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC1jyFTfku6mjXIXL_HwRtlA",
+        "handle": "@eddache",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022229673
+      }
+    },
+    {
+      "id": "video_channel:c69b98bb-3d96-4340-b1de-16ac9d7c8e20",
+      "slug": "edith",
+      "title": "E.D.I.T.H. — The Framing of Tony Stark",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:8ae42ae8-122d-4ac8-8e9b-87810c5cb88a",
+      "slug": "epichistorytv",
+      "title": "Epic History",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCvPXiKxH-eH9xq-80vpgmKQ",
+        "handle": "@EpichistoryTv",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022234094
+      }
+    },
+    {
+      "id": "video_channel:3afa68f5-b8f6-464e-b6c4-796d4c2a1ab3",
+      "slug": "equilibriumfx",
+      "title": "Equilibrium FX",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCpFsfsGv1tNwsEnBlXbXGfg",
+        "handle": "@EquilibriumFX",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022238517
+      }
+    },
+    {
+      "id": "video_channel:fd488ca3-2763-400e-b0fe-c33b1930d84b",
+      "slug": "eumadesimple",
+      "title": "EU Made Simple",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC8KFs307LrTkQCu-P1Fl6dw",
+        "handle": "@EUMadeSimple",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022242915
+      }
+    },
+    {
+      "id": "video_channel:625ef0b8-08a0-4ec0-9817-edbd174e4aff",
+      "slug": "eurothug4000",
+      "title": "eurothug4000",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCxddeIv7GdHNcVPZI9JvGXQ",
+        "handle": "@eurothug4000",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022247335
+      }
+    },
+    {
+      "id": "video_channel:b0887362-a26f-4d5c-95bd-aa5ae388c341",
+      "slug": "everydayastronaut",
+      "title": "Everyday Astronaut",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC6uKrU_WqJ1R2HMTY3LIx5Q",
+        "handle": "@EverydayAstronaut",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022251718
+      }
+    },
+    {
+      "id": "video_channel:294fc95d-e5e9-4cae-8227-8551b772692a",
+      "slug": "evilpinely",
+      "title": "Evil Pinely",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCKNmTQLBSTWetB7pMyvQaNQ",
+        "handle": "@EvilPinely",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022256119
+      }
+    },
+    {
+      "id": "video_channel:aeabb71d-afb8-4030-9661-dbf8f81f9562",
+      "slug": "exploringhistory",
+      "title": "William C. Fox",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCyuAKnN3g2fZ7_R9irgEUZQ",
+        "handle": "@williamcfox",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021977335
+      }
+    },
+    {
+      "id": "video_channel:2067bfde-8a51-4f76-9482-0199192ac342",
+      "slug": "extracredits",
+      "title": "Extra Credits",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCVzt0Ltq6VNKRqRMrry3OIA",
+        "handle": "@extracredits",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792021981578
+      }
+    },
+    {
+      "id": "video_channel:0c662a9c-928e-439e-8964-487987e04dce",
+      "slug": "extracreditslive",
+      "title": "Extra Credits Live",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:88a72e1e-1065-46d1-8b79-91cfbaf356ad",
+      "slug": "extrahistory",
+      "title": "Extra History",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCCODtTcd5M1JavPCOr_Uydg",
+        "handle": "@extrahistory",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021981731
+      }
+    },
+    {
+      "id": "video_channel:6c4b9634-8d39-427c-81c9-22b83f29ff26",
+      "slug": "extrahistorypresents",
+      "title": "Fighting for the Vote",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:0c02e9bf-79a9-4e6f-ae1b-9ede7dfc8581",
+      "slug": "extramythology",
+      "title": "Extra Mythology",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a37b5eba-88ad-48ef-b985-511aac605460",
+      "slug": "extremities",
+      "title": "Extremities",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCTWKe1zATFV6d0o6oLS9sgw",
+        "handle": "@Extremities",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021982863
+      }
+    },
+    {
+      "id": "video_channel:f897cf2b-d45c-4a52-a4cc-1bd56d11ef6c",
+      "slug": "faithless",
+      "title": "Faithless: A Sojourn Story",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:d8cb2e35-23d2-4e33-b2e4-f9a04bce7d17",
+      "slug": "fdsignifier",
+      "title": "F.D Signifier",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCgi2u-lGY-2i2ubLsUr6FbQ",
+        "handle": "@FDSignifire",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021983016
+      }
+    },
+    {
+      "id": "video_channel:b328f229-b8a3-4c6a-a13b-7e7942af70ae",
+      "slug": "featurehistory",
+      "title": "Feature History",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCHdluULl5c7bilx1x1TGzJQ",
+        "handle": "@FeatureHistory",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021983167
+      }
+    },
+    {
+      "id": "video_channel:0ac3bdf0-707a-4cd5-8715-4b171948f18b",
+      "slug": "fieldnotes",
+      "title": "Field Notes",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:272bf565-c4ce-47e9-bde5-cfe56200041f",
+      "slug": "filmjoy",
+      "title": "FilmJoy",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCEtB-nx5ngoNJWEzYa-yXBg",
+        "handle": "@filmjoy",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021983319
+      }
+    },
+    {
+      "id": "video_channel:76abe0cb-dd35-49bd-9e68-c39d5b80803b",
+      "slug": "foamparty",
+      "title": "Foam Party",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:f1d751ad-2400-42a2-bb8d-6928919fdfb2",
+      "slug": "foreignfridays",
+      "title": "Foreign Fridays",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCcPjAdaZfLWXr5RkoaMDetQ",
+        "handle": "@foreignfridays",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022264908
+      }
+    },
+    {
+      "id": "video_channel:73e92180-42fd-47ed-aca2-79a296794305",
+      "slug": "foreignman",
+      "title": "Foreign Man in a Foreign Land",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC1qBXNO9sM4xV0wKC0_SlYQ",
+        "handle": "@ForeignManinaForeignLand",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021983471
+      }
+    },
+    {
+      "id": "video_channel:82fd3a5b-14b4-464a-bcc4-3e5e9245336d",
+      "slug": "fredrikknudsen",
+      "title": "Fredrik Knudsen",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCbWcXB0PoqOsAvAdfzWMf0w",
+        "handle": "@FredrikKnudsen",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022269315
+      }
+    },
+    {
+      "id": "video_channel:82b5ec83-cc5e-4a92-9238-42fe0a0e0f45",
+      "slug": "georgiadow",
+      "title": "Georgia Dow",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCBNA43Ppw3sCUbq-x2SvP8g",
+        "handle": "@GeorgiaDow",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021983623
+      }
+    },
+    {
+      "id": "video_channel:2418e2f3-c269-40b7-a2e1-cf639b39f14a",
+      "slug": "getaway",
+      "title": "The Getaway",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:1277d93e-8ad5-4b70-b0f8-28859adda82e",
+      "slug": "ghosttowns",
+      "title": "RealLifeLore — Ghost Towns",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:05a68990-d187-49d2-bdbc-044619b2636e",
+      "slug": "glidus",
+      "title": "Glidus",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCx6FUi5hHm78HPslucrVAcA",
+        "handle": "@Glidus",
+        "verifiedBy": "first-party-nebula-website",
+        "verifiedAtMs": 1792022270826
+      }
+    },
+    {
+      "id": "video_channel:3d27ad5d-1781-4fbe-9412-c3734392d7a5",
+      "slug": "gmtk",
+      "title": "Game Maker's Toolkit",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCqJ-Xo29CKyLTjn6z2XwYAw",
+        "handle": "@GMTK",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021983775
+      }
+    },
+    {
+      "id": "video_channel:d2a0cf3d-c2dd-44d8-b639-b9d2b758029f",
+      "slug": "goldminers",
+      "title": "LowSpecGamer — Digital GoldMiners",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:5c446de2-3e7a-4860-9782-f04a4e48a9d7",
+      "slug": "gonebirds",
+      "title": "Bright Trip — Gone Birds",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:ea84ee68-da1e-4b15-9b50-573e3595b190",
+      "slug": "goodwork",
+      "title": "Good Work",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:77e5eb95-5c51-4702-bd17-de7e7a073fbe",
+      "slug": "goonworld",
+      "title": "Goon World",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:221d128f-1374-4e8e-bbac-2b4d68a3517d",
+      "slug": "grandtestauto",
+      "title": "Grand Test Auto",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCyx5MmYymoZ_5q7tz6lvn7Q",
+        "handle": "@grandtestauto1457",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021984162
+      }
+    },
+    {
+      "id": "video_channel:2f28fd54-703e-431c-8ea9-1e0980c50f95",
+      "slug": "greatcities",
+      "title": "City Beautiful — Great Cities",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:55ad6017-5c30-40fd-9236-a242f31a97d1",
+      "slug": "hacksmith",
+      "title": "Hacksmith Industries",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCjgpFI5dU-D1-kh9H1muoxQ",
+        "handle": "@hacksmith",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022279245
+      }
+    },
+    {
+      "id": "video_channel:8f3a2a56-3f9f-4ce0-b105-ede41688d84b",
+      "slug": "hai",
+      "title": "Half as Interesting",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCuCkxoKLYO_EQ2GeFtbM_bw",
+        "handle": "@halfasinteresting",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021984314
+      }
+    },
+    {
+      "id": "video_channel:b3153e23-7728-4a28-a064-aed44e418bbe",
+      "slug": "haicrimespree",
+      "title": "Half as Interesting’s Crime Spree",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:0816b59b-efeb-4ad8-b7ae-84eea574c88a",
+      "slug": "hbomberguy",
+      "title": "Hbomberguy",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UClt01z1wHHT7c5lKcU8pxRQ",
+        "handle": "@hbomberguy",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021984466
+      }
+    },
+    {
+      "id": "video_channel:11ffc72a-5c11-46ec-81bd-82de444c2dd8",
+      "slug": "hellofutureme",
+      "title": "Hello Future Me",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCFQMO-YL87u-6Rt8hIVsRjA",
+        "handle": "@HelloFutureMe",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021984619
+      }
+    },
+    {
+      "id": "video_channel:0e493ac2-c8d7-49d7-9e55-fcd985e1d039",
+      "slug": "identiteaze",
+      "title": "IDENTITEAZE",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:bd0a95d9-565e-40ed-8db9-64bbf13949c3",
+      "slug": "ilovethecity",
+      "title": "I Love the City!",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCk5gRGcOIiSuhpRgS7sZexQ",
+        "handle": "@ilovethecity",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022284735
+      }
+    },
+    {
+      "id": "video_channel:6bc54cdc-17e4-45ea-b399-c4177158f401",
+      "slug": "imaginaryambition",
+      "title": "Imaginary Ambition",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCP5bYRGZUJMG93AVoMekz9g",
+        "handle": "@ImaginaryAmbition",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021984771
+      }
+    },
+    {
+      "id": "video_channel:6d86a754-9239-4017-9ed7-bc71c6f07003",
+      "slug": "impact",
+      "title": "Rene Ritchie — Impact",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:67a3a1eb-d72b-424d-8015-ba9e84d38ef6",
+      "slug": "imperial",
+      "title": "IMPERIAL",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6befb179-1d6c-440d-b993-3aa026d73c38",
+      "slug": "induction",
+      "title": "Induction",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:68b02a19-17e7-4eb2-ab3e-e89b36ff8b4f",
+      "slug": "integza",
+      "title": "Integza",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC2avWDLN1EI3r1RZ_dlSxCw",
+        "handle": "@integza",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022293526
+      }
+    },
+    {
+      "id": "video_channel:f9c2d0d5-1d0d-43e8-bdf0-08610dae35a8",
+      "slug": "ironicsans",
+      "title": "Ironic Sans",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a542ab38-97c7-4b06-b8fa-93b0e58b63fc",
+      "slug": "isaacarthur",
+      "title": "Isaac Arthur",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCZFipeZtQM5CKUjx6grh54g",
+        "handle": "@isaacarthurSFIA",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021984923
+      }
+    },
+    {
+      "id": "video_channel:8bb46a00-e05a-44fc-bd11-450cb04f03b4",
+      "slug": "ismathinvented",
+      "title": "Up and Atom — Is Mathematics Invented or Discovered?",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:203879ff-3424-4f06-a352-e20eccb0d25f",
+      "slug": "jaredhenderson",
+      "title": "Jared Henderson",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6bd1a575-41cf-4a57-bfc8-ad866e67581a",
+      "slug": "jdraper",
+      "title": "J. Draper",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCF0-84qhSDVOq8i2I3jDVcA",
+        "handle": "@JDraper",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022303439
+      }
+    },
+    {
+      "id": "video_channel:38a8f912-dbd3-4d0f-8058-89e3d9496401",
+      "slug": "jeffiot",
+      "title": "Jeffiot",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCWZjWqQ1gt5dakhUuzRVZbA",
+        "handle": "@jeffiot",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022307867
+      }
+    },
+    {
+      "id": "video_channel:626bf77c-0302-4e6e-a83f-1d3d5714b783",
+      "slug": "jenny-ma",
+      "title": "Jenny Ma",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCC_sp9B1jwesbC5-T04Tt9w",
+        "handle": "@JennyMaAviation",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021985075
+      }
+    },
+    {
+      "id": "video_channel:2940aa70-829b-40a1-9e15-bdc95a01240f",
+      "slug": "jessiegender",
+      "title": "Jessie Gender",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UChBcQ24GbjS5xCXm3K4e8-A",
+        "handle": "@JessieGender1",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021985227
+      }
+    },
+    {
+      "id": "video_channel:5204fde5-3bc0-4dc4-bbd9-fca185f3ba50",
+      "slug": "jessiegenderafterdark",
+      "title": "Jessie Gender After Dark",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:9cea6296-223e-4c7e-a245-d96db75de32f",
+      "slug": "jetlag",
+      "title": "Jet Lag: The Game",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:a4915c7e-8503-40a0-9eda-c90c4d05aedf",
+      "slug": "jjmccullough",
+      "title": "J.J. McCullough",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCyhOl6uRlxryALlT5yifldw",
+        "handle": "@JJMcCullough",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022313354
+      }
+    },
+    {
+      "id": "video_channel:ee1b232b-999c-464b-8305-135f3dacd747",
+      "slug": "joescott",
+      "title": "Joe Scott",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC-2YHgc363EdcusLIBbgxzg",
+        "handle": "@joescott",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021985378
+      }
+    },
+    {
+      "id": "video_channel:7fb81159-fb2c-40fc-90ab-b8ff29353b62",
+      "slug": "joescottmysteries",
+      "title": "Joe Scott Presents: Mysteries of the Human Body",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:603b4531-6d27-43ff-94c4-381a436c94fd",
+      "slug": "johnnyharris",
+      "title": "Johnny Harris",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCmGSJVG3mCRXVOP4yZrU1Dw",
+        "handle": "@johnnyharris",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022318861
+      }
+    },
+    {
+      "id": "video_channel:94c84e30-d51d-4f35-ab53-42575f55b784",
+      "slug": "jordanharrod",
+      "title": "Jordan Harrod",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC1H1NWNTG2Xi3pt85ykVSHA",
+        "handle": "@JordanHarrod",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792021988910
+      }
+    },
+    {
+      "id": "video_channel:aa430e83-76b5-49ec-ba0e-957f62a8b55d",
+      "slug": "jose",
+      "title": "José",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:0ea0d1c3-02ec-4601-8398-2a1a582043ec",
+      "slug": "justwrite",
+      "title": "Just Write",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCx0L2ZdYfiq-tsAXb8IXpQg",
+        "handle": "@JustWrite",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021989062
+      }
+    },
+    {
+      "id": "video_channel:de64c5ea-ccdc-4956-9c1d-12e30f2aeba6",
+      "slug": "kaptainkristian",
+      "title": "kaptainkristian",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCuPgdqQKpq4T4zeqmTelnFg",
+        "handle": "@kaptainkristian",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021989213
+      }
+    },
+    {
+      "id": "video_channel:f9b43da9-3c04-47c0-b379-13ba4b388dc8",
+      "slug": "kat-blaque",
+      "title": "Kat Blaque",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCxFWzKZa74SyAqpJyVlG5Ew",
+        "handle": "@KatBlaque",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021989364
+      }
+    },
+    {
+      "id": "video_channel:f1227a7a-b8b8-4863-b4e7-ce7d7c45b539",
+      "slug": "katiestewart",
+      "title": "Science With Katie",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2fcfc81c-2c56-4e4e-98c3-54a185b9d443",
+      "slug": "kazrowe",
+      "title": "Kaz Rowe",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCSwwoUNvQWgZDC8a_O6Qs_A",
+        "handle": "@KazRowe",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022324377
+      }
+    },
+    {
+      "id": "video_channel:6a3da2bc-cfb1-45d1-a25d-f53c9eef951f",
+      "slug": "kento-bento-pork-bun-murders",
+      "title": "Kento Bento — The Shocking Chinese Pork Bun Murders",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:8b985d4e-00d6-4770-b9c4-4d0280f35276",
+      "slug": "kentobento",
+      "title": "Kento Bento",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCLOwKVD0bYHxaDZxXkK4piw",
+        "handle": "@KentoBento",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021991375
+      }
+    },
+    {
+      "id": "video_channel:8a20455e-6d4b-453a-ba16-c2a44618a9e5",
+      "slug": "kingk",
+      "title": "KingK",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:f92c0d98-a96c-4a8a-a93e-ecc40407b35f",
+      "slug": "knowingbetter",
+      "title": "Knowing Better",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC8XjmAEDVZSCQjI150cb4QA",
+        "handle": "@KnowingBetter",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021991526
+      }
+    },
+    {
+      "id": "video_channel:f8509ccc-7c9c-496e-9e53-702f6fe4f567",
+      "slug": "kofie",
+      "title": "Kofie",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:57010787-34e6-4189-beb8-6894fac5513e",
+      "slug": "labmuffin",
+      "title": "Lab Muffin Beauty Science",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:703c6c26-712a-4b65-9073-c8313152dd7c",
+      "slug": "ladyemily",
+      "title": "Lady Emily",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCG9fr-NSOwaE65w092RO_AA",
+        "handle": "@LadyEmilyPresents",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021991679
+      }
+    },
+    {
+      "id": "video_channel:2086e017-5302-4dfa-9057-caa5f1b4c52e",
+      "slug": "ladyknightthebrave",
+      "title": "LadyKnightTheBrave",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC7pBv8EE3FtDZEF3HtnbFjA",
+        "handle": "@Ladyknightthebrave",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021991830
+      }
+    },
+    {
+      "id": "video_channel:a58ee498-0739-4edf-ab71-c0dddfda2384",
+      "slug": "lauracrone",
+      "title": "Laura Crone",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCS6Hy72uP6nCbKMfs7hHKKg",
+        "handle": "@LauraCrone",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021991982
+      }
+    },
+    {
+      "id": "video_channel:b87a6c90-f553-43d7-aa52-31681b12325c",
+      "slug": "layover",
+      "title": "The Layover",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:85bf1f47-7cb1-409f-ae8f-4ea1a9b4414b",
+      "slug": "legaleagle",
+      "title": "LegalEagle",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCpa-Zb0ZcQjTCPP1Dx_1M8Q",
+        "handle": "@LegalEagle",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021992134
+      }
+    },
+    {
+      "id": "video_channel:65f6aa26-b251-47bc-a30a-a9b00ccd8e0a",
+      "slug": "leovader",
+      "title": "Leo Vader",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCDT-KKAV1iTIoD1j7AZKkYw",
+        "handle": "@LeoVader",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021992285
+      }
+    },
+    {
+      "id": "video_channel:9abc9302-f45d-4de6-a14c-8afad8c8ef24",
+      "slug": "lfts",
+      "title": "Lessons from the Screenplay",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCErSSa3CaP_GJxmFpdjG9Jw",
+        "handle": "@LessonsfromtheScreenplay",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021992436
+      }
+    },
+    {
+      "id": "video_channel:1b8001b8-52af-4ed9-8147-97cbdc9a6ffe",
+      "slug": "liamtriforce",
+      "title": "Liam Triforce",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:72d831e3-6038-4175-a5ba-4b9aea2656d0",
+      "slug": "lifewhereimfrom",
+      "title": "Life Where I'm From",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCqwxJts-6yF33rupyF_DCsA",
+        "handle": "@LifeWhereImFrom",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022335373
+      }
+    },
+    {
+      "id": "video_channel:30fdee37-5092-4850-bd2c-0ef14c6b87de",
+      "slug": "likestoriesuntold",
+      "title": "Like Stories Untold",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCnK1bkrTdncSz6LrxEXfyyg",
+        "handle": "@LikeStoriesUntold",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022339797
+      }
+    },
+    {
+      "id": "video_channel:5f63e532-20db-4912-9da6-f04fc1cfc932",
+      "slug": "lilyalexandre",
+      "title": "Lily Alexandre",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCHu6yK2Ht1J7lfvYBXv0OsQ",
+        "handle": "@lily_lxndr",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021992588
+      }
+    },
+    {
+      "id": "video_channel:11e9d866-d05a-466f-80a9-ce9f9e061aa2",
+      "slug": "lindsayellis",
+      "title": "Lindsay Ellis",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCG1h-Wqjtwz7uUANw6gazRw",
+        "handle": "@LindsayEllisVids",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021992740
+      }
+    },
+    {
+      "id": "video_channel:1c3c51c5-654d-4a23-a51a-4642c52b7a94",
+      "slug": "linusboman",
+      "title": "Linus Boman",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCSb-xYOELhIqVr2n9s-b_4w",
+        "handle": "@LinusBoman",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022344211
+      }
+    },
+    {
+      "id": "video_channel:f35a828c-1d19-474a-a54c-9343bc4b3681",
+      "slug": "littlejoel",
+      "title": "Little Joel",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2a583259-2906-478a-ab98-430fd4210fb7",
+      "slug": "livestreamingpros",
+      "title": "Live Streaming Pros",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCgtaW8lRcPqVnxiOSMWSLVg",
+        "handle": "@LiveStreamingPros",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021993172
+      }
+    },
+    {
+      "id": "video_channel:9f05322f-55f2-4534-acd2-562c66261a97",
+      "slug": "lolasebastian",
+      "title": "Lola Sebastian",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCVExSO-VMTHDMJoZ2GmZPUQ",
+        "handle": "@LolaSebastian",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021994264
+      }
+    },
+    {
+      "id": "video_channel:c238ebfe-e4b0-4b64-babd-86c857d5e052",
+      "slug": "lostandfound",
+      "title": "Jet Lag: Lost & Found",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:5648cc36-b9c5-4a8a-a2e4-00fa1f156957",
+      "slug": "louisweisz",
+      "title": "Louis Weisz",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:e5476a8f-b7be-4afa-a128-081609cdca14",
+      "slug": "lowspecgamer",
+      "title": "LowSpecGamer",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCQkd05iAYed2-LOmhjzDG6g",
+        "handle": "@LowSpecGamer",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021995360
+      }
+    },
+    {
+      "id": "video_channel:cb034ddc-cf94-42e0-96fe-72dd1b13b81d",
+      "slug": "lsoo",
+      "title": "Like Stories of Old",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCs7nPQIEba0T3tGOWWsZpJQ",
+        "handle": "@LikeStoriesofOld",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021995512
+      }
+    },
+    {
+      "id": "video_channel:996665e9-62f7-47f6-9943-a42c0b215d16",
+      "slug": "maapify",
+      "title": "Maapify",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC0agktm44sIHDgxTTvwjKKw",
+        "handle": "@Maapify",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022351890
+      }
+    },
+    {
+      "id": "video_channel:889c77cd-6068-4c6a-ac13-33f2a0098567",
+      "slug": "madkings",
+      "title": "Mad Kings",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:815bdf38-d6a9-4e2f-9749-83a9bc989ac3",
+      "slug": "maggiemaefish",
+      "title": "Maggie Mae Fish",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UChBD4NpITiW2CzIz5GwppDA",
+        "handle": "@MaggieMaeFish",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021996496
+      }
+    },
+    {
+      "id": "video_channel:b7d6801c-6421-44b1-9d17-e186367cabdf",
+      "slug": "makingofsongbook",
+      "title": "Mary Spender — The Making of Songbook",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:94ec30de-4388-46fb-9b9b-a265e7c2c09c",
+      "slug": "makingphilosophytube",
+      "title": "Making Philosophy Tube",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:b3c10390-4084-4485-a891-f4e5dbc6cc48",
+      "slug": "mancarryingthing",
+      "title": "Man Carrying Thing",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCPdaxSov0mgwh77JvjQO2jQ",
+        "handle": "@ManCarryingThing",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022358499
+      }
+    },
+    {
+      "id": "video_channel:1c3d8831-2183-406f-a02e-350e5449637c",
+      "slug": "marcbutevil",
+      "title": "MarcButEvil",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCc29zhqaTJCkrYHty64_JUQ",
+        "handle": "@MarcButEvil",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022362912
+      }
+    },
+    {
+      "id": "video_channel:b72aea31-f600-40c2-bc24-745966d6ce56",
+      "slug": "mariana",
+      "title": "Mariana Vieira",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCEHp_b02I0GvTYCBPX_0w1g",
+        "handle": "@mariana-vieira",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021997561
+      }
+    },
+    {
+      "id": "video_channel:dcfbfca7-fa67-4153-a109-d8173fe96346",
+      "slug": "maryspender",
+      "title": "Mary Spender",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCpV5A65O3mvaJmlc669cI1A",
+        "handle": "@MarySpender",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021998685
+      }
+    },
+    {
+      "id": "video_channel:dafb64c3-41db-4df6-9720-739db66ecf83",
+      "slug": "maxinomics",
+      "title": "Maxinomics",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCUEmaeh13ai1ivT5wzz5Lhg",
+        "handle": "@Maxinomics",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022367318
+      }
+    },
+    {
+      "id": "video_channel:7876cc79-764b-4cfb-8b1c-4bc2c9d4abbe",
+      "slug": "medlifecrisis",
+      "title": "Medlife Crisis",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCgRBRE1DUP2w7HTH9j_L4OQ",
+        "handle": "@MedlifeCrisis",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792021999768
+      }
+    },
+    {
+      "id": "video_channel:558de3dc-7986-4609-b269-406acc3b42a3",
+      "slug": "miamulder",
+      "title": "Mia Mulder",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC_OttpBEWWzSUlZbk5qmhSA",
+        "handle": "@MiaMulder",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022371733
+      }
+    },
+    {
+      "id": "video_channel:c2add79b-952a-41b2-8bbc-73bfc0984cf4",
+      "slug": "michaelwuerth",
+      "title": "Michael Wuerth",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a171101f-b310-4a5e-b7b8-d9b6a859e5dd",
+      "slug": "micthesnare",
+      "title": "Mic The Snare",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC3qbvcgOHXRIFIofXyd1vBw",
+        "handle": "@MicTheSnare",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022376121
+      }
+    },
+    {
+      "id": "video_channel:134c7423-1e82-4acb-b963-dd4b135f22e1",
+      "slug": "middle8",
+      "title": "Middle 8",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCfeppgcy70ERp4gQrsYijsg",
+        "handle": "@Middle8",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022004154
+      }
+    },
+    {
+      "id": "video_channel:2e5bee30-3803-4029-9771-a20fba19e874",
+      "slug": "minutebody",
+      "title": "MinuteBody",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:e7cacabc-34e6-468b-ac4b-7e663416d2ac",
+      "slug": "minutephysics",
+      "title": "MinutePhysics",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
+        "handle": "@MinutePhysics",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022007471
+      }
+    },
+    {
+      "id": "video_channel:b22dc0ce-e8a8-40f7-8e43-723dda146d21",
+      "slug": "misteramazing",
+      "title": "misteramazing",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCUG9w-kUDyIenbVnldsa6ug",
+        "handle": "@misteramazing",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022008569
+      }
+    },
+    {
+      "id": "video_channel:7c2e75b9-edc6-4c6e-a303-3122d5b7aca3",
+      "slug": "mobox",
+      "title": "MOBOX Graphics",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCQyp3CBrBSfIynoDosN3c7g",
+        "handle": "@moboxgraphics",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022009662
+      }
+    },
+    {
+      "id": "video_channel:8e4165c3-8582-4044-a5a0-1465d66bc0c6",
+      "slug": "modernconflicts",
+      "title": "RealLifeLore — Modern Conflicts",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:f09ec253-7074-4b8d-a3c8-c957abf6889e",
+      "slug": "moneymacro",
+      "title": "Money & Macro",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCCKpicnIwBP3VPxBAZWDeNA",
+        "handle": "@MoneyMacro",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022380544
+      }
+    },
+    {
+      "id": "video_channel:4e43fa7f-3601-481c-ae25-f2340ef7894c",
+      "slug": "morningbrew",
+      "title": "Morning Brew",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:42e2ee72-a57e-4957-be0e-fc05df947c0e",
+      "slug": "morningbrewdaily",
+      "title": "Morning Brew Daily",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2ccf3fed-2045-46c6-9955-cc11d836302d",
+      "slug": "mostinsanehijacking",
+      "title": "Kento Bento — Orchestrating the Most Insane Hijacking in Japanese History",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:50f6ffeb-4ff2-4778-87ed-3868f55b9e08",
+      "slug": "mrmobile",
+      "title": "MrMobile",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:09ee16f4-122a-4f47-b89d-9afea1bcb266",
+      "slug": "msbeautyphile",
+      "title": "MsBeautyphile",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC5gI4wshlCozPRgYaBIHREQ",
+        "handle": "@Msbeautyphile",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022010804
+      }
+    },
+    {
+      "id": "video_channel:f9ab6cdb-5174-4d72-bafa-049b095618b3",
+      "slug": "munecat",
+      "title": "münecat",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCqNpjt_UcMPgm_9gphZgHYA",
+        "handle": "@münecat",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022390437
+      }
+    },
+    {
+      "id": "video_channel:18a3366f-21ea-4856-869e-f27f2874c4b7",
+      "slug": "mustard",
+      "title": "Mustard",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC1ZBQ-F-yktYD4m5AzM6pww",
+        "handle": "@MustardChannel",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022011871
+      }
+    },
+    {
+      "id": "video_channel:2752b848-ba6a-45a9-b199-4da7a12ec2a8",
+      "slug": "mustard-underwater-aircraft-carriers",
+      "title": "Mustard — Underwater Aircraft Carriers: Imperial Japan’s Secret Weapon",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:7b61e973-74cc-4267-be1d-c0b6eba79dcb",
+      "slug": "mywildbackyard",
+      "title": "MyWildBackyard",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC5lYMhQxYsgZTjQ4kDyOzOA",
+        "handle": "@MyWildBackyard",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022396074
+      }
+    },
+    {
+      "id": "video_channel:19ae1516-af16-4dd9-a239-1c31c1db123f",
+      "slug": "nandovmovies",
+      "title": "Nando v Movies",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCf29Sq6-XxLQG_XuJwMHaFg",
+        "handle": "@NandovMovies",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022013001
+      }
+    },
+    {
+      "id": "video_channel:56b4e027-74f9-458e-a682-4570296f7305",
+      "slug": "ndavideo",
+      "title": "NDA",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:8f0cb852-4e84-4a22-9adf-0439aea6796b",
+      "slug": "nebula",
+      "title": "Nebula",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:cd980570-f2a3-4644-bc5e-cf218262754c",
+      "slug": "nebulasans",
+      "title": "Nebula Sans",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:3ca56414-7bd4-48ee-b335-05e6ae8c19c7",
+      "slug": "neo",
+      "title": "neo",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCtYKe7-XbaDjpUwcU5x0bLg",
+        "handle": "@neoexplains",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022014056
+      }
+    },
+    {
+      "id": "video_channel:7cb0dab3-5965-4c43-b0aa-f8ef8d3e539c",
+      "slug": "nerdsync",
+      "title": "NerdSync",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCURz5rKDgt7YibUSageNhEw",
+        "handle": "@NerdSyncProductions",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022015201
+      }
+    },
+    {
+      "id": "video_channel:de9aa902-8128-4d0c-89dd-45cb8c25e1ef",
+      "slug": "neurotransmissions",
+      "title": "Neuro Transmissions",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCYLrBefhyp8YyI9VGPbghvw",
+        "handle": "@neurotransmissions",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022016409
+      }
+    },
+    {
+      "id": "video_channel:0830b88a-0e5b-4e56-a575-fadaf6efe407",
+      "slug": "nextlevelworldbuilding",
+      "title": "The Closer Look — Next-Level Worldbuilding",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c895a58a-f8c1-4ec5-8fbc-ebcc09191ad9",
+      "slug": "nightofthecoconut",
+      "title": "Night of the Coconut",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:ab997212-5f52-4288-83c8-aa6851ace74e",
+      "slug": "nilered",
+      "title": "NileRed",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+        "handle": "@NileRed",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022404873
+      }
+    },
+    {
+      "id": "video_channel:98a84426-07d8-4a1f-aabf-6e250365fb05",
+      "slug": "notdavid",
+      "title": "Not David",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a2bfd5bc-7e96-4ac9-b7f1-ed16016dc6c0",
+      "slug": "notesbyniba",
+      "title": "NotesByNiba",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCVE-Dvzz_kpVTKPah6cSlCw",
+        "handle": "@NotesByNiba",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022017389
+      }
+    },
+    {
+      "id": "video_channel:8714203d-6950-4536-be0b-78196a599cf6",
+      "slug": "notjustbikes",
+      "title": "Not Just Bikes",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC0intLFzLaudFG-xAvUEO-A",
+        "handle": "@NotJustBikes",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022018508
+      }
+    },
+    {
+      "id": "video_channel:d26ebc1f-2f45-4777-b93d-b4accea60485",
+      "slug": "now-you-see-it",
+      "title": "Now You See It",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCWTFGPpNQ0Ms6afXhaWDiRw",
+        "handle": "@NowYouSeeIt",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022019563
+      }
+    },
+    {
+      "id": "video_channel:db16cbe1-9e6a-41fa-85df-6f70569ca508",
+      "slug": "oldestnewest",
+      "title": "Oldest and Newest Places on Earth",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:5e01ca89-d124-409c-ad3e-109e88c8dd30",
+      "slug": "one-villainous-scene",
+      "title": "One Villainous Scene",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:9a06d179-5f32-4385-b44f-a36d1896feb9",
+      "slug": "one-x-cellent-scene",
+      "title": "One X-Cellent Scene",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:678a260b-f636-4c6a-985d-646a16ea3b11",
+      "slug": "originsofstealth",
+      "title": "Mustard — The Origins of Stealth: The F-117 Nighthawk",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:ceb19452-2108-4619-9cb5-a16f54f49833",
+      "slug": "pantslesspajamas",
+      "title": "PantslessPajamas",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCR0O-1cvuPNxDosvSDLpWHg",
+        "handle": "@PantslessPajamas",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022020647
+      }
+    },
+    {
+      "id": "video_channel:3e364299-2c33-4254-a0ba-dedc898d585c",
+      "slug": "paperclips",
+      "title": "Isaac Arthur — The Paperclip Maximizer",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c7e29d6f-631a-48eb-88d3-12580ba915c9",
+      "slug": "paperskies",
+      "title": "Paper Skies",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCnmEz-Q8w4meSGoQdd-cQBw",
+        "handle": "@PaperSkiesAviation",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022022857
+      }
+    },
+    {
+      "id": "video_channel:b20f1e49-1132-4d59-9729-0bb118f007d2",
+      "slug": "patrickholidayspecial",
+      "title": "The Patrick (H) Willems Star Wars Holiday Special",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:a909a46f-3b6b-4a15-a590-6e77fd9d9051",
+      "slug": "patrickhwillems",
+      "title": "Patrick (H) Willems",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCF1fG3gT44nGTPU2sVLoFWg",
+        "handle": "@patrickhwillems",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022024002
+      }
+    },
+    {
+      "id": "video_channel:204d3b81-6df8-4748-ac40-b0574e2aefbd",
+      "slug": "patrickkelly",
+      "title": "Patrick Kelly",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:e7f5c260-c250-4241-99a7-b332156ddcaf",
+      "slug": "people-make-games",
+      "title": "People Make Games",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCZB6V9fUov0Mx_us3MWWILg",
+        "handle": "@PeopleMakeGames",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022025103
+      }
+    },
+    {
+      "id": "video_channel:67998a8c-7e03-4041-b90d-4cadf8b1c1f2",
+      "slug": "peterspittech",
+      "title": "peterspittech",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCoitk5TUppjIS1huKsraU_Q",
+        "handle": "@peterspittech",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022415883
+      }
+    },
+    {
+      "id": "video_channel:67e524f1-5fc5-4b90-8cb9-16520b4e9490",
+      "slug": "philosophytube",
+      "title": "Philosophy Tube",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC2PA-AKmVpU6NKCGtZq_rKQ",
+        "handle": "@PhilosophyTube",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022026170
+      }
+    },
+    {
+      "id": "video_channel:5f3b3ccc-fd06-4d66-b2b7-5a5f6916a7c7",
+      "slug": "pinely",
+      "title": "Pinely",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCiHRg_hyyHQe_IZ-efHR5Vg",
+        "handle": "@Pinely",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022420297
+      }
+    },
+    {
+      "id": "video_channel:7d76aa4c-95aa-4f9f-96a4-dd6fc7cd083a",
+      "slug": "planning-ancient-rome",
+      "title": "City Beautiful — Planning Ancient Rome",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:1ba9e83c-5522-463c-bd95-321864144b25",
+      "slug": "polymatter",
+      "title": "PolyMatter",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCgNg3vwj3xt7QOrcIDaHdFg",
+        "handle": "@PolyMatter",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022027269
+      }
+    },
+    {
+      "id": "video_channel:10067ec1-6d49-463d-95d6-c0061cb74745",
+      "slug": "polymatter-macau",
+      "title": "PolyMatter — Macau: The Story of China’s Golden Child",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a2ad8f3a-47df-4b5d-8786-e5fee9ba6733",
+      "slug": "polyphonic",
+      "title": "Polyphonic",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCXkNod_JcH7PleOjwK_8rYQ",
+        "handle": "@Polyphonic",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022028395
+      }
+    },
+    {
+      "id": "video_channel:62314c17-eace-4cbf-8358-e598c2089b80",
+      "slug": "polyphonic-dark-side",
+      "title": "Polyphonic — Dark Side of the Moon",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:fa6535da-656c-4b7d-b214-b802bb6d1187",
+      "slug": "polyphonic-epics",
+      "title": "Polyphonic — Led Zeppelin's Epics",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:eabbc2b5-0a28-42c5-a0e0-bb1c225196ed",
+      "slug": "polyphonicmagazine",
+      "title": "Polyphonic Magazine",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:48e6bb65-2073-49f1-810e-2f674bb19913",
+      "slug": "postapocalypticinventor",
+      "title": "The Post Apocalyptic Inventor",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:81c20690-b0ee-4e4c-834d-6a49c6cfe3fa",
+      "slug": "practical-engineering",
+      "title": "Practical Engineering",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCMOqf8ab-42UUQIdVoKwjlQ",
+        "handle": "@PracticalEngineeringChannel",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022029468
+      }
+    },
+    {
+      "id": "video_channel:9e3c4d5b-2c54-47f0-9259-5ee0cbb667da",
+      "slug": "practicalconstruction",
+      "title": "Practical Construction",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:97e3b894-efbb-48a9-9e46-a4a54e5b57b6",
+      "slug": "princessweekes",
+      "title": "Princess Weekes",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UClnCLTkRd1vhQYU1t1HyivQ",
+        "handle": "@Princess_Weekes",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022030582
+      }
+    },
+    {
+      "id": "video_channel:253637c4-3dc5-42cb-8b27-24379e775ff5",
+      "slug": "prntscrn",
+      "title": "EposVox  — PrntScrn",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6c72737b-cc5f-4064-b2d8-abec9d274479",
+      "slug": "proofnews",
+      "title": "Proof News",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:4c5edb0d-c6a0-456a-bb8b-b8da242e6a6c",
+      "slug": "proofofsweat",
+      "title": "#ProofOfSweat",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCuDjNpoq2Ovlu9ZEOeM2MkQ",
+        "handle": "@ProofOfSweat",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022435713
+      }
+    },
+    {
+      "id": "video_channel:18c5e56b-a3a7-4713-bd6f-792fdd112b93",
+      "slug": "questionableadvice",
+      "title": "BrainCraft — Questionable Advice",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:1ae8c9f9-0831-4e2d-b0ad-d93e18e6be22",
+      "slug": "quinnsideas",
+      "title": "Quinn's Ideas",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC1rFmaGLYr0Ve_Y_soxZNWQ",
+        "handle": "@QuinnsIdeas",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022441217
+      }
+    },
+    {
+      "id": "video_channel:363bc5f8-6adf-4d68-9381-2eadbe1159d0",
+      "slug": "rare-earth-originals",
+      "title": "Rare Earth — The Illegal Alien",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:42773a32-2268-4bda-81d4-2f0848977de2",
+      "slug": "rareearth",
+      "title": "Rare Earth",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCtGG8ucQgEJPeUPhJZ4M4jA",
+        "handle": "@RareEarthSeries",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022032785
+      }
+    },
+    {
+      "id": "video_channel:c053d34c-f373-4535-9238-301f75c7a5c8",
+      "slug": "raz",
+      "title": "Raz",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:0277b8e8-360c-4290-8642-162a51f9a563",
+      "slug": "razbuten",
+      "title": "Razbuten",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCfHmyqCntYHQ81ZukNu66rg",
+        "handle": "@razbuten",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022033885
+      }
+    },
+    {
+      "id": "video_channel:cd10b3ef-9ad8-4562-9e39-5387485102a0",
+      "slug": "realengineering",
+      "title": "Real Engineering",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCR1IuLEqb6UEA_zQ81kwXfg",
+        "handle": "@RealEngineering",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022035019
+      }
+    },
+    {
+      "id": "video_channel:67fdf179-b530-46c6-a0d1-6e998ae1167c",
+      "slug": "reallifelore",
+      "title": "RealLifeLore",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCP5tjEmvPItGyLhmjdwP7Ww",
+        "handle": "@RealLifeLore",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022036110
+      }
+    },
+    {
+      "id": "video_channel:656b2e46-4675-42bd-adcd-f73fb706c8a8",
+      "slug": "realscience",
+      "title": "Real Science",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC176GAQozKKjhz62H8u9vQQ",
+        "handle": "@realscience",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022037189
+      }
+    },
+    {
+      "id": "video_channel:72450552-861a-4702-a0f2-74091779c5ff",
+      "slug": "realtimehistory",
+      "title": "Real Time History",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCB1eDEd1AYG3YrRIJSZzMOQ",
+        "handle": "@realtimehistory",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022038278
+      }
+    },
+    {
+      "id": "video_channel:8a7ff25e-15d7-45e1-be49-3f1827b01f37",
+      "slug": "redatoms",
+      "title": "Real Time History — Red Atoms",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2b440413-b92d-4fd5-85a5-18ff889275a2",
+      "slug": "religionforbreakfast",
+      "title": "ReligionForBreakfast",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCct9aR7HC79Cv2g-9oDOTLw",
+        "handle": "@ReligionForBreakfast",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022447835
+      }
+    },
+    {
+      "id": "video_channel:156c4256-8dbd-4787-a958-3b928151ce1b",
+      "slug": "reneritchie",
+      "title": "Rene Ritchie",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCLBHPoY3NugnZYURxln3fKQ",
+        "handle": "@ReneRitchie",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022039389
+      }
+    },
+    {
+      "id": "video_channel:a165e5f0-b490-44b9-919c-c7f3f386aee2",
+      "slug": "rifftrax",
+      "title": "RiffTrax",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:473a8418-31cc-412d-a33c-f5979cf28870",
+      "slug": "rmtransit",
+      "title": "RMTransit",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCf4iKXL_SJQ5d0qsKkboRRQ",
+        "handle": "@RMTransit",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022040525
+      }
+    },
+    {
+      "id": "video_channel:92589cd5-adae-4662-8cfd-a099f7be0efe",
+      "slug": "rng",
+      "title": "Georgia & Rene",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:4882e5be-da11-4493-beda-572ddcc230eb",
+      "slug": "robwords",
+      "title": "RobWords",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC4a9LfdavRlVMaSSWFdIciA",
+        "handle": "@RobWords",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022456755
+      }
+    },
+    {
+      "id": "video_channel:8e121225-470b-4aa0-a58d-e41bf886dd72",
+      "slug": "royal-ocean-film-society",
+      "title": "The Royal Ocean Film Society",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCWq-qJSudqKrzquTVep9Jwg",
+        "handle": "@TheRoyalOceanFilmSociety",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022041612
+      }
+    },
+    {
+      "id": "video_channel:8ef93396-3e34-47b7-a0a4-5f94ea322ce0",
+      "slug": "samonella",
+      "title": "Sam O'Nella",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC1DTYW241WD64ah5BFWn4JA",
+        "handle": "@SamONellaAcademy",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022041764
+      }
+    },
+    {
+      "id": "video_channel:ff298ddb-b160-4f5c-85bc-10a53b5349e0",
+      "slug": "sarah-z-debater-theater",
+      "title": "Sarah Z  — Debater Theater",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:9a83d619-9190-49c1-9145-77df2acc7c25",
+      "slug": "sarahdavisbaker",
+      "title": "Sarah Davis Baker",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCriil4aussYUAGVwpm_zI9w",
+        "handle": "@sarahdavisbaker",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022463171
+      }
+    },
+    {
+      "id": "video_channel:90f121db-d481-4ec7-be1b-23b973d7de98",
+      "slug": "sarahrenaeclark",
+      "title": "Sarah Renae Clark",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCibTRXCGW9o16HjUODtvTVQ",
+        "handle": "@SarahRenaeClark",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022467555
+      }
+    },
+    {
+      "id": "video_channel:57586ec8-7cdd-4bbe-a666-f06737fb33f8",
+      "slug": "sarahz",
+      "title": "SarahZ",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCK-GxvzttTnNhq3JPYpXhqg",
+        "handle": "@SarahZ",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022042690
+      }
+    },
+    {
+      "id": "video_channel:d0f439c1-d6f4-428f-a589-4102a3b9f39c",
+      "slug": "scav",
+      "title": "Scav",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:1f0faed2-7a0c-4129-be40-d83d8f9a794c",
+      "slug": "schaffrillas",
+      "title": "Schaffrillas Productions",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:9732b456-84e3-4da8-865d-2d33d83f2903",
+      "slug": "scienceasylum",
+      "title": "The Science Asylum",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCXgNowiGxwwnLeQ7DXTwXPg",
+        "handle": "@ScienceAsylum",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022473060
+      }
+    },
+    {
+      "id": "video_channel:8108af9e-58c8-4d61-a90b-37567e3a2c01",
+      "slug": "sebastianlague",
+      "title": "Sebastian Lague",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCmtyQOKKmrMVaKuRXz02jbQ",
+        "handle": "@SebastianLague",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022477453
+      }
+    },
+    {
+      "id": "video_channel:8e6a36d0-1bf3-47ce-a845-71d0221c48f9",
+      "slug": "sexplanations",
+      "title": "sexplanations",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCkxMlA7rt-mnIc1AjbyAsPw",
+        "handle": "@sexplanations",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022481853
+      }
+    },
+    {
+      "id": "video_channel:c1e6a8a9-2016-4c71-be05-4a1191099fa6",
+      "slug": "showrunners",
+      "title": "Showrunners",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:8a1be8ea-e448-4966-b831-411ab43cc791",
+      "slug": "signifiedbsides",
+      "title": "Signified B Sides",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6fb20f6f-0e7d-435f-9697-8a0ff4e0906d",
+      "slug": "simonclark",
+      "title": "Simon Clark",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCRRr_xrOm66qaigIbwFLvbQ",
+        "handle": "@SimonClark",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022043788
+      }
+    },
+    {
+      "id": "video_channel:d9d0799d-9247-4a5f-a8be-e06d7ed436cf",
+      "slug": "skipintro",
+      "title": "Skip Intro",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCKUm503onGg3NatpBtTWHkQ",
+        "handle": "@SkipIntroYT",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022044887
+      }
+    },
+    {
+      "id": "video_channel:0af82751-bf6a-4d16-9a30-f407e0ec5c12",
+      "slug": "slownewsday",
+      "title": "Slow News Day",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c6d3a8d7-0dae-4084-8b43-a1ffe664ab72",
+      "slug": "sophs-notes",
+      "title": "Soph's Notes",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC-Qj80avWItNRjkZ41rzHyw",
+        "handle": "@SophsNotes",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022045989
+      }
+    },
+    {
+      "id": "video_channel:780bb853-592b-4669-99e0-a57d5783f565",
+      "slug": "soundsgood",
+      "title": "Sarah Feldman",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCiuOCDkRu0-ncKMK8K4R96Q",
+        "handle": "@SoundsGoodChannel",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022047091
+      }
+    },
+    {
+      "id": "video_channel:201f0c28-dd98-457c-a2a0-5c6a57334122",
+      "slug": "soupemporium",
+      "title": "Soup Emporium",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:1603eeeb-9562-471c-ab58-4f45899b6009",
+      "slug": "soyouhaventread",
+      "title": "So You Haven't Read",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:ce133419-751b-441a-87a3-78cf113c0f27",
+      "slug": "spaceduck",
+      "title": "Space Duck Video",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:021dbbfb-2e11-4f0b-9f83-c93542413262",
+      "slug": "spectacles",
+      "title": "Spectacles",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:11942736-d961-46ed-ab59-93d330728ee5",
+      "slug": "stefanmilo",
+      "title": "Stefan Milo",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCZ9jWH_8tJ-Nmaj8dSQdEYA",
+        "handle": "@StefanMilo",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022050411
+      }
+    },
+    {
+      "id": "video_channel:ef4e6e53-f0cc-451b-862a-5b7f8b9b6286",
+      "slug": "stepback",
+      "title": "Step Back",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCxTdWpLJurbGlFMWOwXWG_A",
+        "handle": "@StepBackHistory",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022051600
+      }
+    },
+    {
+      "id": "video_channel:3a936834-ff35-47cc-86d6-2eda61ae824f",
+      "slug": "stephaniesammann",
+      "title": "Stephanie Sammann",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:7552f0b4-302b-4986-85c2-a3716489783b",
+      "slug": "stevenbridges",
+      "title": "Steven Bridges",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCqK0ukwGsTDh7sHih1OmLJA",
+        "handle": "@stevenbridges",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022052597
+      }
+    },
+    {
+      "id": "video_channel:54bff8a1-574a-49fe-9be1-68fad64f5215",
+      "slug": "stewarthicks",
+      "title": "Stewart Hicks",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCYAm24PkejQR2xMgJgn7xwg",
+        "handle": "@stewarthicks",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022053795
+      }
+    },
+    {
+      "id": "video_channel:d7a9fe83-bb42-4eed-a6f6-54d7a5d43aeb",
+      "slug": "storymode",
+      "title": "Story Mode",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:3ba13534-19d6-4664-9085-636025e4f6ad",
+      "slug": "strangeparts",
+      "title": "Strange Parts",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCO8DQrSp5yEP937qNqTooOw",
+        "handle": "@StrangeParts",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022054841
+      }
+    },
+    {
+      "id": "video_channel:6788ce44-ac93-405d-9984-8607d9a118bd",
+      "slug": "submerged",
+      "title": "Submerged",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:bc68491b-f942-405f-a790-d57d78d15d95",
+      "slug": "suibhne",
+      "title": "Suibhne",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCQD-0MjUbDBwm2UTVYr0Dag",
+        "handle": "@Suibhne",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022055931
+      }
+    },
+    {
+      "id": "video_channel:86ab55de-44db-40b7-9325-519234fc5243",
+      "slug": "superbunnyhop",
+      "title": "Super Bunnyhop",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCWqr2tH3dPshNhPjV5h1xRw",
+        "handle": "@bunnyhopshow",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022057038
+      }
+    },
+    {
+      "id": "video_channel:d8f46daa-e813-4401-9d71-0e9de31023e4",
+      "slug": "synthet",
+      "title": "Synthet",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c62d56c9-d567-4a72-8319-eb1ce6e3ac06",
+      "slug": "t1j",
+      "title": "T1J",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCajw8zd6DPpXOuF6d22Fjkw",
+        "handle": "@T1J",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022058178
+      }
+    },
+    {
+      "id": "video_channel:0f8e5447-43da-4979-be70-e3505a08a8df",
+      "slug": "taboo",
+      "title": "Broey Deschanel — Taboo on Screen",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:b72734fe-e61d-418d-84dc-2965e3b3833e",
+      "slug": "talefoundry",
+      "title": "Tale Foundry",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCusb0SpT8elBJdbcEJS_l2A",
+        "handle": "@TheTaleFoundry",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022059303
+      }
+    },
+    {
+      "id": "video_channel:a1777e97-4a6e-4aa5-957a-3c0535ab33b9",
+      "slug": "tantacrul",
+      "title": "Tantacrul",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCl_dlV_7ofr4qeP1drJQ-qg",
+        "handle": "@Tantacrul",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022498391
+      }
+    },
+    {
+      "id": "video_channel:b4c6b167-7011-488d-8c53-5a7f73da51cd",
+      "slug": "taramooknee",
+      "title": "Ro Mooknee",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:110622cf-b0a3-468f-a5d6-5e1012f79729",
+      "slug": "taranvanhemert",
+      "title": "Taran Van Hemert",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:d6ad3f88-2902-4e75-b1e2-febdbd03f8d3",
+      "slug": "taranvanhemert2",
+      "title": "Taran Van Hemert 2",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCkTnIE2RohNA1eV4v-nov7A",
+        "handle": "@taranvanhemert2",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022505026
+      }
+    },
+    {
+      "id": "video_channel:2289cdbf-9a63-42e6-890a-28209babed53",
+      "slug": "tataw",
+      "title": "The America That Almost Was",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:0b7faa58-7a18-41b3-b98f-53d4e7d61111",
+      "slug": "teamseas",
+      "title": "#TeamSeas",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:702bb67a-c7c3-4b70-8ad3-f40ad79b8683",
+      "slug": "techaltar",
+      "title": "TechAltar",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCtZO3K2p8mqFwiKWb9k7fXA",
+        "handle": "@TechAltar",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022060305
+      }
+    },
+    {
+      "id": "video_channel:b64e9493-1278-4449-9632-72d1ebfb107c",
+      "slug": "technicality",
+      "title": "Technicality",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCnoIjdOZF4tTA7M7C4Nt4-w",
+        "handle": "@technicality",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022061523
+      }
+    },
+    {
+      "id": "video_channel:cbd0df8e-5955-4218-a029-9be3c272f88b",
+      "slug": "technorama",
+      "title": "TechAltar — Technorama",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:30bd52d8-6839-41ba-9d0b-2c7b4b25cb2f",
+      "slug": "techtree",
+      "title": "TechTree",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:33611b09-0c75-4f50-a923-a40c9d2093fe",
+      "slug": "terriblewritingadvice",
+      "title": "Terrible Writing Advice",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC3ogrx6d9oohf6D42G44j1A",
+        "handle": "@TerribleWritingAdvice",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022062530
+      }
+    },
+    {
+      "id": "video_channel:736edbca-580e-4a5c-bd9a-9a2eb527b0c7",
+      "slug": "tfc",
+      "title": "The Friday Checkout",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCRG_N2uO405WO4P3Ruef9NA",
+        "handle": "@TheFridayCheckout",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022062682
+      }
+    },
+    {
+      "id": "video_channel:047da453-754d-411d-ae17-09d4d27b0683",
+      "slug": "thatsabsurdvideo",
+      "title": "That's Absurd Please Elaborate",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:fd85b19b-fe63-4f39-999b-9d477e6f4ad9",
+      "slug": "thattimewhen",
+      "title": "That Time When",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:ef83667b-5e5f-4b72-be1f-be56baf4883f",
+      "slug": "the-closer-look",
+      "title": "The Closer Look",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCI9DUIgtRGHNH_HmSTcfUbA",
+        "handle": "@TheCloserLook",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022065798
+      }
+    },
+    {
+      "id": "video_channel:f8700e85-232b-4373-8d4d-85992b610c19",
+      "slug": "the-efficient-engineer",
+      "title": "The Efficient Engineer",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCXAS_Ekkq0iFJ9dSUIkcAkw",
+        "handle": "@TheEfficientEngineer",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022065951
+      }
+    },
+    {
+      "id": "video_channel:d1fbec3d-7601-44c0-aa5d-e59daa8f9fbd",
+      "slug": "the-great-war",
+      "title": "The Great War",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCUcyEsEjhPEDf69RRVhRh4A",
+        "handle": "@TheGreatWar",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022066103
+      }
+    },
+    {
+      "id": "video_channel:d87deae5-7dea-4d2c-b07c-18e5d336fdf7",
+      "slug": "theamaazing",
+      "title": "TheAMaazing",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCQ9HvHH-KRYHI5ynj2kbLwQ",
+        "handle": "@TheAMaazing",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022066892
+      }
+    },
+    {
+      "id": "video_channel:1cad47b0-cc28-427e-b6f0-4faf05d02ccb",
+      "slug": "thecoloradoproblem",
+      "title": "Wendover — The Colorado Problem",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:86ca831d-1044-4e7c-a30e-95d4508324f0",
+      "slug": "thecursedjudge",
+      "title": "The Cursed Judge",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCTDWASrT-T6wMBcZU4IXCKQ",
+        "handle": "@TheCursedJudge",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022515993
+      }
+    },
+    {
+      "id": "video_channel:fd74f4ce-70da-46f5-a3d4-14ce4e8fc90e",
+      "slug": "thedailybriefing",
+      "title": "TLDR Daily",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCz_3xlMTVUYYTQqCfh9lD7w",
+        "handle": "@TLDRdaily",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022067044
+      }
+    },
+    {
+      "id": "video_channel:ee00ceda-1f2c-49c1-9219-766f4ab2f91b",
+      "slug": "theeditorial",
+      "title": "The Editorial",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:405ba0f5-b18c-4ebc-876c-e907f66730bc",
+      "slug": "thelogisticsofx",
+      "title": "Wendover — The Logistics of X",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:7ef5ada8-d761-425c-93c6-dcbf6ddedcc3",
+      "slug": "themorbidzoo",
+      "title": "The Morbid Zoo",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCOXhxpe6-cDq7SyJdxasTkQ",
+        "handle": "@themorbidzoo",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022521510
+      }
+    },
+    {
+      "id": "video_channel:3a31470d-7c62-433d-b457-01ee87139449",
+      "slug": "thenandocut",
+      "title": "The Nando Cut",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCNSsNByP4GiEFNS-RIPHW7w",
+        "handle": "@thenandocut",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022525916
+      }
+    },
+    {
+      "id": "video_channel:be3999c7-5fa7-4f17-aeff-d3724a6bb369",
+      "slug": "theoctopuslady",
+      "title": "The Octopus Lady",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c8cb5792-0ba1-4815-b648-af81dca51558",
+      "slug": "thepresentpast",
+      "title": "The Present Past",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC5Axef4J11DIu17y2RKVqNQ",
+        "handle": "@ThePresentPast_",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022068030
+      }
+    },
+    {
+      "id": "video_channel:f1a6708a-3a7f-4457-b05d-72e6e946d8f7",
+      "slug": "theprince",
+      "title": "The Prince",
+      "kind": "film"
+    },
+    {
+      "id": "video_channel:de710c02-0794-425b-a792-c3046369e70f",
+      "slug": "thesojourn",
+      "title": "The Sojourn",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:b2a08f59-12cd-4069-b3f4-8a88536943b4",
+      "slug": "thethoughtemporium",
+      "title": "The Thought Emporium",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCV5vCi3jPJdURZwAOO_FNfQ",
+        "handle": "@thethoughtemporium",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022533614
+      }
+    },
+    {
+      "id": "video_channel:c611a949-041d-445f-be81-0426a90dfaad",
+      "slug": "thevintagespace",
+      "title": "The Vintage Space",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2988bd31-7e27-4eaa-b47d-ac5c56551adc",
+      "slug": "thomasflight",
+      "title": "Thomas Flight",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCUyvQV2JsICeLZP4c_h40kA",
+        "handle": "@ThomasFlight",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022069165
+      }
+    },
+    {
+      "id": "video_channel:ad499e8c-9bd6-4196-aad6-93e695a4319b",
+      "slug": "thomasfrank",
+      "title": "Thomas Frank",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCG-KntY7aVnIGXYEBQvmBAQ",
+        "handle": "@Thomasfrank",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022070267
+      }
+    },
+    {
+      "id": "video_channel:5304a234-c5ba-4213-89dd-6360b81769bb",
+      "slug": "thomasfrankexplains",
+      "title": "Thomas Frank Explains",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCd_WBvzBg1UbHE8j8MIL5Ng",
+        "handle": "@ThomasFrankExplains",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022071333
+      }
+    },
+    {
+      "id": "video_channel:c1beff16-c75b-44ae-85d0-e14282de794c",
+      "slug": "thomaspercykim",
+      "title": "Thomas Percy Kim",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:b7ea4b77-8365-4e79-9553-99f9d972f84c",
+      "slug": "tianamichele",
+      "title": "Tiana Michele",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:753180f8-989b-4848-907c-7e85f0993052",
+      "slug": "tibees",
+      "title": "Tibees",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC52kszkc08-acFOuogFl5jw",
+        "handle": "@tibees",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022544673
+      }
+    },
+    {
+      "id": "video_channel:6ca6d676-e2d2-4e7f-8b04-aead15f41996",
+      "slug": "tierzoo",
+      "title": "TierZoo",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCHsRtomD4twRf5WVHHk-cMw",
+        "handle": "@TierZoo",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022072493
+      }
+    },
+    {
+      "id": "video_channel:dff00d5b-9915-4ec9-890e-c2dcc4a63bb5",
+      "slug": "tierzoo-lets-play",
+      "title": "TierZoo — Let's Play Outside",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:874e4d64-c81d-4530-a9f5-9dcebbe6f18e",
+      "slug": "tipofthespear",
+      "title": "Mustard — Tip of the Spear: The B-2 Spirit",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:a8e7758a-68ec-4d34-9d8c-26fba19b0e25",
+      "slug": "tipusultan",
+      "title": "Extra History — Tipu Sultan: Tiger or Tyrant?",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:45c7c20b-70e3-4e68-9ecb-3cea27172984",
+      "slug": "tldrbusiness",
+      "title": "TLDR Business",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCEVRlkXYhvrtfdqRNvydl3w",
+        "handle": "@TLDRbusiness",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022073552
+      }
+    },
+    {
+      "id": "video_channel:35009c31-e1cc-4410-bd92-5f618b115944",
+      "slug": "tldrnewseu",
+      "title": "TLDR News EU",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC-eegKVWEgBCa4OzjnK_PtA",
+        "handle": "@TLDRnewsEU",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022074644
+      }
+    },
+    {
+      "id": "video_channel:e3eda4cd-3ee3-414b-a489-4b7c5f731a6c",
+      "slug": "tldrnewsglobal",
+      "title": "TLDR News Global",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC-uhvujip5deVcEtLxnW8qg",
+        "handle": "@TLDRnewsGLOBAL",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022075702
+      }
+    },
+    {
+      "id": "video_channel:238fe61e-02b2-4789-885b-77f63c5a8e08",
+      "slug": "tldrnewsuk",
+      "title": "TLDR News UK",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:f9426b1b-81cd-4bd7-a075-9e6cfd836ad0",
+      "slug": "tldrnewsus",
+      "title": "TLDR News US",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCGg5QDOcFZYS3FbLVHRvJUw",
+        "handle": "@TLDRnewsUS",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022079222
+      }
+    },
+    {
+      "id": "video_channel:b064663b-88cf-4363-bdd9-de2986ce4e1c",
+      "slug": "todd-in-the-shadows",
+      "title": "Todd in the Shadows",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCaTSjmqzOO-P8HmtVW3t7sA",
+        "handle": "@ToddintheShadows",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022080104
+      }
+    },
+    {
+      "id": "video_channel:54967c6b-3473-4260-8e72-26511af7a3c6",
+      "slug": "tom-scott-presents-money",
+      "title": "Tom Scott Presents: Money",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:396542ae-0dda-4b8c-b751-31b66e0428ca",
+      "slug": "tomnicholas",
+      "title": "Tom Nicholas",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCxt2r57cLastdmrReiQJkEg",
+        "handle": "@Tom_Nicholas",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022083444
+      }
+    },
+    {
+      "id": "video_channel:e362345d-ced2-4708-81c2-6aea314ef5de",
+      "slug": "tomscott",
+      "title": "Tom Scott: England",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:b84c0645-428b-4ec4-8b0c-fe592227e23c",
+      "slug": "tracedominguez",
+      "title": "Uno Dos of Trace",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:9e543982-130a-4c15-a106-54da27950189",
+      "slug": "trussissues",
+      "title": "The Big Rissue",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:3269dc8b-7393-45a0-a2a7-3f0d8faa41cb",
+      "slug": "underexposure",
+      "title": "neo  — Under Exposure",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:41e6c81c-07b6-459c-b05a-81595d260b13",
+      "slug": "unknowncity",
+      "title": "neo — The Unknown City",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:f5408fda-8cfa-40a8-82db-69cb329db5d2",
+      "slug": "unrated",
+      "title": "Maggie Mae Fish — Unrated",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:3514e35d-3640-4047-9a03-4a280b72f7db",
+      "slug": "upandatom",
+      "title": "Up and Atom",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCSIvk78tK2TiviLQn4fSHaw",
+        "handle": "@upandatom",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022087886
+      }
+    },
+    {
+      "id": "video_channel:29e4512e-eefb-4caf-9d76-2687fdcdfc60",
+      "slug": "vbirchwood",
+      "title": "V. Birchwood",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCgz4oLdeKP1Pt2BpiUn2iXQ",
+        "handle": "@VBirchwood",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022554573
+      }
+    },
+    {
+      "id": "video_channel:197dfaf2-ec84-4512-9475-27ebbd4e3b69",
+      "slug": "volksgeist",
+      "title": "Philip Simon Damico",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCikpumVCosztN-ZUthleRug",
+        "handle": "@Volksgeist",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022088985
+      }
+    },
+    {
+      "id": "video_channel:2dc63969-a85b-4fd8-8d82-f4d10f59f9e0",
+      "slug": "volksgeist-a-brief-history-of-music",
+      "title": "Volksgeist — A Brief History of Music",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2223caec-c29c-494d-807c-0af3914f6280",
+      "slug": "warroom",
+      "title": "RealLifeLore — War Room",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:3ca378fd-2b4c-4c6f-b180-c42ae2ccb603",
+      "slug": "watchcinemaofmeaning",
+      "title": "Cinema of Meaning",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:2e5086f2-1ad1-4d45-adbd-2acd6869ddc0",
+      "slug": "wayuu",
+      "title": "Bright Trip — Resistencia: The Story of the Wayuu",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:fe4d9c1c-017b-494c-9afc-e79e6859b211",
+      "slug": "wendover",
+      "title": "Wendover",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC9RM-iSvTu1uPJb8X5yp3EQ",
+        "handle": "@Wendoverproductions",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022090052
+      }
+    },
+    {
+      "id": "video_channel:88d3ff2d-09cd-403e-90dc-d35c4fd5d9ab",
+      "slug": "wendover-airport",
+      "title": "Wendover — The World's Most Useful Airport",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:573ca46e-7ff2-41e4-9fbd-084774b4fff8",
+      "slug": "wendover-final-days-of-majuro",
+      "title": "Wendover — The Final Years of Majuro",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:106dd3ff-f22e-42d2-b9c3-4440c8fb7db8",
+      "slug": "wesleywang",
+      "title": "Wesley Wang",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCOB6UwC_dZ3-gAJBNLkPfuA",
+        "handle": "@WesleyWang",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022564478
+      }
+    },
+    {
+      "id": "video_channel:461f77a2-d7a7-46a4-8cc8-031223324a9b",
+      "slug": "womancarryingman",
+      "title": "Woman Carrying Man",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UC8aGE10t6QrcdRMpgorwkAA",
+        "handle": "@womancarryingman",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022568873
+      }
+    },
+    {
+      "id": "video_channel:6bea4498-95f7-4f36-8c7e-7220801c9ba5",
+      "slug": "wonder",
+      "title": "The Wonder of It All",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:6a7cd221-3b93-416a-82e1-b985dba78b36",
+      "slug": "wonderwhy",
+      "title": "WonderWhy",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCcEPmwpXKrKzZahqjwpIAsQ",
+        "handle": "@WonderWhy",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022091163
+      }
+    },
+    {
+      "id": "video_channel:41aa6b97-98a2-4df0-9977-ca4c1b2aa581",
+      "slug": "workingtitles",
+      "title": "Working Titles",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:2c2ef73a-cadd-4346-9086-af0644c626e7",
+      "slug": "worldsmiths",
+      "title": "Tale Foundry — Worldsmiths",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:37952657-e793-4269-9251-056dd42fb842",
+      "slug": "wtf",
+      "title": "What to Follow: USA",
+      "kind": "episodic"
+    },
+    {
+      "id": "video_channel:5c4f31f6-55b5-4aaf-a016-91d32c7bde03",
+      "slug": "zachhighley",
+      "title": "Zach Highley",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCaffuWQ2mLfRevosyKoz87Q",
+        "handle": "@ZachHighley",
+        "verifiedBy": "historical-stable-ids-and-current-channel-identity",
+        "verifiedAtMs": 1792022092271
+      }
+    },
+    {
+      "id": "video_channel:abe8309c-309a-4838-9ec0-1943a55c6914",
+      "slug": "zachhighleyshow",
+      "title": "The Zach Highley Show",
+      "kind": "default"
+    },
+    {
+      "id": "video_channel:c41d1fd3-6917-44d4-aba4-dcd35cf61f6e",
+      "slug": "ziertoo",
+      "title": "ZierToo",
+      "kind": "default",
+      "youtube": {
+        "channelId": "UCH-1ieGGk1942uyn_nlc-lQ",
+        "handle": "@ziertoo",
+        "verifiedBy": "current-channel-identity-and-two-public-video-titles",
+        "verifiedAtMs": 1792022576603
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "nebulate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "description": "Local YouTube and Nebula matching browser extension",
@@ -12,8 +12,8 @@
   "packageManager": "bun@1.4.3",
   "scripts": {
     "postinstall": "node scripts/wxt.mjs prepare",
-    "lint": "biome check extension/entrypoints extension/core test/modern wxt.config.ts vitest.config.ts scripts/check-artifacts.mjs",
-    "format": "biome check --write extension/entrypoints extension/core test/modern wxt.config.ts vitest.config.ts scripts/check-artifacts.mjs",
+    "lint": "biome check extension/entrypoints extension/core test/modern wxt.config.ts vitest.config.ts scripts/check-artifacts.mjs scripts/update-creators.ts",
+    "format": "biome check --write extension/entrypoints extension/core test/modern wxt.config.ts vitest.config.ts scripts/check-artifacts.mjs scripts/update-creators.ts",
     "typecheck": "node scripts/wxt.mjs prepare && tsc --noEmit",
     "test": "node --test test/nebula/api.test.mjs && vitest run",
     "build:chrome": "node scripts/wxt.mjs build chrome",
@@ -22,7 +22,8 @@
     "dev:chrome": "node scripts/wxt.mjs dev chrome",
     "dev:firefox": "node scripts/wxt.mjs dev firefox",
     "probe:nebula": "node scripts/nebula/probe.mjs --live",
-    "probe:build": "node scripts/nebula/build-extension.mjs"
+    "probe:build": "node scripts/nebula/build-extension.mjs",
+    "update:creators": "bun run --no-env-file scripts/update-creators.ts --live"
   },
   "dependencies": {
     "react": "19.3.1",

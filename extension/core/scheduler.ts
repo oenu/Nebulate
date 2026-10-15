@@ -15,6 +15,7 @@ export class RefreshScheduler {
     private readonly store: LocalStore,
     private readonly client: NebulaClient,
     private readonly now = Date.now,
+    private readonly onUpdated: () => void = () => {},
   ) {}
 
   async refresh(mapping: CreatorMapping, force = false): Promise<RefreshJob> {
@@ -120,11 +121,24 @@ export class RefreshScheduler {
         retryAtMs: this.now() + Math.max(retry, Math.min(86400000, 60_000 * 2 ** (failures - 1))),
       };
     }
-    const finish = this.store.db.transaction('jobs', 'readwrite');
-    if ((await finish.store.get(job.slug))?.generation === job.generation)
-      await finish.store.put(job);
-    else job = { ...job, status: 'retry', error: 'refresh-cancelled' };
+    const finish = this.store.db.transaction(['jobs', 'decisions'], 'readwrite');
+    if ((await finish.objectStore('jobs').get(job.slug))?.generation === job.generation) {
+      await finish.objectStore('jobs').put(job);
+      if (job.status === 'idle') {
+        let cursor = await finish.objectStore('decisions').openCursor();
+        while (cursor) {
+          if (
+            cursor.value.creatorSlug === mapping.slug &&
+            cursor.value.state !== 'confirmed' &&
+            cursor.value.reason !== 'manual'
+          )
+            await cursor.delete();
+          cursor = await cursor.continue();
+        }
+      }
+    } else job = { ...job, status: 'retry', error: 'refresh-cancelled' };
     await finish.done;
+    if (job.status === 'idle') this.onUpdated();
     return job;
   }
 

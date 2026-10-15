@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 import { BrowsingController, videoCards } from '../../extension/core/browsing';
 import { migratePreferences } from '../../extension/core/preferences';
 import type { MatchDecision } from '../../extension/core/types';
@@ -13,6 +13,7 @@ afterEach(() => {
   controller?.stop();
   controller = undefined;
   document.body.innerHTML = '';
+  vi.useRealTimers();
 });
 
 test('home/search/subscriptions/channel/recommendation adapters read current card metadata conservatively', () => {
@@ -125,4 +126,33 @@ test('YouTube metadata uses only public typed endpoints, deduplicates requests, 
   expect(calls).toBe(1);
   expect(() => youtubeIdentity('https://www.youtube.com.evil.invalid/@NotJustBikes')).toThrow();
   await expect(youtube.observation('../arbitrary-url')).rejects.toThrow();
+});
+
+test('continuous page mutations cannot postpone the first visible card observation', async () => {
+  vi.useFakeTimers();
+  document.body.innerHTML = '';
+  let calls = 0;
+  controller = new BrowsingController(
+    document,
+    () => href,
+    async (observation) => {
+      calls++;
+      return {
+        videoId: observation.videoId,
+        state: 'no-match',
+        reason: 'fixture',
+        fingerprint: 'fixture',
+        checkedAtMs: Date.now(),
+        expiresAtMs: Number.MAX_SAFE_INTEGER,
+      };
+    },
+    () => true,
+  );
+  controller.start();
+  card();
+  for (let i = 0; i < 12; i++) {
+    document.body.append(document.createElement('span'));
+    await vi.advanceTimersByTimeAsync(50);
+  }
+  expect(calls).toBe(1);
 });

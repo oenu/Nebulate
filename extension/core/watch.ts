@@ -139,8 +139,11 @@ export class WatchController {
     }
   }
   private schedule = (): void => {
-    clearTimeout(this.timer);
-    this.timer = setTimeout(() => void this.sync(), 100);
+    if (this.timer !== undefined) return;
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      void this.sync();
+    }, 100);
   };
   private startNavigation = (): void => {
     this.navigating = true;
@@ -172,6 +175,7 @@ export class WatchController {
     this.observer?.disconnect();
     this.observer = undefined;
     clearTimeout(this.timer);
+    this.timer = undefined;
     clearTimeout(this.retryTimer);
     this.revision++;
     this.key = '';

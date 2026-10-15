@@ -1,9 +1,10 @@
 import 'fake-indexeddb/auto';
 import { readFileSync } from 'node:fs';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { NebulaClient } from '../../extension/core/client';
 import { CONFIRMED_TTL_MS } from '../../extension/core/matching';
 import { Pipeline } from '../../extension/core/pipeline';
+import { CREATOR_TTL_MS } from '../../extension/core/scheduler';
 import { LocalStore, SEED } from '../../extension/core/storage';
 import type { Observation } from '../../extension/core/types';
 
@@ -89,5 +90,83 @@ test('unverified creators make no requests; failure remains retryable and confir
   });
   expect(failed.state).toBe('retryable-error');
   expect(failed.url).toBeUndefined();
+  store.db.close();
+});
+
+test('encountering a cached video refreshes its creator after four hours without waiting for the seven-day match expiry', async () => {
+  const store = await LocalStore.open(`cached-creator-${crypto.randomUUID()}`);
+  const fixture = fixtureClient();
+  let now = 1000;
+  const pipeline = new Pipeline(store, fixture.client, () => now);
+  const first = await pipeline.observe(observation);
+  expect(fixture.requests()).toBe(2);
+  now += CREATOR_TTL_MS + 1;
+  const cached = await pipeline.observe(observation);
+  expect(cached.checkedAtMs).toBe(first.checkedAtMs);
+  await vi.waitFor(async () => {
+    expect(fixture.requests()).toBe(4);
+    expect((await store.db.get('jobs', SEED.slug))?.status).toBe('idle');
+  });
+  await Promise.all([pipeline.observe(observation), pipeline.observe(observation)]);
+  expect(fixture.requests()).toBe(4);
+  store.db.close();
+});
+
+test('cached encounters honor failure backoff and manual video decisions do not suppress creator fetching', async () => {
+  const store = await LocalStore.open(`cached-backoff-${crypto.randomUUID()}`);
+  const fixture = fixtureClient();
+  let now = 1000;
+  const pipeline = new Pipeline(store, fixture.client, () => now);
+  const first = await pipeline.observe(observation);
+  await store.correct(
+    {
+      videoId: observation.videoId,
+      observation,
+      nebulaId: first.nebulaId as string,
+      url: first.url,
+      updatedAtMs: now,
+    },
+    { ...first, reason: 'manual' },
+  );
+  fixture.goOffline();
+  now += CREATOR_TTL_MS + 1;
+  expect((await pipeline.observe(observation)).reason).toBe('manual');
+  await vi.waitFor(async () =>
+    expect((await store.db.get('jobs', SEED.slug))?.status).toBe('retry'),
+  );
+  expect(fixture.requests()).toBe(3);
+  await Promise.all([pipeline.observe(observation), pipeline.observe(observation)]);
+  expect(fixture.requests()).toBe(3);
+  store.db.close();
+});
+
+test('a newly available catalogue match replaces a cached negative after the automatic creator update', async () => {
+  const store = await LocalStore.open(`new-release-${crypto.randomUUID()}`);
+  const fixture = fixtureClient();
+  let now = 1000;
+  let updates = 0;
+  const pipeline = new Pipeline(
+    store,
+    fixture.client,
+    () => now,
+    () => {
+      updates++;
+    },
+  );
+  const original = await pipeline.observe(observation);
+  now += CREATOR_TTL_MS + 1;
+  await store.db.put('decisions', {
+    ...original,
+    state: 'no-match',
+    reason: 'no-candidate',
+    url: undefined,
+    nebulaId: undefined,
+    checkedAtMs: now - 1,
+    expiresAtMs: now + 15 * 60000,
+  });
+  expect((await pipeline.observe(observation)).state).toBe('no-match');
+  await vi.waitFor(() => expect(updates).toBe(2));
+  expect((await pipeline.observe(observation)).state).toBe('confirmed');
+  expect(fixture.requests()).toBe(4);
   store.db.close();
 });

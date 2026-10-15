@@ -5,7 +5,7 @@ export interface CreatorMapping {
   slug: string;
   title: string;
   confirmedAtMs: number;
-  source: 'verified-seed' | 'manual';
+  source: 'verified-seed' | 'verified-registry' | 'manual';
 }
 
 export interface NebulaVideo {

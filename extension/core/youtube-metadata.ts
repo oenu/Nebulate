@@ -1,6 +1,7 @@
 import { ServiceError } from './client';
 import { record, text } from './metadata';
 import type { Observation } from './types';
+import { parseYouTubeChannel } from './youtube-channel';
 
 export function youtubeIdentity(value: string): Pick<Observation, 'channelId' | 'channelHandle'> {
   const url = new URL(value, 'https://www.youtube.com');
@@ -85,18 +86,10 @@ export class YouTubeMetadata {
   async verifyChannel(channelId: string, handle: string): Promise<void> {
     if (!/^UC[\w-]{22}$/.test(channelId)) throw new ServiceError('invalid-channel-id');
     youtubeIdentity(`https://www.youtube.com/${handle}`);
-    const response = await this.get(
-      `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
-    );
-    const xml = await response.text();
-    const returned = xml.match(/<yt:channelId>([\w-]+)<\/yt:channelId>/)?.[1];
-    const videoId = xml.match(/<yt:videoId>([\w-]{11})<\/yt:videoId>/)?.[1];
-    if (
-      !returned ||
-      ![returned, `UC${returned}`].includes(channelId) ||
-      !videoId ||
-      (await this.observation(videoId)).channelHandle?.toLowerCase() !== handle.toLowerCase()
-    )
+    // RSS can return 404 for a valid channel with no recent feed entries.
+    const response = await this.get(`https://www.youtube.com/channel/${channelId}`);
+    const returned = parseYouTubeChannel(await response.text());
+    if (returned.channelId !== channelId || returned.handle.toLowerCase() !== handle.toLowerCase())
       throw new ServiceError('channel-verification-failed');
   }
 }

@@ -62,6 +62,42 @@ test('rate-limit backoff persists and an explicit refresh still respects Retry-A
   store.db.close();
 });
 
+test('a completed creator fetch invalidates automatic negatives and notifies tabs once while preserving confirmations and corrections', async () => {
+  const store = await db();
+  const base = {
+    videoId: 'ABCDEFGHIJK',
+    fingerprint: 'fixture',
+    creatorSlug: SEED.slug,
+    state: 'no-match' as const,
+    reason: 'no-candidate',
+    checkedAtMs: 1,
+    expiresAtMs: 1000000,
+  };
+  await store.db.put('decisions', base);
+  await store.db.put('decisions', { ...base, videoId: 'manual', reason: 'manual' });
+  await store.db.put('decisions', { ...base, videoId: 'confirmed', state: 'confirmed' });
+  let notifications = 0;
+  const client = new NebulaClient(port, async (input) =>
+    json(String(input).includes('video_episodes') ? { results: [], next: null } : creator),
+  );
+  const scheduler = new RefreshScheduler(
+    store,
+    client,
+    () => 1000,
+    () => {
+      notifications++;
+    },
+  );
+  await scheduler.refresh(SEED);
+  expect(await store.db.get('decisions', base.videoId)).toBeUndefined();
+  expect((await store.db.get('decisions', 'manual'))?.reason).toBe('manual');
+  expect((await store.db.get('decisions', 'confirmed'))?.state).toBe('confirmed');
+  expect(notifications).toBe(1);
+  await scheduler.refresh(SEED);
+  expect(notifications).toBe(1);
+  store.db.close();
+});
+
 test('cache clear invalidates an in-flight page generation so late writes cannot restore it', async () => {
   const store = await db();
   let release!: () => void;

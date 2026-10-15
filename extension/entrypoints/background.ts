@@ -10,6 +10,16 @@ import { LocalStore } from '../core/storage';
 import { YouTubeMetadata } from '../core/youtube-metadata';
 
 export default defineBackground(() => {
+  const invalidateTabs = async () => {
+    const tabs = await browser.tabs.query({ url: 'https://www.youtube.com/*' });
+    await Promise.all(
+      tabs.map((tab) =>
+        tab.id === undefined
+          ? undefined
+          : browser.tabs.sendMessage(tab.id, { type: 'invalidate' }).catch(() => {}),
+      ),
+    );
+  };
   const ready = (async () => {
     if (browser.storage.session.setAccessLevel)
       await browser.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
@@ -29,7 +39,12 @@ export default defineBackground(() => {
     await browser.storage.local.remove(['options', 'table', 'lastUpdate', 'lastUpdated']);
     const store = await LocalStore.open();
     const youtube = new YouTubeMetadata();
-    const pipeline = new Pipeline(store, client);
+    const pipeline = new Pipeline(
+      store,
+      client,
+      Date.now,
+      () => void invalidateTabs().catch(() => {}),
+    );
     const management = new Management(store, client, pipeline, youtube);
     if (!(await browser.alarms.get('nebulate-recovery')))
       await browser.alarms.create('nebulate-recovery', { periodInMinutes: 1 });
@@ -97,14 +112,7 @@ export default defineBackground(() => {
           message.type,
         )
       ) {
-        const tabs = await browser.tabs.query({ url: 'https://www.youtube.com/*' });
-        await Promise.all(
-          tabs.map((tab) =>
-            tab.id === undefined
-              ? undefined
-              : browser.tabs.sendMessage(tab.id, { type: 'invalidate' }).catch(() => {}),
-          ),
-        );
+        await invalidateTabs();
       }
       return result;
     })().then(respond, (error) =>

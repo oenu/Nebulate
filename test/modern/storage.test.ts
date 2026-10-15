@@ -34,7 +34,11 @@ test('version 1 upgrades preserve data and add lookup indexes/stores', async () 
   legacy.close();
   const upgraded = await LocalStore.open(name);
   expect(await upgraded.db.getAllFromIndex('videos', 'creator', SEED.nebulaId)).toEqual([video]);
-  expect(await upgraded.db.get('creators', SEED.youtubeChannelId)).toEqual(SEED);
+  expect(await upgraded.db.get('creators', SEED.youtubeChannelId)).toMatchObject({
+    youtubeChannelId: SEED.youtubeChannelId,
+    nebulaId: SEED.nebulaId,
+    slug: SEED.slug,
+  });
   expect(upgraded.db.objectStoreNames.contains('jobs')).toBe(true);
   upgraded.db.close();
 });

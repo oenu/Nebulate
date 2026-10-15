@@ -1,4 +1,5 @@
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
+import { REGISTRY_MAPPINGS } from './creators';
 import type {
   CreatorMapping,
   ManualOverride,
@@ -66,9 +67,60 @@ export class LocalStore {
       },
     });
     const store = new LocalStore(db);
-    for (const seed of SEEDS) {
-      if (!(await db.get('creators', seed.youtubeChannelId))) await db.put('creators', seed);
+    const tx = db.transaction(['creators', 'decisions'], 'readwrite');
+    let changed = false;
+    const affected = new Set<string>();
+    const existing = await tx.objectStore('creators').getAll();
+    const manual = existing.filter((mapping) => mapping.source === 'manual');
+    const conflictsWithManual = (mapping: CreatorMapping) =>
+      manual.some(
+        (correction) =>
+          correction.nebulaId === mapping.nebulaId ||
+          (mapping.youtubeHandle &&
+            correction.youtubeHandle?.toLowerCase() === mapping.youtubeHandle.toLowerCase()),
+      );
+    for (const mapping of existing) {
+      if (mapping.source !== 'manual' && conflictsWithManual(mapping)) {
+        await tx.objectStore('creators').delete(mapping.youtubeChannelId);
+        affected.add(mapping.slug);
+        changed = true;
+      }
     }
+    for (const seed of [
+      ...SEEDS.filter(
+        (seed) =>
+          !REGISTRY_MAPPINGS.some((mapping) => seed.youtubeChannelId === mapping.youtubeChannelId),
+      ),
+      ...REGISTRY_MAPPINGS,
+    ]) {
+      const previous = await tx.objectStore('creators').get(seed.youtubeChannelId);
+      if (previous?.source === 'manual' || conflictsWithManual(seed)) continue;
+      // New verified registry data replaces automatic mappings. The original
+      // seeds are fallback entries; manual corrections always take priority.
+      if (!previous || previous.confirmedAtMs <= seed.confirmedAtMs) {
+        await tx.objectStore('creators').put(seed);
+        if (
+          !previous ||
+          previous.slug !== seed.slug ||
+          previous.youtubeHandle !== seed.youtubeHandle
+        ) {
+          changed = true;
+          if (previous) affected.add(previous.slug);
+        }
+      }
+    }
+    if (changed) {
+      let cursor = await tx.objectStore('decisions').openCursor();
+      while (cursor) {
+        if (
+          (cursor.value.state === 'unknown' && cursor.value.reason === 'creator-unverified') ||
+          (cursor.value.reason !== 'manual' && affected.has(cursor.value.creatorSlug ?? ''))
+        )
+          await cursor.delete();
+        cursor = await cursor.continue();
+      }
+    }
+    await tx.done;
     return store;
   }
 

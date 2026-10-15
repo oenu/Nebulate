@@ -11,6 +11,11 @@ import { youtubeIdentity } from '../extension/core/youtube-metadata';
 
 if (!process.argv.includes('--live'))
   throw new Error('Use --live to update the public creator registry explicitly.');
+
+const VERIFICATION_TTL_MS = 24 * 60 * 60_000;
+const REQUEST_INTERVAL_MS = 1_100;
+const DEFAULT_BACKOFF_MS = 5 * 60_000;
+
 type Candidate = {
   slug: string;
   title: string;
@@ -30,6 +35,8 @@ const candidates: Candidate[] = JSON.parse(
 );
 const cachePath = '.local/creator-verification-cache.json';
 await mkdir('.local', { recursive: true });
+// Cache successes and unavailable channels so interrupted maintenance can
+// resume without repeating the same public requests throughout the day.
 let cache: Record<string, { atMs: number; channel?: Channel }> = {};
 try {
   cache = JSON.parse(await readFile(cachePath, 'utf8'));
@@ -42,8 +49,9 @@ try {
 } catch {}
 if (retryAtMs > Date.now())
   throw new Error(`Public verification is in backoff until ${new Date(retryAtMs).toISOString()}.`);
+
 let lastRequestMs = 0;
-async function get(url: string) {
+async function fetchPublicMetadata(url: string) {
   const target = new URL(url);
   if (
     target.protocol !== 'https:' ||
@@ -54,7 +62,7 @@ async function get(url: string) {
   )
     throw new Error('destination-denied');
   if (rateLimited) throw new Error('rate-limited');
-  const delay = 1100 - (Date.now() - lastRequestMs);
+  const delay = REQUEST_INTERVAL_MS - (Date.now() - lastRequestMs);
   if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
   lastRequestMs = Date.now();
   const response = await fetch(target, {
@@ -63,6 +71,8 @@ async function get(url: string) {
     signal: AbortSignal.timeout(15000),
   });
   if (response.status === 429) {
+    // Persist the deadline so restarting this script cannot bypass a server's
+    // Retry-After. Stop further requests for the rest of this invocation too.
     rateLimited = true;
     const header = response.headers.get('retry-after');
     const retryMs =
@@ -70,19 +80,22 @@ async function get(url: string) {
         ? Number(header) * 1000
         : header
           ? Date.parse(header) - Date.now()
-          : 300000;
-    retryAtMs = Date.now() + Math.max(60000, Number.isFinite(retryMs) ? retryMs : 300000);
+          : DEFAULT_BACKOFF_MS;
+    retryAtMs =
+      Date.now() + Math.max(60_000, Number.isFinite(retryMs) ? retryMs : DEFAULT_BACKOFF_MS);
     await writeFile(retryPath, JSON.stringify({ retryAtMs }));
     throw new Error('rate-limited');
   }
   if (!response.ok) throw new Error('public-metadata-unavailable');
   return response;
 }
-const brand = (value: string) =>
+
+const normalizedBrand = (value: string) =>
   normalizedTitle(value)
     .replace(/\b(?:official|productions|academy|videos|channel)\b/g, '')
     .replace(/\s/g, '');
-async function channel(reference: string, needVideos = false): Promise<Channel | undefined> {
+
+async function loadChannel(reference: string, needVideos = false): Promise<Channel | undefined> {
   const cached =
     cache[reference] ??
     Object.values(cache).find(
@@ -92,7 +105,7 @@ async function channel(reference: string, needVideos = false): Promise<Channel |
     );
   if (
     cached &&
-    cached.atMs + 86400000 > Date.now() &&
+    cached.atMs + VERIFICATION_TTL_MS > Date.now() &&
     (!cached.channel || !needVideos || cached.channel.videos.length > 0)
   )
     return cached.channel ? { ...cached.channel, checkedAtMs: cached.atMs } : undefined;
@@ -103,7 +116,7 @@ async function channel(reference: string, needVideos = false): Promise<Channel |
         ? `/${reference}`
         : undefined;
     if (!path) throw new Error('invalid-channel-reference');
-    const html = await (await get(`https://www.youtube.com${path}/videos`)).text();
+    const html = await (await fetchPublicMetadata(`https://www.youtube.com${path}/videos`)).text();
     const metadata = parseYouTubeChannel(html);
     if (path.startsWith('/channel/') && metadata.channelId !== reference)
       throw new Error('channel-id-changed');
@@ -117,6 +130,7 @@ async function channel(reference: string, needVideos = false): Promise<Channel |
     return;
   }
 }
+
 const entries: DirectoryCreator[] = [];
 const websites = new Map<string, string>();
 let next: string | null = 'https://content.api.nebula.app/video_channels/?page_size=100';
@@ -134,7 +148,7 @@ while (next) {
   )
     throw new Error('invalid-directory-pagination');
   seen.add(next);
-  const page = await (await get(next)).json();
+  const page = await (await fetchPublicMetadata(next)).json();
   if (
     !Array.isArray(page.results) ||
     page.results.length > 100 ||
@@ -159,7 +173,7 @@ entries.sort(
     a.slug.localeCompare(b.slug),
 );
 let cursor = 0;
-async function verify() {
+async function verifyMappings() {
   while (cursor < entries.length && !rateLimited) {
     const entry = entries[cursor++];
     if (entry?.kind !== 'default') continue;
@@ -169,15 +183,19 @@ async function verify() {
     );
     let result: Channel | undefined;
     let verifiedBy: string | undefined;
+    // A historical row is only a candidate: require unchanged Nebula identity
+    // and a matching current YouTube owner name before activating its mapping.
     if (historical) {
-      result = await channel(historical.youtubeChannelId);
+      result = await loadChannel(historical.youtubeChannelId);
       if (
         result &&
-        (brand(result.title) === brand(entry.title) ||
-          brand(result.title) === brand(historical.title))
+        (normalizedBrand(result.title) === normalizedBrand(entry.title) ||
+          normalizedBrand(result.title) === normalizedBrand(historical.title))
       )
         verifiedBy = 'historical-stable-ids-and-current-channel-identity';
     }
+    // A YouTube channel linked by Nebula itself is stronger evidence than a
+    // guessed handle. Resolve the linked page to its canonical channel ID.
     if (!verifiedBy) {
       const website = websites.get(entry.slug);
       if (website)
@@ -188,17 +206,19 @@ async function verify() {
               /^\/channel\/(UC[\w-]{22})\/?$/.exec(url.pathname)?.[1] ??
               /^\/(@[^/]+)\/?$/.exec(url.pathname)?.[1];
             if (reference) {
-              result = await channel(reference);
+              result = await loadChannel(reference);
               if (result) verifiedBy = 'first-party-nebula-website';
             }
           }
         } catch {}
     }
+    // A guessed same-name handle alone proves nothing. Require two distinct,
+    // sufficiently long shared video titles and verify both YouTube authors.
     if (!verifiedBy) {
-      result = await channel(`@${entry.slug}`, true);
-      if (result && brand(result.title) === brand(entry.title)) {
+      result = await loadChannel(`@${entry.slug}`, true);
+      if (result && normalizedBrand(result.title) === normalizedBrand(entry.title)) {
         const page = await (
-          await get(
+          await fetchPublicMetadata(
             `https://content.api.nebula.app/video_channels/${entry.slug}/video_episodes/?page_size=100`,
           )
         ).json();
@@ -207,23 +227,20 @@ async function verify() {
             .filter((video) => video.channel_id === entry.id)
             .map((video) => normalizedTitle(video.title)),
         );
-        const matches = [
-          ...new Map(
-            result.videos
-              .filter(
-                (video) =>
-                  normalizedTitle(video.title).length >= 12 &&
-                  titles.has(normalizedTitle(video.title)),
-              )
-              .map((video) => [normalizedTitle(video.title), video]),
-          ).values(),
-        ];
+        // Repeated uploads with the same title count as one piece of evidence.
+        const matchingTitles = new Map<string, { id: string; title: string }>();
+        for (const video of result.videos) {
+          const title = normalizedTitle(video.title);
+          if (title.length >= 12 && titles.has(title)) matchingTitles.set(title, video);
+        }
+        const matches = [...matchingTitles.values()];
         if (matches.length >= 2) {
           let authorsMatch = true;
           for (const video of matches.slice(0, 2)) {
+            const watchURL = `https://www.youtube.com/watch?v=${video.id}`;
             const data = await (
-              await get(
-                `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${video.id}`)}&format=json`,
+              await fetchPublicMetadata(
+                `https://www.youtube.com/oembed?url=${encodeURIComponent(watchURL)}&format=json`,
               )
             ).json();
             const author = youtubeIdentity(data.author_url);
@@ -258,7 +275,7 @@ async function verify() {
   }
 }
 try {
-  await verify();
+  await verifyMappings();
 } catch {
   console.log(
     JSON.stringify({
@@ -273,6 +290,8 @@ for (const entry of entries) {
   const old = CREATOR_DIRECTORY.find((old) => old.id === entry.id && old.slug === entry.slug);
   if (!entry.youtube && old?.youtube) entry.youtube = old.youtube;
 }
+// Do not let two Nebula entries claim one YouTube identity. Leave both
+// unresolved instead of choosing a winner based on directory traversal order.
 const channelCounts = new Map<string, number>();
 for (const entry of entries)
   if (entry.youtube)
@@ -283,6 +302,7 @@ for (const entry of entries)
 for (const entry of entries)
   if (entry.youtube && channelCounts.get(entry.youtube.channelId) !== 1) delete entry.youtube;
 entries.sort((a, b) => a.slug.localeCompare(b.slug));
+// Publish atomically; interrupted writes must leave the bundled registry intact.
 await writeFile(
   '.local/creator-registry-next.json',
   `${JSON.stringify({ schemaVersion: 1, updatedAtMs: Date.now(), entries }, null, 2)}\n`,

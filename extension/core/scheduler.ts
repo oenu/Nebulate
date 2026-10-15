@@ -8,6 +8,8 @@ export const LEASE_MS = 45_000;
 export const MAX_PAGES = 5;
 
 export class RefreshScheduler {
+  // Deduplicate callers in this worker. Persisted leases below also protect
+  // jobs when workers restart or another scheduler instance reaches the store.
   private running = new Map<string, Promise<RefreshJob>>();
   private active = 0;
   private waiting: (() => void)[] = [];
@@ -31,11 +33,13 @@ export class RefreshScheduler {
   }
 
   private async run(mapping: CreatorMapping, force: boolean): Promise<RefreshJob> {
-    if (this.active >= 2) await new Promise<void>((r) => this.waiting.push(r));
+    if (this.active >= 2) await new Promise<void>((resolve) => this.waiting.push(resolve));
     else this.active++;
     try {
       return await this.claimAndRun(mapping, force);
     } finally {
+      // Transfer this occupied slot directly to a waiter. Only release the
+      // count when nobody is waiting, or new callers could exceed the limit.
       const next = this.waiting.shift();
       if (next) next();
       else this.active--;
@@ -46,6 +50,7 @@ export class RefreshScheduler {
     const now = this.now();
     const tx = this.store.db.transaction('jobs', 'readwrite');
     const old = await tx.store.get(mapping.slug);
+    // Even an explicit refresh must respect an active lease and service backoff.
     if (
       old &&
       ((old.status === 'refreshing' && old.leaseUntilMs > now) ||
@@ -85,11 +90,15 @@ export class RefreshScheduler {
         }
         const update = this.store.db.transaction(['jobs', 'videos'], 'readwrite');
         const current = await update.objectStore('jobs').get(job.slug);
+        // A replacement job or cache clear revokes this generation. Never let a
+        // delayed response write into the newer job's catalogue.
         if (current?.generation !== job.generation) {
           await update.done;
           throw new ServiceError('refresh-cancelled');
         }
         for (const video of page.videos) await update.objectStore('videos').put(video);
+        // Commit the page and its checkpoint together so recovery cannot skip
+        // metadata that was fetched but not saved before worker termination.
         job = {
           ...job,
           nextURL: page.next,
@@ -112,6 +121,8 @@ export class RefreshScheduler {
     } catch (error) {
       const retry = error instanceof ServiceError ? error.retryMs : 60_000;
       const failures = Math.min(10, (job.failures ?? 0) + 1);
+      // Honour the service's retry delay and increase repeated-failure delays
+      // exponentially, capped at one day for the local backoff component.
       job = {
         ...job,
         status: 'retry',
@@ -125,6 +136,8 @@ export class RefreshScheduler {
     if ((await finish.objectStore('jobs').get(job.slug))?.generation === job.generation) {
       await finish.objectStore('jobs').put(job);
       if (job.status === 'idle') {
+        // New uploads can invalidate old negatives. Keep confirmed matches and
+        // manual decisions while allowing current tabs to rematch the rest.
         let cursor = await finish.objectStore('decisions').openCursor();
         while (cursor) {
           if (

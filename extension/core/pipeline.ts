@@ -25,16 +25,16 @@ export class Pipeline {
     const override = await this.store.db.get('overrides', observation.videoId);
     const mapping = resolveCreator(observation, await this.store.db.getAll('creators'));
     const cached = await this.store.db.get('decisions', observation.videoId);
+    // An expired negative result may reflect a delayed Nebula release, so let it
+    // bypass catalogue freshness. The scheduler still enforces failure backoff.
+    const negativeDecisionExpired = Boolean(
+      !override && cached && cached.state !== 'confirmed' && cached.expiresAtMs <= started,
+    );
     // Every encountered mapped creator gets a freshness check. Cached/manual
     // video decisions can render immediately while the bounded refresh proceeds.
-    const refresh = mapping
-      ? this.scheduler.refresh(
-          mapping,
-          Boolean(
-            !override && cached && cached.state !== 'confirmed' && cached.expiresAtMs <= started,
-          ),
-        )
-      : undefined;
+    const refresh = mapping ? this.scheduler.refresh(mapping, negativeDecisionExpired) : undefined;
+    // These paths do not await the refresh; service failures are recorded in the
+    // job's retry state and must not prevent an existing decision from rendering.
     if (override) {
       void refresh?.catch(() => {});
       return matchVideo(observation, mapping, [], started, override);
@@ -48,6 +48,7 @@ export class Pipeline {
     const job = await refresh;
     const videos = await this.store.db.getAllFromIndex('videos', 'creator', mapping.nebulaId);
     let decision = matchVideo(observation, mapping, videos, started);
+    // Absence from a partial catalogue is not evidence that no match exists.
     if (decision.state !== 'confirmed' && decision.state !== 'ambiguous' && !job.complete) {
       decision = {
         ...decision,

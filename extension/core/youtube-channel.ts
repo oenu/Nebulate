@@ -8,8 +8,10 @@ export function jsonObjectAfter(source: string, marker: string): Record<string, 
   let quoted = false;
   let escaped = false;
   let depth = 0;
-  for (let i = offset; i < source.length; i++) {
-    const character = source[i];
+  // Braces inside titles are data, not JSON boundaries. Track strings and
+  // escapes rather than trying to capture a nested object with a regex.
+  for (let index = offset; index < source.length; index++) {
+    const character = source[index];
     if (quoted) {
       if (escaped) escaped = false;
       else if (character === '\\') escaped = true;
@@ -17,13 +19,15 @@ export function jsonObjectAfter(source: string, marker: string): Record<string, 
     } else if (character === '"') quoted = true;
     else if (character === '{') depth++;
     else if (character === '}' && --depth === 0)
-      return record(JSON.parse(source.slice(offset, i + 1)));
+      return record(JSON.parse(source.slice(offset, index + 1)));
   }
   throw new Error('channel-metadata-unavailable');
 }
 
 export function parseYouTubeChannel(source: string) {
   if (source.length > 5_000_000) throw new Error('channel-response-too-large');
+  // Other channel IDs in this HTML may belong to recommendations. Only the
+  // page owner's metadata establishes which channel this response represents.
   const data = jsonObjectAfter(source, '"channelMetadataRenderer":');
   const channelId = text(data.externalId);
   if (!/^UC[\w-]{22}$/.test(channelId)) throw new Error('invalid-channel-id');
@@ -52,7 +56,9 @@ export function parseChannelVideos(source: string): { id: string; title: string 
     if (match[1] === 'lockupViewModel') {
       if (data.contentType !== 'LOCKUP_CONTENT_TYPE_VIDEO') continue;
       id = data.contentId;
-      title = record(record(record(data.metadata).lockupMetadataViewModel).title).content;
+      const metadata = record(data.metadata);
+      const lockup = record(metadata.lockupMetadataViewModel);
+      title = record(lockup.title).content;
     } else {
       id = data.videoId;
       const value = record(data.title);

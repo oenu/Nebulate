@@ -15,6 +15,12 @@ Work on `modernize/local-extension`, initially based on `965c2d2` from `origin/f
 - Keep React and Mantine initially; use WXT and TypeScript for the modern extension, with explicit Chrome and Firefox Manifest V3 targets. Validate Nebula browser access before broad migration.
 - Preserve the existing visual identity for the first working creator. Broad visual redesign is outside the first milestone.
 
+## Readability and comments
+
+- Keep code readable, with descriptive names, consistent formatting, and small functions that have a clear purpose. Avoid compressed statements and deeply nested expressions when named intermediate values make the flow easier to follow.
+- Add comments explaining non-obvious intent, constraints, and invariants, especially identity verification, cache freshness, backoff, worker recovery, and browser lifecycle handling. Keep comments accurate as code changes; avoid narrating obvious statements.
+- Prefer straightforward control flow and existing project patterns over clever abstractions. Apply these conventions to development scripts and tests as well as shipped extension code.
+
 ## Credentials and local data
 
 - `.env` and `.env.*` are private, ignored files; `.env.example` contains placeholders only. Never stage private environment files with `git add -f`.
